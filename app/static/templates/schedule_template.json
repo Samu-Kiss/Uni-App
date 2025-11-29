@@ -1,0 +1,78 @@
+{
+  "clases": [
+    {
+      "codigo_materia": "MAT101",
+      "nombre_materia": "Cálculo I",
+      "seccion": "A1",
+      "profesor": "Dr. García",
+      "creditos": 4,
+      "bloques": [
+        { "dia": "L", "hora_inicio": "07:00", "hora_fin": "09:00" },
+        { "dia": "W", "hora_inicio": "07:00", "hora_fin": "09:00" }
+      ]
+    },
+    {
+      "codigo_materia": "MAT101",
+      "nombre_materia": "Cálculo I",
+      "seccion": "B1",
+      "profesor": "Dra. López",
+      "creditos": 4,
+      "bloques": [
+        { "dia": "M", "hora_inicio": "09:00", "hora_fin": "11:00" },
+        { "dia": "J", "hora_inicio": "09:00", "hora_fin": "11:00" }
+      ]
+    },
+    {
+      "codigo_materia": "FIS101",
+      "nombre_materia": "Física I",
+      "seccion": "A1",
+      "profesor": "Dr. Martínez",
+      "creditos": 3,
+      "bloques": [
+        { "dia": "L", "hora_inicio": "09:00", "hora_fin": "11:00" },
+        { "dia": "J", "hora_inicio": "14:00", "hora_fin": "15:00" }
+      ]
+    },
+    {
+      "codigo_materia": "FIS101L",
+      "nombre_materia": "Laboratorio de Física I",
+      "seccion": "L1",
+      "profesor": "Ing. Rodríguez",
+      "creditos": 1,
+      "bloques": [
+        { "dia": "V", "hora_inicio": "14:00", "hora_fin": "17:00" }
+      ]
+    },
+    {
+      "codigo_materia": "PRG101",
+      "nombre_materia": "Programación I",
+      "seccion": "C1",
+      "profesor": "Ing. Pérez",
+      "creditos": 3,
+      "bloques": [
+        { "dia": "M", "hora_inicio": "14:00", "hora_fin": "16:00" },
+        { "dia": "V", "hora_inicio": "10:00", "hora_fin": "12:00" }
+      ]
+    }
+  ],
+  "franjas": [
+    {
+      "tipo": "blocked",
+      "dia": "L",
+      "hora_inicio": "12:00",
+      "hora_fin": "14:00"
+    },
+    {
+      "tipo": "blocked",
+      "dia": "W",
+      "hora_inicio": "12:00",
+      "hora_fin": "14:00"
+    }
+  ],
+  "_comentarios": {
+    "bloques": "Cada bloque tiene: dia (L/M/W/J/V/S), hora_inicio (HH:MM), hora_fin (HH:MM)",
+    "franjas_tipo": "blocked = franja bloqueada (no programar clases), preferred = franja preferida",
+    "dias": "L=Lunes, M=Martes, W=Miércoles, J=Jueves, V=Viernes, S=Sábado",
+    "horas": "Formato 24 horas (07:00 - 21:00)"
+  }
+}

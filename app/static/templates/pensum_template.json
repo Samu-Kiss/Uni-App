@@ -1,0 +1,112 @@
+{
+  "materias": [
+    {
+      "codigo": "MAT101",
+      "nombre": "Cálculo I",
+      "creditos": 4,
+      "semestre": 1,
+      "prerrequisitos": [],
+      "correquisitos": [],
+      "estado": "passed"
+    },
+    {
+      "codigo": "MAT102",
+      "nombre": "Cálculo II",
+      "creditos": 4,
+      "semestre": 2,
+      "prerrequisitos": ["MAT101"],
+      "correquisitos": [],
+      "estado": "enrolled"
+    },
+    {
+      "codigo": "FIS101",
+      "nombre": "Física I",
+      "creditos": 3,
+      "semestre": 1,
+      "prerrequisitos": [],
+      "correquisitos": ["FIS101L"],
+      "estado": "passed"
+    },
+    {
+      "codigo": "FIS101L",
+      "nombre": "Laboratorio de Física I",
+      "creditos": 1,
+      "semestre": 1,
+      "prerrequisitos": [],
+      "correquisitos": ["FIS101"],
+      "estado": "passed"
+    },
+    {
+      "codigo": "FIS102",
+      "nombre": "Física II",
+      "creditos": 3,
+      "semestre": 2,
+      "prerrequisitos": ["FIS101", "MAT101"],
+      "correquisitos": ["FIS102L"],
+      "estado": "pending"
+    },
+    {
+      "codigo": "FIS102L",
+      "nombre": "Laboratorio de Física II",
+      "creditos": 1,
+      "semestre": 2,
+      "prerrequisitos": ["FIS101L"],
+      "correquisitos": ["FIS102"],
+      "estado": "pending"
+    },
+    {
+      "codigo": "PRG101",
+      "nombre": "Programación I",
+      "creditos": 3,
+      "semestre": 1,
+      "prerrequisitos": [],
+      "correquisitos": [],
+      "estado": "passed"
+    }
+  ],
+  "calificaciones": [
+    {
+      "codigo_materia": "MAT101",
+      "nota": 4.2,
+      "componentes": [
+        { "nombre": "Parcial 1", "porcentaje": 25, "nota": 4.0 },
+        { "nombre": "Parcial 2", "porcentaje": 25, "nota": 4.5 },
+        { "nombre": "Final", "porcentaje": 50, "nota": 4.2 }
+      ]
+    },
+    {
+      "codigo_materia": "FIS101",
+      "nota": 3.8,
+      "componentes": [
+        { "nombre": "Parcial 1", "porcentaje": 30, "nota": 3.5 },
+        { "nombre": "Parcial 2", "porcentaje": 30, "nota": 4.0 },
+        { "nombre": "Laboratorio", "porcentaje": 20, "nota": 4.0 },
+        { "nombre": "Final", "porcentaje": 20, "nota": 3.8 }
+      ]
+    },
+    {
+      "codigo_materia": "FIS101L",
+      "nota": 4.0,
+      "componentes": [
+        { "nombre": "Informes", "porcentaje": 60, "nota": 4.0 },
+        { "nombre": "Evaluación Final", "porcentaje": 40, "nota": 4.0 }
+      ]
+    },
+    {
+      "codigo_materia": "PRG101",
+      "nota": 4.5,
+      "componentes": [
+        { "nombre": "Proyecto", "porcentaje": 40, "nota": 4.8 },
+        { "nombre": "Parciales", "porcentaje": 40, "nota": 4.2 },
+        { "nombre": "Talleres", "porcentaje": 20, "nota": 4.5 }
+      ]
+    }
+  ],
+  "_comentarios": {
+    "estados_validos": ["pending", "enrolled", "passed", "failed", "dropped"],
+    "nota_rango": "0.0 a 5.0",
+    "porcentaje_total": "Los porcentajes de componentes deberían sumar 100%, pero el cálculo funciona con cualquier porcentaje",
+    "prerrequisitos": "Array de códigos de materias que deben estar aprobadas ANTES de cursar esta materia",
+    "correquisitos": "Array de códigos de materias que deben cursarse EN EL MISMO SEMESTRE (coterminales)"
+  }
+}
