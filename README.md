@@ -2,46 +2,92 @@
 
 Sistema de gestión académica universitaria para visualización de pensum, seguimiento de GPA y generación de horarios.
 
-🌐 **[Acceder a la aplicación](uni-app-eta.vercel.app)**
+🌐 **[Acceder a la aplicación](https://uni-app-eta.vercel.app)**
 
 ---
 
-## ✨ ¿Qué puedes hacer?
+## ✨ Funcionalidades
 
-### 📚 Gestionar tu Pensum
-- Visualiza todas tus materias organizadas por semestre
-- Dos vistas disponibles: **Árbol** (por semestre) y **Cuadrícula**
+### 📚 Gestión de Pensum
+
+#### Múltiples Vistas
+- **Vista Árbol**: Materias organizadas por semestre con diseño de tarjetas
+- **Vista Tabla**: Lista compacta para ver todas las materias de un vistazo
+- **Vista Grafo**: Visualización interactiva de prerrequisitos y dependencias
+- **Vista Estadísticas**: Dashboard con gráficas de progreso y rendimiento
+
+#### Gestión de Materias
 - Código de colores según estado:
-  - 🔵 Pendiente
-  - 🟡 Inscrita  
-  - 🟢 Aprobada
-  - 🔴 Reprobada
-  - ⚫ Retirada
-- Ve los prerrequisitos y correquisitos de cada materia
-- Arrastra materias entre semestres (respetando prerrequisitos)
+  - 🔵 Pendiente | 🟡 Inscrita | 🟢 Aprobada | 🔴 Reprobada | ⚫ Retirada
+- **Tipos de materia**: Núcleo Carrera, Ciencias Básicas, Socio Humano, Énfasis, Complementarias, Electivas
+- Visualización de prerrequisitos y correquisitos
+- Drag & drop entre semestres (respetando prerrequisitos)
+- Colores personalizados por materia
 
-### 📝 Registrar Calificaciones
+#### Múltiples Planes de Estudio
+- Crea y gestiona varios planes de estudio
+- Copia datos entre planes
+- Alterna fácilmente entre diferentes escenarios académicos
+
+#### Simulación de Semestre
+- Simula inscripciones antes de hacerlas oficiales
+- Visualiza qué materias puedes inscribir según prerrequisitos
+- Prueba diferentes combinaciones sin afectar tu plan real
+
+### 📊 Estadísticas y Analytics
+
+- **Promedio Acumulado (GPA)** en tiempo real
+- **Gráficas interactivas**:
+  - Promedio por semestre (línea temporal)
+  - Distribución de estados (donut)
+  - Tipos de materias (donut)
+- **Tabla detallada** por semestre
+- **Top 5 mejores y peores notas**
+- Modo oscuro compatible
+
+### 📝 Calificaciones
+
 - Agrega componentes de evaluación (parciales, tareas, proyectos)
 - Asigna porcentajes a cada componente
-- Calcula automáticamente la nota final
+- Cálculo automático de nota final
 - Simula qué nota necesitas en evaluaciones pendientes
 
-### 📊 Calcular tu GPA
-- GPA acumulado en tiempo real
-- GPA por semestre
-- Alertas cuando tu promedio baja del umbral
+### 📅 Generador de Horarios
 
-### 📅 Generar Horarios
-- Registra las secciones disponibles de cada materia
-- Marca franjas horarias bloqueadas o preferidas
-- Genera automáticamente todas las combinaciones sin conflictos
-- Ordena por puntuación según tus preferencias
-- Exporta tu horario como **imagen PNG**
+- Registra secciones disponibles por materia
+- Marca franjas horarias bloqueadas (trabajo, almuerzo)
+- Marca franjas preferidas (mañanas, tardes)
+- **Generación automática** de todas las combinaciones sin conflictos
+- **Métricas por combinación**: días libres, huecos, hora inicio/fin
+- **Ordenar por**: días libres, menos huecos, entrada tarde, salida temprana
+- **Exportar**: PNG (imagen), ICS (calendario)
 
-### ☁️ Sincronización (Opcional)
-- Tus datos se guardan localmente (funciona sin internet)
+### 🔄 Undo/Redo
+
+- Historial completo de acciones
+- Deshaz y rehaz cambios con atajos de teclado
+- Funciona en todas las vistas
+
+### 🔗 URLs Navegables
+
+- URLs con hash para vistas del pensum (`#tree`, `#table`, `#graph`, `#stats`)
+- Query params para el horario (`?sem=1`)
+- Soporte para navegación con botones atrás/adelante del navegador
+
+### ☁️ Sincronización en la Nube
+
+- **Funciona offline**: tus datos se guardan localmente
 - Crea una cuenta para sincronizar entre dispositivos
-- Tus datos locales tienen prioridad en conflictos
+- Refresh automático de tokens de sesión
+- Indicador de estado de conexión en tiempo real
+
+### ♿ Accesibilidad
+
+- Aria-labels en elementos interactivos
+- Tooltips explicativos en botones
+- Indicador visual de conexión online/offline
+- Confirmaciones en acciones destructivas
+- Soporte completo para modo oscuro
 
 ---
 
@@ -49,10 +95,8 @@ Sistema de gestión académica universitaria para visualización de pensum, segu
 
 ### 1. Importar tu Pensum
 
-La forma más fácil de empezar es importar un pensum existente:
-
 1. Ve a la página de **Pensum**
-2. Click en **Importar JSON**
+2. Click en **Importar**
 3. Descarga la **plantilla** y llénala con tus materias
 4. Sube el archivo JSON
 
@@ -65,75 +109,114 @@ La forma más fácil de empezar es importar un pensum existente:
       "nombre": "Cálculo I",
       "creditos": 4,
       "semestre": 1,
-      "prerequisitos": [],
-      "correquisitos": []
-    },
+      "prerrequisitos": [],
+      "correquisitos": [],
+      "estado": "passed",
+      "color": "#5091AF",
+      "tipo": "basicas"
+    }
+  ],
+  "calificaciones": [
     {
-      "codigo": "MAT201",
-      "nombre": "Cálculo II", 
-      "creditos": 4,
-      "semestre": 2,
-      "prerequisitos": ["MAT101"],
-      "correquisitos": []
+      "codigo_materia": "MAT101",
+      "nota": 4.2,
+      "componentes": [
+        { "nombre": "Parcial 1", "porcentaje": 25, "nota": 4.0 },
+        { "nombre": "Final", "porcentaje": 75, "nota": 4.3 }
+      ]
     }
   ]
 }
 ```
 
-### 2. Actualizar Estados
+**Tipos de materia válidos:**
+- `nucleo` - Núcleo Carrera
+- `basicas` - Ciencias Básicas
+- `sociohumano` - Socio Humano
+- `enfasis` - Énfasis
+- `complementarias` - Complementarias
+- `electivas` - Electivas
 
-- Click en una materia para abrir el modal de detalles
-- Cambia el estado (Pendiente → Inscrita → Aprobada/Reprobada)
-- Si repruebas una materia, se crea automáticamente una copia en el siguiente semestre
+### 2. Navegar entre Vistas
 
-### 3. Registrar Calificaciones
+- **Árbol** (por defecto): Ver materias por semestre
+- **Tabla**: Vista compacta tipo lista
+- **Grafo**: Ver dependencias entre materias
+- **Estadísticas**: Dashboard con métricas y gráficas
+
+### 3. Gestionar Planes de Estudio
+
+1. Click en el dropdown de planes (arriba a la izquierda)
+2. **Nuevo Plan**: Crear un plan desde cero o copiando otro
+3. **Editar**: Cambiar nombre/descripción
+4. **Administrar**: Ver todos los planes, eliminar los que no uses
+
+### 4. Registrar Calificaciones
 
 1. Click en una materia inscrita o aprobada
-2. En la pestaña **Calificaciones**, agrega componentes:
-   - Nombre (ej: "Parcial 1")
-   - Porcentaje (ej: 25%)
-   - Nota obtenida (0-100)
-3. La nota final se calcula automáticamente
+2. Cambia el estado y agrega la nota final
+3. O usa componentes para cálculo automático
 
-### 4. Generar Horarios
+### 5. Generar Horarios
 
-1. Ve a la página de **Horario**
-2. **Registra las clases** disponibles para el semestre:
-   - Materia
-   - Sección
-   - Profesor
-   - Horario (días y horas)
-3. Marca **franjas bloqueadas** (ej: trabajo, almuerzo)
-4. Marca **franjas preferidas** (ej: mañanas)
-5. Click en **Generar Horarios**
-6. Revisa las combinaciones y selecciona la mejor
-7. **Exporta como PNG** para guardar o compartir
+1. Ve a **Horario**
+2. Selecciona el semestre
+3. Registra las clases disponibles
+4. Marca franjas bloqueadas/preferidas
+5. Click en **Generar**
+6. Navega entre combinaciones
+7. Exporta como PNG o ICS
 
-### 5. Sincronizar (Opcional)
+### 6. Sincronizar
 
-1. Click en **Iniciar sesión** (esquina superior derecha)
-2. Crea una cuenta con tu email
-3. Verifica tu email
-4. Tus datos se sincronizarán automáticamente
+1. Click en tu usuario (esquina superior derecha)
+2. Click en **Sincronizar**
+3. Tus datos se suben a la nube
 
 ---
 
 ## 💡 Tips
 
 - **Arrastra materias** entre semestres para reorganizar tu plan
-- **Simula pérdidas** para ver qué materias se afectarían
-- Usa **franjas preferidas** para que el generador priorice esos horarios
-- **Exporta tu pensum** como backup antes de hacer cambios grandes
-- La app funciona **offline** - tus datos están en tu navegador
+- Usa **Ctrl+Z** / **Ctrl+Y** para deshacer/rehacer
+- **Simula inscripciones** antes de hacer cambios reales
+- **Exporta tu pensum** como backup antes de cambios grandes
+- La app funciona **offline** - tus datos están seguros en tu navegador
+- Usa **franjas preferidas** para priorizar ciertos horarios
+- Cambia entre **planes** para explorar diferentes caminos académicos
 
 ---
 
 ## 🛠️ Tecnologías
 
-- **Backend**: Flask (Python)
-- **Frontend**: Tailwind CSS, Vanilla JavaScript
-- **Base de Datos**: Supabase (para sincronización)
-- **Hosting**: Vercel
+| Categoría | Tecnología |
+|-----------|------------|
+| Backend | Flask (Python) |
+| Frontend | Tailwind CSS, Vanilla JavaScript |
+| Gráficas | Canvas API nativo |
+| Base de Datos | Supabase (PostgreSQL) |
+| Autenticación | Supabase Auth |
+| Hosting | Vercel |
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+Uni-App/
+├── app/
+│   ├── blueprints/       # Rutas Flask (API, pensum, schedule, etc.)
+│   ├── models/           # Modelos Pydantic
+│   ├── services/         # Servicios (database, etc.)
+│   ├── static/
+│   │   ├── css/          # Estilos
+│   │   ├── js/           # JavaScript (storage, theme, etc.)
+│   │   └── templates/    # Plantillas JSON de ejemplo
+│   └── templates/        # Templates Jinja2
+├── config.py             # Configuración
+├── requirements.txt      # Dependencias Python
+└── vercel.json           # Configuración de deploy
+```
 
 ---
 
@@ -143,6 +226,12 @@ La forma más fácil de empezar es importar un pensum existente:
 
 1. Abre un [Issue](https://github.com/Samu-Kiss/Uni-App/issues)
 2. O haz un Pull Request
+
+---
+
+## 📄 Licencia
+
+Este proyecto está licenciado bajo la [GNU General Public License v3.0](LICENSE).
 
 ---
 
