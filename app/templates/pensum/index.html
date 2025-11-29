@@ -124,6 +124,152 @@
         </div>
     </div>
     
+    <!-- Search and Filters Bar -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <!-- Search Input -->
+            <div class="flex-1 relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" id="search-input" placeholder="Buscar por nombre o código..." 
+                       oninput="applyFilters()"
+                       style="padding-left: 2.5rem;"
+                       class="w-full pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors placeholder-gray-400 dark:placeholder-gray-500">
+                <button id="clear-search" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Filter Toggles -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Status Filter -->
+                <div class="relative">
+                    <button onclick="toggleFilterDropdown('status')" id="filter-status-btn"
+                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Estado
+                        <span id="filter-status-badge" class="hidden ml-2 px-1.5 py-0.5 text-xs font-bold bg-accent-500 text-white rounded-full"></span>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="filter-status-dropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20 py-2">
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="passed" onchange="applyFilters()" class="filter-status rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Aprobada</span>
+                            <span class="ml-auto w-3 h-3 rounded-full bg-green-500"></span>
+                        </label>
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="enrolled" onchange="applyFilters()" class="filter-status rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Cursando</span>
+                            <span class="ml-auto w-3 h-3 rounded-full bg-blue-500"></span>
+                        </label>
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="pending" onchange="applyFilters()" class="filter-status rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Pendiente</span>
+                            <span class="ml-auto w-3 h-3 rounded-full bg-gray-400"></span>
+                        </label>
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="failed" onchange="applyFilters()" class="filter-status rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Reprobada</span>
+                            <span class="ml-auto w-3 h-3 rounded-full bg-red-500"></span>
+                        </label>
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="blocked" onchange="applyFilters()" class="filter-status rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Bloqueada</span>
+                            <span class="ml-auto w-3 h-3 rounded-full bg-orange-500"></span>
+                        </label>
+                        <div class="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2 px-3">
+                            <button onclick="clearStatusFilters()" class="text-xs text-accent-500 hover:text-accent-600">Limpiar filtros</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Semester Filter -->
+                <div class="relative">
+                    <button onclick="toggleFilterDropdown('semester')" id="filter-semester-btn"
+                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Semestre
+                        <span id="filter-semester-badge" class="hidden ml-2 px-1.5 py-0.5 text-xs font-bold bg-accent-500 text-white rounded-full"></span>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="filter-semester-dropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20 py-2 max-h-64 overflow-y-auto">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Credits Filter -->
+                <div class="relative">
+                    <button onclick="toggleFilterDropdown('credits')" id="filter-credits-btn"
+                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                        Créditos
+                        <span id="filter-credits-badge" class="hidden ml-2 px-1.5 py-0.5 text-xs font-bold bg-accent-500 text-white rounded-full"></span>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="filter-credits-dropdown" class="hidden absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20 py-2">
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="1" onchange="applyFilters()" class="filter-credits rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">1 crédito</span>
+                        </label>
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="2" onchange="applyFilters()" class="filter-credits rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">2 créditos</span>
+                        </label>
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="3" onchange="applyFilters()" class="filter-credits rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">3 créditos</span>
+                        </label>
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="4" onchange="applyFilters()" class="filter-credits rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">4 créditos</span>
+                        </label>
+                        <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                            <input type="checkbox" value="5+" onchange="applyFilters()" class="filter-credits rounded text-accent-500 focus:ring-accent-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">5+ créditos</span>
+                        </label>
+                        <div class="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2 px-3">
+                            <button onclick="clearCreditsFilters()" class="text-xs text-accent-500 hover:text-accent-600">Limpiar filtros</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Clear All Filters -->
+                <button id="clear-all-filters" onclick="clearAllFilters()" 
+                        class="hidden inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Limpiar todo
+                </button>
+            </div>
+        </div>
+        
+        <!-- Active Filters Display -->
+        <div id="active-filters" class="hidden mt-3 flex flex-wrap gap-2">
+            <!-- Populated by JavaScript -->
+        </div>
+        
+        <!-- Search Results Count -->
+        <div id="search-results-info" class="hidden mt-3 text-sm text-gray-500 dark:text-gray-400">
+            <span id="results-count">0</span> materias encontradas
+        </div>
+    </div>
+    
     <!-- GPA Alerts -->
     <div id="gpa-alerts-container" class="space-y-2"></div>
     
@@ -559,6 +705,14 @@
         renderTable(materias);
         renderTree(materias);
         updateStats(materias);
+        
+        // Re-initialize and apply filters
+        if (typeof initializeSemesterFilter === 'function') {
+            initializeSemesterFilter();
+        }
+        if (typeof applyFilters === 'function') {
+            setTimeout(() => applyFilters(), 50);
+        }
     }
     
     function renderTable(materias) {
@@ -602,11 +756,11 @@
             const nota = cal?.nota;
             
             return `
-                <tr class="hover:bg-gray-50 cursor-pointer" onclick="openEditMateriaModal('${m.codigo}')">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${m.semestre}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${m.codigo}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${m.nombre}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">${m.creditos}</td>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" data-codigo="${m.codigo}" onclick="openEditMateriaModal('${m.codigo}')">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${m.semestre}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">${m.codigo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-200">${m.nombre}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">${m.creditos}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-center">
                         <span class="px-2 py-1 text-xs font-medium rounded-full ${status.bg} ${status.text}">${status.label}</span>
                     </td>
@@ -657,8 +811,9 @@
             const totalCredits = semMaterias.reduce((s, m) => s + (m.creditos || 0), 0);
             
             html += `
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 semester-drop-zone transition-all"
+                <div class="semester-column bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 semester-drop-zone transition-all"
                      data-semester="${sem}"
+                     data-semestre="${sem}"
                      ondragover="handleDragOver(event, ${sem})"
                      ondragleave="handleDragLeave(event)"
                      ondrop="handleDrop(event, ${sem})">
@@ -680,7 +835,7 @@
                     const isSimulated = simulatedCourses.includes(m.codigo);
                     
                     html += `
-                        <div class="p-2 rounded-lg border-l-4 ${st.border} ${st.bg} hover:shadow-sm transition-all group relative ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''} ${isSimulated ? 'ring-2 ring-indigo-500 ring-offset-1' : ''}"
+                        <div class="course-card p-2 rounded-lg border-l-4 ${st.border} ${st.bg} hover:shadow-sm transition-all group relative ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''} ${isSimulated ? 'ring-2 ring-indigo-500 ring-offset-1' : ''}"
                              draggable="${isDraggable}"
                              data-codigo="${m.codigo}"
                              ondragstart="handleDragStart(event, '${m.codigo}')"
@@ -1901,5 +2056,384 @@
         }
         return originalSaveCalificacion(calificacion);
     };
+    
+    // ==================== SEARCH AND FILTERS ====================
+    
+    // Current filter state
+    let currentFilters = {
+        search: '',
+        status: [],
+        semester: [],
+        credits: []
+    };
+    
+    // Store original visibility state
+    let filteredCourses = new Set();
+    
+    // Initialize semester filter options
+    function initializeSemesterFilter() {
+        const materias = storage.getMaterias() || [];
+        const semesters = [...new Set(materias.map(m => m.semestre))].sort((a, b) => a - b);
+        
+        const dropdown = document.getElementById('filter-semester-dropdown');
+        dropdown.innerHTML = semesters.map(sem => `
+            <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                <input type="checkbox" value="${sem}" onchange="applyFilters()" class="filter-semester rounded text-accent-500 focus:ring-accent-500">
+                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Semestre ${sem}</span>
+            </label>
+        `).join('');
+        
+        dropdown.innerHTML += `
+            <div class="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2 px-3">
+                <button onclick="clearSemesterFilters()" class="text-xs text-accent-500 hover:text-accent-600">Limpiar filtros</button>
+            </div>
+        `;
+    }
+    
+    // Toggle filter dropdown
+    function toggleFilterDropdown(type) {
+        const dropdowns = ['status', 'semester', 'credits'];
+        dropdowns.forEach(d => {
+            const dropdown = document.getElementById(`filter-${d}-dropdown`);
+            if (d === type) {
+                dropdown.classList.toggle('hidden');
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        });
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        const isFilterBtn = e.target.closest('[id^="filter-"][id$="-btn"]');
+        const isDropdown = e.target.closest('[id^="filter-"][id$="-dropdown"]');
+        
+        if (!isFilterBtn && !isDropdown) {
+            ['status', 'semester', 'credits'].forEach(type => {
+                document.getElementById(`filter-${type}-dropdown`).classList.add('hidden');
+            });
+        }
+    });
+    
+    // Apply all filters
+    function applyFilters() {
+        const searchInput = document.getElementById('search-input');
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        // Get selected status filters
+        const statusFilters = Array.from(document.querySelectorAll('.filter-status:checked')).map(cb => cb.value);
+        
+        // Get selected semester filters
+        const semesterFilters = Array.from(document.querySelectorAll('.filter-semester:checked')).map(cb => parseInt(cb.value));
+        
+        // Get selected credit filters
+        const creditFilters = Array.from(document.querySelectorAll('.filter-credits:checked')).map(cb => cb.value);
+        
+        // Update current filters state
+        currentFilters = {
+            search: searchTerm,
+            status: statusFilters,
+            semester: semesterFilters,
+            credits: creditFilters
+        };
+        
+        // Get all materias
+        const materias = storage.getMaterias() || [];
+        filteredCourses.clear();
+        
+        materias.forEach(materia => {
+            let visible = true;
+            
+            // Search filter
+            if (searchTerm) {
+                const matchesSearch = 
+                    materia.nombre.toLowerCase().includes(searchTerm) ||
+                    materia.codigo.toLowerCase().includes(searchTerm);
+                if (!matchesSearch) visible = false;
+            }
+            
+            // Status filter
+            if (visible && statusFilters.length > 0) {
+                if (!statusFilters.includes(materia.estado)) {
+                    visible = false;
+                }
+            }
+            
+            // Semester filter
+            if (visible && semesterFilters.length > 0) {
+                if (!semesterFilters.includes(materia.semestre)) {
+                    visible = false;
+                }
+            }
+            
+            // Credits filter
+            if (visible && creditFilters.length > 0) {
+                const credits = materia.creditos;
+                const matchesCredits = creditFilters.some(filter => {
+                    if (filter === '5+') return credits >= 5;
+                    return credits === parseInt(filter);
+                });
+                if (!matchesCredits) visible = false;
+            }
+            
+            if (visible) {
+                filteredCourses.add(materia.codigo);
+            }
+        });
+        
+        // Update UI
+        updateFilteredView();
+        updateFilterBadges();
+        updateActiveFiltersDisplay();
+        updateSearchResultsInfo();
+    }
+    
+    // Update the view to show/hide filtered courses
+    function updateFilteredView() {
+        const hasFilters = currentFilters.search || 
+                          currentFilters.status.length > 0 || 
+                          currentFilters.semester.length > 0 || 
+                          currentFilters.credits.length > 0;
+        
+        // Update tree view cards
+        document.querySelectorAll('.course-card').forEach(card => {
+            const codigo = card.dataset.codigo;
+            if (!hasFilters || filteredCourses.has(codigo)) {
+                card.classList.remove('hidden', 'opacity-30');
+                card.classList.add('filter-visible');
+            } else {
+                card.classList.add('opacity-30');
+                card.classList.remove('filter-visible');
+            }
+        });
+        
+        // Update table view rows
+        document.querySelectorAll('#pensum-table-body tr[data-codigo]').forEach(row => {
+            const codigo = row.dataset.codigo;
+            if (!hasFilters || filteredCourses.has(codigo)) {
+                row.classList.remove('hidden', 'opacity-30');
+            } else {
+                row.classList.add('opacity-30');
+            }
+        });
+        
+        // Show/hide semester columns in tree view if all courses are hidden
+        document.querySelectorAll('.semester-column').forEach(col => {
+            const semestre = parseInt(col.dataset.semestre);
+            if (!hasFilters) {
+                col.classList.remove('opacity-50');
+                return;
+            }
+            
+            const visibleCards = col.querySelectorAll('.course-card.filter-visible');
+            if (visibleCards.length === 0 && currentFilters.semester.length > 0 && !currentFilters.semester.includes(semestre)) {
+                col.classList.add('opacity-50');
+            } else {
+                col.classList.remove('opacity-50');
+            }
+        });
+        
+        // Show/hide clear search button
+        const clearSearchBtn = document.getElementById('clear-search');
+        if (currentFilters.search) {
+            clearSearchBtn.classList.remove('hidden');
+        } else {
+            clearSearchBtn.classList.add('hidden');
+        }
+        
+        // Show/hide clear all button
+        const clearAllBtn = document.getElementById('clear-all-filters');
+        if (hasFilters) {
+            clearAllBtn.classList.remove('hidden');
+        } else {
+            clearAllBtn.classList.add('hidden');
+        }
+    }
+    
+    // Update filter badges
+    function updateFilterBadges() {
+        // Status badge
+        const statusBadge = document.getElementById('filter-status-badge');
+        if (currentFilters.status.length > 0) {
+            statusBadge.textContent = currentFilters.status.length;
+            statusBadge.classList.remove('hidden');
+        } else {
+            statusBadge.classList.add('hidden');
+        }
+        
+        // Semester badge
+        const semesterBadge = document.getElementById('filter-semester-badge');
+        if (currentFilters.semester.length > 0) {
+            semesterBadge.textContent = currentFilters.semester.length;
+            semesterBadge.classList.remove('hidden');
+        } else {
+            semesterBadge.classList.add('hidden');
+        }
+        
+        // Credits badge
+        const creditsBadge = document.getElementById('filter-credits-badge');
+        if (currentFilters.credits.length > 0) {
+            creditsBadge.textContent = currentFilters.credits.length;
+            creditsBadge.classList.remove('hidden');
+        } else {
+            creditsBadge.classList.add('hidden');
+        }
+    }
+    
+    // Update active filters display
+    function updateActiveFiltersDisplay() {
+        const container = document.getElementById('active-filters');
+        const chips = [];
+        
+        // Search chip
+        if (currentFilters.search) {
+            chips.push(`
+                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+                    Búsqueda: "${currentFilters.search}"
+                    <button onclick="clearSearch()" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </span>
+            `);
+        }
+        
+        // Status chips
+        const statusLabels = {
+            'passed': 'Aprobada',
+            'enrolled': 'Cursando', 
+            'pending': 'Pendiente',
+            'failed': 'Reprobada',
+            'blocked': 'Bloqueada'
+        };
+        currentFilters.status.forEach(status => {
+            chips.push(`
+                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+                    Estado: ${statusLabels[status] || status}
+                    <button onclick="removeStatusFilter('${status}')" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </span>
+            `);
+        });
+        
+        // Semester chips
+        currentFilters.semester.forEach(sem => {
+            chips.push(`
+                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+                    Semestre ${sem}
+                    <button onclick="removeSemesterFilter(${sem})" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </span>
+            `);
+        });
+        
+        // Credits chips
+        currentFilters.credits.forEach(cred => {
+            chips.push(`
+                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+                    ${cred === '5+' ? '5+ créditos' : cred + ' crédito(s)'}
+                    <button onclick="removeCreditsFilter('${cred}')" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </span>
+            `);
+        });
+        
+        if (chips.length > 0) {
+            container.innerHTML = chips.join('');
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
+    }
+    
+    // Update search results info
+    function updateSearchResultsInfo() {
+        const infoDiv = document.getElementById('search-results-info');
+        const countSpan = document.getElementById('results-count');
+        const hasFilters = currentFilters.search || 
+                          currentFilters.status.length > 0 || 
+                          currentFilters.semester.length > 0 || 
+                          currentFilters.credits.length > 0;
+        
+        if (hasFilters) {
+            countSpan.textContent = filteredCourses.size;
+            infoDiv.classList.remove('hidden');
+        } else {
+            infoDiv.classList.add('hidden');
+        }
+    }
+    
+    // Clear functions
+    function clearSearch() {
+        document.getElementById('search-input').value = '';
+        applyFilters();
+    }
+    
+    function clearStatusFilters() {
+        document.querySelectorAll('.filter-status').forEach(cb => cb.checked = false);
+        applyFilters();
+    }
+    
+    function clearSemesterFilters() {
+        document.querySelectorAll('.filter-semester').forEach(cb => cb.checked = false);
+        applyFilters();
+    }
+    
+    function clearCreditsFilters() {
+        document.querySelectorAll('.filter-credits').forEach(cb => cb.checked = false);
+        applyFilters();
+    }
+    
+    function clearAllFilters() {
+        document.getElementById('search-input').value = '';
+        document.querySelectorAll('.filter-status, .filter-semester, .filter-credits').forEach(cb => cb.checked = false);
+        applyFilters();
+    }
+    
+    // Remove individual filters
+    function removeStatusFilter(status) {
+        const checkbox = document.querySelector(`.filter-status[value="${status}"]`);
+        if (checkbox) checkbox.checked = false;
+        applyFilters();
+    }
+    
+    function removeSemesterFilter(sem) {
+        const checkbox = document.querySelector(`.filter-semester[value="${sem}"]`);
+        if (checkbox) checkbox.checked = false;
+        applyFilters();
+    }
+    
+    function removeCreditsFilter(cred) {
+        const checkbox = document.querySelector(`.filter-credits[value="${cred}"]`);
+        if (checkbox) checkbox.checked = false;
+        applyFilters();
+    }
+    
+    // Initialize filters on page load
+    initializeSemesterFilter();
+    
+    // Re-initialize semester filter when materias change
+    const originalRenderTree = typeof renderTree === 'function' ? renderTree : null;
+    if (originalRenderTree) {
+        const wrappedRenderTree = renderTree;
+        window.renderTreeWithFilters = function() {
+            wrappedRenderTree();
+            initializeSemesterFilter();
+            // Re-apply filters after render
+            if (currentFilters.search || currentFilters.status.length || currentFilters.semester.length || currentFilters.credits.length) {
+                setTimeout(() => applyFilters(), 50);
+            }
+        };
+    }
 </script>
 {% endblock %}
