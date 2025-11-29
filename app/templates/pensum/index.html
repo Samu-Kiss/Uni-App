@@ -7,7 +7,48 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mi Pensum</h1>
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mi Pensum</h1>
+                <!-- Plan Selector Dropdown -->
+                <div class="relative" id="plan-selector-container">
+                    <button onclick="togglePlanDropdown()" id="plan-selector-btn"
+                            class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        <span id="plan-selector-name">Mi Plan de Estudios</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="plan-dropdown" class="hidden absolute left-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                        <div class="p-2 border-b border-gray-200 dark:border-gray-700">
+                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase px-2">Mis Planes de Estudio</p>
+                        </div>
+                        <div id="plan-list" class="max-h-64 overflow-y-auto py-1">
+                            <!-- Plans will be rendered here -->
+                        </div>
+                        <div class="p-2 border-t border-gray-200 dark:border-gray-700">
+                            <button onclick="openNewPlanModal()" 
+                                    class="w-full flex items-center px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Crear nuevo plan
+                            </button>
+                            <button onclick="openManagePlansModal()" 
+                                    class="w-full flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Administrar planes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Visualiza y gestiona tu plan de estudios</p>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -934,6 +975,101 @@
     </div>
 </div>
 
+<!-- New Plan Modal -->
+<div id="new-plan-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeNewPlanModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 transition-colors">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Crear Nuevo Plan de Estudios</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre del plan *</label>
+                    <input type="text" id="new-plan-name" 
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                           placeholder="Ej: Plan Alternativo, Doble Titulación...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción (opcional)</label>
+                    <textarea id="new-plan-description" rows="2"
+                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              placeholder="Breve descripción del plan..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Copiar datos de</label>
+                    <select id="new-plan-copy-from"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">-- Comenzar vacío --</option>
+                        <!-- Plans will be populated here -->
+                    </select>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Copia las materias y calificaciones de otro plan</p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeNewPlanModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                    Cancelar
+                </button>
+                <button onclick="createNewPlan()"
+                        class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">
+                    Crear Plan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Plans Modal -->
+<div id="manage-plans-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeManagePlansModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 transition-colors">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Administrar Planes de Estudio</h3>
+            <div id="manage-plans-list" class="space-y-3 max-h-96 overflow-y-auto">
+                <!-- Plans will be rendered here -->
+            </div>
+            <div class="flex justify-end mt-6">
+                <button onclick="closeManagePlansModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Plan Modal -->
+<div id="edit-plan-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeEditPlanModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 transition-colors">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Editar Plan</h3>
+            <input type="hidden" id="edit-plan-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre del plan *</label>
+                    <input type="text" id="edit-plan-name" 
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
+                    <textarea id="edit-plan-description" rows="2"
+                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeEditPlanModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                    Cancelar
+                </button>
+                <button onclick="saveEditedPlan()"
+                        class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Import Modal -->
 <div id="import-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
@@ -1052,12 +1188,266 @@
     
     // Initialize pensum when page loads
     document.addEventListener('DOMContentLoaded', function() {
+        // Migrate to plans support and initialize
+        storage.migrateToPlans();
+        initializePlanSelector();
+        
         loadPensumData();
         setupMateriaForm();
         populateSimulateSelect();
         updateSimMaxCredits();
     });
     
+    // Listen for plan changes
+    window.addEventListener('planChanged', function(e) {
+        loadPensumData();
+        updatePlanSelectorUI();
+        closePlanDropdown();
+    });
+    
+    // ==================== PLAN SELECTOR FUNCTIONS ====================
+    
+    function initializePlanSelector() {
+        updatePlanSelectorUI();
+        renderPlanList();
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('plan-selector-container');
+            if (container && !container.contains(e.target)) {
+                closePlanDropdown();
+            }
+        });
+    }
+    
+    function updatePlanSelectorUI() {
+        const planActivo = storage.getPlanActivo();
+        const plan = storage.getPlan(planActivo);
+        const nameEl = document.getElementById('plan-selector-name');
+        if (nameEl && plan) {
+            nameEl.textContent = plan.nombre;
+        }
+    }
+    
+    function togglePlanDropdown() {
+        const dropdown = document.getElementById('plan-dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+            if (!dropdown.classList.contains('hidden')) {
+                renderPlanList();
+            }
+        }
+    }
+    
+    function closePlanDropdown() {
+        const dropdown = document.getElementById('plan-dropdown');
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+        }
+    }
+    
+    function renderPlanList() {
+        const listEl = document.getElementById('plan-list');
+        if (!listEl) return;
+        
+        const planes = storage.getPlanes();
+        const planActivo = storage.getPlanActivo();
+        
+        listEl.innerHTML = planes.map(plan => {
+            const isActive = plan.id === planActivo;
+            const materias = storage.getLocal(plan.id === 'default' ? 'materias' : `${plan.id}_materias`) || [];
+            const passedCount = materias.filter(m => m.estado === 'passed').length;
+            
+            return `
+                <button onclick="switchPlan('${plan.id}')"
+                        class="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30' : ''}">
+                    <div class="flex items-center min-w-0">
+                        ${isActive ? `
+                            <svg class="w-4 h-4 mr-2 text-indigo-600 dark:text-indigo-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        ` : '<div class="w-4 h-4 mr-2 flex-shrink-0"></div>'}
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${plan.nombre}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${materias.length} materias · ${passedCount} aprobadas</p>
+                        </div>
+                    </div>
+                </button>
+            `;
+        }).join('');
+    }
+    
+    function switchPlan(planId) {
+        if (storage.getPlanActivo() !== planId) {
+            storage.setPlanActivo(planId);
+        }
+        closePlanDropdown();
+    }
+    
+    // ==================== NEW PLAN MODAL ====================
+    
+    function openNewPlanModal() {
+        closePlanDropdown();
+        const modal = document.getElementById('new-plan-modal');
+        const copySelect = document.getElementById('new-plan-copy-from');
+        
+        // Clear form
+        document.getElementById('new-plan-name').value = '';
+        document.getElementById('new-plan-description').value = '';
+        
+        // Populate copy-from select
+        const planes = storage.getPlanes();
+        copySelect.innerHTML = '<option value="">-- Comenzar vacío --</option>' +
+            planes.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        
+        if (modal) modal.classList.remove('hidden');
+    }
+    
+    function closeNewPlanModal() {
+        const modal = document.getElementById('new-plan-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+    
+    function createNewPlan() {
+        const nombre = document.getElementById('new-plan-name').value.trim();
+        const descripcion = document.getElementById('new-plan-description').value.trim();
+        const copiarDe = document.getElementById('new-plan-copy-from').value;
+        
+        if (!nombre) {
+            alert('Por favor ingresa un nombre para el plan');
+            return;
+        }
+        
+        const newPlan = storage.createPlan(nombre, descripcion, copiarDe || null);
+        storage.setPlanActivo(newPlan.id);
+        
+        closeNewPlanModal();
+        showToast(`Plan "${nombre}" creado exitosamente`, 'success');
+    }
+    
+    // ==================== MANAGE PLANS MODAL ====================
+    
+    function openManagePlansModal() {
+        closePlanDropdown();
+        renderManagePlansList();
+        const modal = document.getElementById('manage-plans-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+    
+    function closeManagePlansModal() {
+        const modal = document.getElementById('manage-plans-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+    
+    function renderManagePlansList() {
+        const listEl = document.getElementById('manage-plans-list');
+        if (!listEl) return;
+        
+        const planes = storage.getPlanes();
+        const planActivo = storage.getPlanActivo();
+        
+        listEl.innerHTML = planes.map(plan => {
+            const isDefault = plan.id === 'default';
+            const isActive = plan.id === planActivo;
+            const materias = storage.getLocal(plan.id === 'default' ? 'materias' : `${plan.id}_materias`) || [];
+            
+            return `
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg ${isActive ? 'ring-2 ring-indigo-500' : ''}">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <p class="font-medium text-gray-900 dark:text-white truncate">${plan.nombre}</p>
+                            ${isActive ? '<span class="px-2 py-0.5 text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full">Activo</span>' : ''}
+                            ${isDefault ? '<span class="px-2 py-0.5 text-xs bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full">Principal</span>' : ''}
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">${plan.descripcion || 'Sin descripción'}</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">${materias.length} materias</p>
+                    </div>
+                    <div class="flex items-center gap-1 ml-3">
+                        <button onclick="openEditPlanModal('${plan.id}')" 
+                                class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                                title="Editar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        ${!isDefault ? `
+                            <button onclick="confirmDeletePlan('${plan.id}', '${plan.nombre}')" 
+                                    class="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                                    title="Eliminar">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // ==================== EDIT PLAN MODAL ====================
+    
+    function openEditPlanModal(planId) {
+        const plan = storage.getPlan(planId);
+        if (!plan) return;
+        
+        document.getElementById('edit-plan-id').value = planId;
+        document.getElementById('edit-plan-name').value = plan.nombre;
+        document.getElementById('edit-plan-description').value = plan.descripcion || '';
+        
+        const modal = document.getElementById('edit-plan-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+    
+    function closeEditPlanModal() {
+        const modal = document.getElementById('edit-plan-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+    
+    function saveEditedPlan() {
+        const planId = document.getElementById('edit-plan-id').value;
+        const nombre = document.getElementById('edit-plan-name').value.trim();
+        const descripcion = document.getElementById('edit-plan-description').value.trim();
+        
+        if (!nombre) {
+            alert('Por favor ingresa un nombre para el plan');
+            return;
+        }
+        
+        storage.updatePlan(planId, { nombre, descripcion });
+        
+        closeEditPlanModal();
+        renderManagePlansList();
+        updatePlanSelectorUI();
+        showToast('Plan actualizado', 'success');
+    }
+    
+    function confirmDeletePlan(planId, planName) {
+        if (confirm(`¿Estás seguro de eliminar el plan "${planName}"? Esta acción no se puede deshacer y se perderán todas las materias y calificaciones asociadas.`)) {
+            storage.deletePlan(planId);
+            renderManagePlansList();
+            updatePlanSelectorUI();
+            showToast('Plan eliminado', 'success');
+        }
+    }
+    
+    // Simple toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 transition-all transform translate-y-0 opacity-100 ${
+            type === 'success' ? 'bg-green-500 text-white' :
+            type === 'error' ? 'bg-red-500 text-white' :
+            'bg-gray-800 text-white'
+        }`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'translate-y-2');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
     function loadPensumData() {
         const materias = storage.getMaterias();
         renderTable(materias);

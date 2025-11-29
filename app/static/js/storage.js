@@ -72,20 +72,192 @@ class StorageManager {
         localStorage.removeItem(this.prefix + '_pendingSync');
     }
 
-    // ==================== MATERIAS (COURSES) ====================
+    // ==================== PLANES DE ESTUDIO (STUDY PLANS) ====================
 
     /**
-     * Get all materias
+     * Get all study plans
      */
-    getMaterias() {
-        return this.getLocal('materias') || [];
+    getPlanes() {
+        const planes = this.getLocal('planes');
+        if (!planes || planes.length === 0) {
+            // Create default plan if none exist
+            const defaultPlan = {
+                id: 'default',
+                nombre: 'Mi Plan de Estudios',
+                descripcion: 'Plan de estudios principal',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            this.setLocal('planes', [defaultPlan]);
+            this.setLocal('planActivo', 'default');
+            return [defaultPlan];
+        }
+        return planes;
     }
 
     /**
-     * Save all materias
+     * Save all study plans
+     */
+    savePlanes(planes) {
+        return this.setLocal('planes', planes);
+    }
+
+    /**
+     * Get a single study plan by ID
+     */
+    getPlan(planId) {
+        return this.getPlanes().find(p => p.id === planId);
+    }
+
+    /**
+     * Get the active study plan ID
+     */
+    getPlanActivo() {
+        const planActivo = this.getLocal('planActivo');
+        if (!planActivo) {
+            // Ensure default plan exists
+            this.getPlanes();
+            return 'default';
+        }
+        return planActivo;
+    }
+
+    /**
+     * Set the active study plan
+     */
+    setPlanActivo(planId) {
+        const plan = this.getPlan(planId);
+        if (plan) {
+            this.setLocal('planActivo', planId);
+            window.dispatchEvent(new CustomEvent('planChanged', { detail: { planId } }));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Create a new study plan
+     */
+    createPlan(nombre, descripcion = '', copiarDatosDe = null) {
+        const planes = this.getPlanes();
+        const id = `plan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        const newPlan = {
+            id,
+            nombre,
+            descripcion,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        planes.push(newPlan);
+        this.savePlanes(planes);
+        
+        // Initialize empty data for the new plan (using plan prefix format: planId_key)
+        this.setLocal(`${id}_materias`, []);
+        this.setLocal(`${id}_calificaciones`, []);
+        this.setLocal(`${id}_clases`, []);
+        
+        // Optionally copy data from another plan
+        if (copiarDatosDe) {
+            const sourcePrefix = copiarDatosDe === 'default' ? '' : `${copiarDatosDe}_`;
+            const materias = this.getLocal(`${sourcePrefix}materias`) || [];
+            const calificaciones = this.getLocal(`${sourcePrefix}calificaciones`) || [];
+            const clases = this.getLocal(`${sourcePrefix}clases`) || [];
+            
+            this.setLocal(`${id}_materias`, JSON.parse(JSON.stringify(materias)));
+            this.setLocal(`${id}_calificaciones`, JSON.parse(JSON.stringify(calificaciones)));
+            this.setLocal(`${id}_clases`, JSON.parse(JSON.stringify(clases)));
+        }
+        
+        return newPlan;
+    }
+
+    /**
+     * Update a study plan
+     */
+    updatePlan(planId, updates) {
+        const planes = this.getPlanes();
+        const index = planes.findIndex(p => p.id === planId);
+        
+        if (index >= 0) {
+            planes[index] = {
+                ...planes[index],
+                ...updates,
+                updatedAt: new Date().toISOString()
+            };
+            this.savePlanes(planes);
+            return planes[index];
+        }
+        return null;
+    }
+
+    /**
+     * Delete a study plan
+     */
+    deletePlan(planId) {
+        if (planId === 'default') {
+            console.error('Cannot delete the default plan');
+            return false;
+        }
+        
+        const planes = this.getPlanes().filter(p => p.id !== planId);
+        this.savePlanes(planes);
+        
+        // Remove associated data (using plan prefix format: planId_key)
+        this.removeLocal(`${planId}_materias`);
+        this.removeLocal(`${planId}_calificaciones`);
+        this.removeLocal(`${planId}_clases`);
+        
+        // If deleted plan was active, switch to default
+        if (this.getPlanActivo() === planId) {
+            this.setPlanActivo('default');
+        }
+        
+        return true;
+    }
+
+    /**
+     * Get the storage key prefix for the active plan
+     */
+    _getPlanPrefix() {
+        const planActivo = this.getPlanActivo();
+        return planActivo === 'default' ? '' : `${planActivo}_`;
+    }
+
+    /**
+     * Migrate existing data to use plan-based storage (run once)
+     */
+    migrateToPlans() {
+        const migrated = this.getLocal('_plansMigrated');
+        if (migrated) return;
+        
+        // Ensure default plan exists
+        this.getPlanes();
+        
+        // Existing data stays as is (for 'default' plan which uses no prefix)
+        // New plans will use prefixed keys
+        
+        this.setLocal('_plansMigrated', true);
+        console.log('Storage migrated to support multiple plans');
+    }
+
+    // ==================== MATERIAS (COURSES) ====================
+
+    /**
+     * Get all materias for the active plan
+     */
+    getMaterias() {
+        const prefix = this._getPlanPrefix();
+        return this.getLocal(`${prefix}materias`) || [];
+    }
+
+    /**
+     * Save all materias for the active plan
      */
     saveMaterias(materias) {
-        return this.setLocal('materias', materias);
+        const prefix = this._getPlanPrefix();
+        return this.setLocal(`${prefix}materias`, materias);
     }
 
     /**
@@ -123,10 +295,11 @@ class StorageManager {
     // ==================== CLASES (CLASS SECTIONS) ====================
 
     /**
-     * Get all clases
+     * Get all clases for the active plan
      */
     getClases() {
-        return this.getLocal('clases') || [];
+        const prefix = this._getPlanPrefix();
+        return this.getLocal(`${prefix}clases`) || [];
     }
 
     /**
@@ -141,6 +314,14 @@ class StorageManager {
      */
     getClasesByMateria(codigoMateria) {
         return this.getClases().filter(c => c.codigo_materia === codigoMateria);
+    }
+
+    /**
+     * Save all clases for the active plan
+     */
+    saveClases(clases) {
+        const prefix = this._getPlanPrefix();
+        return this.setLocal(`${prefix}clases`, clases);
     }
 
     /**
@@ -208,17 +389,19 @@ class StorageManager {
     // ==================== CALIFICACIONES (GRADES) ====================
 
     /**
-     * Get all calificaciones
+     * Get all calificaciones for the active plan
      */
     getCalificaciones() {
-        return this.getLocal('calificaciones') || [];
+        const prefix = this._getPlanPrefix();
+        return this.getLocal(`${prefix}calificaciones`) || [];
     }
 
     /**
-     * Save all calificaciones
+     * Save all calificaciones for the active plan
      */
     saveCalificaciones(calificaciones) {
-        return this.setLocal('calificaciones', calificaciones);
+        const prefix = this._getPlanPrefix();
+        return this.setLocal(`${prefix}calificaciones`, calificaciones);
     }
 
     /**
