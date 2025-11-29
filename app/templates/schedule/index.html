@@ -9,28 +9,28 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Generador de Horarios</h1>
-            <p class="text-sm text-gray-500 mt-1">Crea y optimiza tu horario de clases</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Generador de Horarios</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Crea y optimiza tu horario de clases</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <button onclick="openScheduleImportModal()" 
-                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                 </svg>
                 Importar
             </button>
             <button onclick="exportScheduleJSON()" 
-                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>
                 Exportar
             </button>
             <div class="flex items-center space-x-2 ml-2">
-                <label class="text-sm font-medium text-gray-700">Semestre:</label>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Semestre:</label>
                 <select id="schedule-semester-select" onchange="loadSemesterClasses(this.value)"
-                        class="border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                        class="border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                     <!-- Options populated by JS -->
                 </select>
             </div>
@@ -42,34 +42,34 @@
         <!-- Left Column: Classes Management -->
         <div class="lg:col-span-1 space-y-4">
             <!-- Add Class Section -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Agregar Clase</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Agregar Clase</h3>
                 <form id="add-class-form" class="space-y-3">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Materia</label>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Materia</label>
                         <select id="class-materia" required
-                                class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                                class="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                             <option value="">Seleccionar...</option>
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">Sección</label>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Sección</label>
                             <input type="text" id="class-section" required placeholder="A1"
-                                   class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                                   class="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">Profesor</label>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Profesor</label>
                             <input type="text" id="class-professor" placeholder="Opcional"
-                                   class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                                   class="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                         </div>
                     </div>
                     
                     <!-- Time blocks -->
                     <div id="time-blocks-container" class="space-y-2">
-                        <label class="block text-xs font-medium text-gray-600">Bloques de horario</label>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">Bloques de horario</label>
                         <div class="time-block flex items-center space-x-2">
-                            <select class="block-day text-xs border-gray-300 rounded focus:ring-accent-500">
+                            <select class="block-day text-xs border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors">
                                 <option value="L">Lun</option>
                                 <option value="M">Mar</option>
                                 <option value="W">Mié</option>
@@ -77,9 +77,9 @@
                                 <option value="V">Vie</option>
                                 <option value="S">Sáb</option>
                             </select>
-                            <input type="time" class="block-start text-xs border-gray-300 rounded focus:ring-accent-500" value="07:00">
-                            <span class="text-gray-400">-</span>
-                            <input type="time" class="block-end text-xs border-gray-300 rounded focus:ring-accent-500" value="09:00">
+                            <input type="time" class="block-start text-xs border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors" value="07:00">
+                            <span class="text-gray-400 dark:text-gray-500">-</span>
+                            <input type="time" class="block-end text-xs border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors" value="09:00">
                             <button type="button" onclick="removeTimeBlock(this)" class="text-red-400 hover:text-red-600">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -100,21 +100,21 @@
             </div>
             
             <!-- Classes List -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Clases Registradas</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Clases Registradas</h3>
                 <div id="classes-list" class="space-y-2 max-h-64 overflow-y-auto">
-                    <p class="text-sm text-gray-500 text-center py-4">No hay clases registradas</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No hay clases registradas</p>
                 </div>
             </div>
             
             <!-- Time Preferences -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Preferencias de Horario</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Preferencias de Horario</h3>
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Franjas bloqueadas</label>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Franjas bloqueadas</label>
                         <div id="blocked-slots" class="space-y-1">
-                            <p class="text-xs text-gray-400">Ninguna</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500">Ninguna</p>
                         </div>
                         <button type="button" onclick="openFranjaModal('blocked')"
                                 class="mt-1 text-xs text-accent-500 hover:text-accent-600">
@@ -122,9 +122,9 @@
                         </button>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Franjas preferidas</label>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Franjas preferidas</label>
                         <div id="preferred-slots" class="space-y-1">
-                            <p class="text-xs text-gray-400">Ninguna</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500">Ninguna</p>
                         </div>
                         <button type="button" onclick="openFranjaModal('preferred')"
                                 class="mt-1 text-xs text-accent-500 hover:text-accent-600">
@@ -138,11 +138,11 @@
         <!-- Right Column: Schedule Grid & Generation -->
         <div class="lg:col-span-2 space-y-4">
             <!-- Generate Button & Filters -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-700">Generar Horarios</h3>
-                        <p class="text-xs text-gray-500">Se generarán todas las combinaciones válidas</p>
+                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Generar Horarios</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Se generarán todas las combinaciones válidas</p>
                     </div>
                     <button onclick="generateSchedules()"
                             class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
@@ -154,8 +154,8 @@
                 </div>
                 
                 <!-- Warning banner for large combinations -->
-                <div id="generation-warning" class="hidden mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p class="text-sm text-yellow-700">
+                <div id="generation-warning" class="hidden mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <p class="text-sm text-yellow-700 dark:text-yellow-400">
                         <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                         </svg>
@@ -165,7 +165,7 @@
                 
                 <!-- Optimization Presets -->
                 <div class="mt-4">
-                    <label class="block text-xs font-medium text-gray-600 mb-2">Optimizar por:</label>
+                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Optimizar por:</label>
                     <div id="optimization-presets" class="flex flex-wrap gap-2">
                         <!-- Populated by JS -->
                     </div>
@@ -173,25 +173,25 @@
             </div>
             
             <!-- Results Summary -->
-            <div id="results-summary" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div id="results-summary" class="hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-700">Resultados</h3>
-                        <p class="text-xs text-gray-500">
+                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Resultados</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
                             <span id="results-count">0</span> combinaciones válidas de <span id="results-total">0</span> posibles
                         </p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="prevCombination()" class="p-1 rounded hover:bg-gray-100" id="prev-btn" disabled>
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button onclick="prevCombination()" class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700" id="prev-btn" disabled>
+                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                             </svg>
                         </button>
-                        <span class="text-sm font-medium text-gray-700">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
                             <span id="current-combo">1</span> / <span id="total-combos">0</span>
                         </span>
-                        <button onclick="nextCombination()" class="p-1 rounded hover:bg-gray-100" id="next-btn" disabled>
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button onclick="nextCombination()" class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700" id="next-btn" disabled>
+                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </button>
@@ -200,37 +200,37 @@
                 
                 <!-- Combination Metrics -->
                 <div id="combo-metrics" class="mt-3 grid grid-cols-4 gap-2 text-center">
-                    <div class="p-2 bg-gray-50 rounded">
+                    <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded">
                         <p class="text-lg font-bold text-accent-600" id="metric-free-days">0</p>
-                        <p class="text-xs text-gray-500">Días libres</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Días libres</p>
                     </div>
-                    <div class="p-2 bg-gray-50 rounded">
-                        <p class="text-lg font-bold text-gray-700" id="metric-gaps">0</p>
-                        <p class="text-xs text-gray-500">Huecos</p>
+                    <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                        <p class="text-lg font-bold text-gray-700 dark:text-gray-200" id="metric-gaps">0</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Huecos</p>
                     </div>
-                    <div class="p-2 bg-gray-50 rounded">
-                        <p class="text-lg font-bold text-gray-700" id="metric-start">--:--</p>
-                        <p class="text-xs text-gray-500">Inicia</p>
+                    <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                        <p class="text-lg font-bold text-gray-700 dark:text-gray-200" id="metric-start">--:--</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Inicia</p>
                     </div>
-                    <div class="p-2 bg-gray-50 rounded">
-                        <p class="text-lg font-bold text-gray-700" id="metric-end">--:--</p>
-                        <p class="text-xs text-gray-500">Termina</p>
+                    <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                        <p class="text-lg font-bold text-gray-700 dark:text-gray-200" id="metric-end">--:--</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Termina</p>
                     </div>
                 </div>
             </div>
             
             <!-- Schedule Grid -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-semibold text-gray-700">Vista del Horario</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Vista del Horario</h3>
                     <div class="flex items-center space-x-2">
-                        <button onclick="exportToPNG()" class="text-xs text-gray-600 hover:text-accent-500">
+                        <button onclick="exportToPNG()" class="text-xs text-gray-600 dark:text-gray-400 hover:text-accent-500">
                             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
                             PNG
                         </button>
-                        <button onclick="exportToICS()" class="text-xs text-gray-600 hover:text-accent-500">
+                        <button onclick="exportToICS()" class="text-xs text-gray-600 dark:text-gray-400 hover:text-accent-500">
                             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
@@ -244,13 +244,13 @@
                     <table class="w-full border-collapse" id="schedule-grid">
                         <thead>
                             <tr>
-                                <th class="w-16 p-2 text-xs font-medium text-gray-500 border-b"></th>
-                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Lun</th>
-                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Mar</th>
-                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Mié</th>
-                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Jue</th>
-                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Vie</th>
-                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Sáb</th>
+                                <th class="w-16 p-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b dark:border-gray-700"></th>
+                                <th class="p-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">Lun</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">Mar</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">Mié</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">Jue</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">Vie</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">Sáb</th>
                             </tr>
                         </thead>
                         <tbody id="schedule-grid-body">
@@ -266,15 +266,15 @@
 <!-- Franja Modal -->
 <div id="franja-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeFranjaModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
-            <h3 id="franja-modal-title" class="text-lg font-semibold text-gray-900 mb-4">Agregar Franja</h3>
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeFranjaModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full p-6 transition-colors">
+            <h3 id="franja-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Agregar Franja</h3>
             <form id="franja-form" class="space-y-4">
                 <input type="hidden" id="franja-type">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Día</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Día</label>
                     <select id="franja-day" required
-                            class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                            class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                         <option value="L">Lunes</option>
                         <option value="M">Martes</option>
                         <option value="W">Miércoles</option>
@@ -285,19 +285,19 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Inicio</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Inicio</label>
                         <input type="time" id="franja-start" required value="12:00"
-                               class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                               class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fin</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fin</label>
                         <input type="time" id="franja-end" required value="14:00"
-                               class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                               class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                     </div>
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeFranjaModal()"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit"
@@ -313,23 +313,23 @@
 <!-- ICS Export Modal -->
 <div id="ics-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeICSModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Exportar a Calendario</h3>
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeICSModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full p-6 transition-colors">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Exportar a Calendario</h3>
             <form id="ics-form" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Inicio del semestre</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Inicio del semestre</label>
                     <input type="date" id="ics-start" required
-                           class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fin del semestre</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fin del semestre</label>
                     <input type="date" id="ics-end" required
-                           class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeICSModal()"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit"
@@ -345,21 +345,21 @@
 <!-- Schedule Import Modal -->
 <div id="schedule-import-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeScheduleImportModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Importar Horario</h3>
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeScheduleImportModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 transition-colors">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Importar Horario</h3>
             <div class="space-y-4">
                 <!-- Template Download -->
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+                <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between">
                     <div class="flex items-center">
                         <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span class="text-sm text-blue-700">¿Primera vez? Descarga la plantilla</span>
+                        <span class="text-sm text-blue-700 dark:text-blue-400">¿Primera vez? Descarga la plantilla</span>
                     </div>
                     <a href="{{ url_for('static', filename='templates/schedule_template.json') }}" 
                        download="horario_template.json"
-                       class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200">
+                       class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/70">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
@@ -370,33 +370,33 @@
                 <!-- Import Options -->
                 <div class="flex items-center space-x-4 text-sm">
                     <label class="flex items-center">
-                        <input type="checkbox" id="import-replace" class="rounded border-gray-300 text-accent-500 focus:ring-accent-500">
-                        <span class="ml-2 text-gray-700">Reemplazar clases existentes</span>
+                        <input type="checkbox" id="import-replace" class="rounded border-gray-300 dark:border-gray-600 text-accent-500 focus:ring-accent-500">
+                        <span class="ml-2 text-gray-700 dark:text-gray-300">Reemplazar clases existentes</span>
                     </label>
                 </div>
                 
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
                     <input type="file" id="schedule-import-file" accept=".json" class="hidden" onchange="handleScheduleImportFile(event)">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                     </svg>
-                    <p class="mt-2 text-sm text-gray-600">Arrastra un archivo JSON o</p>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Arrastra un archivo JSON o</p>
                     <button onclick="document.getElementById('schedule-import-file').click()"
                             class="mt-2 text-sm text-accent-500 hover:text-accent-600 font-medium">
                         selecciona un archivo
                     </button>
                 </div>
                 <div id="schedule-import-preview" class="hidden">
-                    <p class="text-sm text-gray-600 mb-2">Vista previa:</p>
-                    <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
-                        <pre id="schedule-import-preview-content" class="text-xs text-gray-700"></pre>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Vista previa:</p>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 max-h-40 overflow-y-auto">
+                        <pre id="schedule-import-preview-content" class="text-xs text-gray-700 dark:text-gray-300"></pre>
                     </div>
                 </div>
-                <div id="schedule-import-error" class="hidden text-sm text-red-600"></div>
+                <div id="schedule-import-error" class="hidden text-sm text-red-600 dark:text-red-400"></div>
             </div>
             <div class="flex justify-end space-x-3 mt-6">
                 <button onclick="closeScheduleImportModal()"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                     Cancelar
                 </button>
                 <button id="schedule-import-confirm-btn" onclick="confirmScheduleImport()" disabled
@@ -411,30 +411,30 @@
 <!-- Edit Class Modal -->
 <div id="edit-class-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeEditClassModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Editar Clase</h3>
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeEditClassModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 transition-colors">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Editar Clase</h3>
             <form id="edit-class-form" class="space-y-4">
                 <input type="hidden" id="edit-class-id">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Materia</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Materia</label>
                     <input type="text" id="edit-class-materia" readonly
-                           class="w-full text-sm border-gray-300 rounded-lg bg-gray-50">
+                           class="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg bg-gray-50 dark:bg-gray-600">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Sección</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sección</label>
                         <input type="text" id="edit-class-section" required
-                               class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                               class="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Profesor</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profesor</label>
                         <input type="text" id="edit-class-professor"
-                               class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                               class="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Bloques de horario</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bloques de horario</label>
                     <div id="edit-time-blocks-container" class="space-y-2"></div>
                     <button type="button" onclick="addEditTimeBlock()"
                             class="mt-2 text-sm text-accent-500 hover:text-accent-600">
@@ -443,7 +443,7 @@
                 </div>
                 <div class="flex justify-end space-x-3 pt-4">
                     <button type="button" onclick="closeEditClassModal()"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit"

@@ -72,10 +72,10 @@ const Pensum = {
         const totalCredits = materias.reduce((sum, m) => sum + (m.creditos || 0), 0);
         
         return `
-            <div class="semester-column bg-white rounded-lg shadow p-4 min-w-[200px]">
+            <div class="semester-column bg-white dark:bg-gray-800 rounded-lg shadow p-4 min-w-[200px] transition-colors">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="font-semibold text-gray-800">Semestre ${semester}</h3>
-                    <span class="text-xs text-gray-500">${totalCredits} cr</span>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-100">Semestre ${semester}</h3>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">${totalCredits} cr</span>
                 </div>
                 <div class="space-y-2">
                     ${materias.map(m => this.renderCourseCard(m)).join('')}
@@ -93,11 +93,11 @@ const Pensum = {
      */
     renderCourseCard(materia) {
         const statusColors = {
-            'pending': 'bg-gray-100 border-gray-300',
-            'enrolled': 'bg-blue-50 border-accent',
-            'passed': 'bg-green-50 border-green-400',
-            'failed': 'bg-red-50 border-red-400',
-            'dropped': 'bg-yellow-50 border-yellow-400'
+            'pending': 'status-pending',
+            'enrolled': 'status-enrolled',
+            'passed': 'status-passed',
+            'failed': 'status-failed',
+            'dropped': 'status-dropped'
         };
 
         const statusLabels = {
@@ -116,22 +116,22 @@ const Pensum = {
         const gradeDisplay = calificacion ? `<span class="text-xs font-medium">${calificacion.nota.toFixed(1)}</span>` : '';
 
         return `
-            <div class="course-card p-3 rounded border-l-4 ${statusClass} cursor-pointer hover:shadow-md transition-shadow"
+            <div class="course-card p-3 rounded border-l-4 ${statusClass} cursor-pointer hover:shadow-md transition-all"
                  onclick="Pensum.showCourseDetails('${materia.codigo}')"
                  data-codigo="${materia.codigo}">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="font-medium text-sm text-gray-800">${materia.nombre}</p>
-                        <p class="text-xs text-gray-500">${materia.codigo}</p>
+                        <p class="font-medium text-sm text-gray-800 dark:text-gray-100">${materia.nombre}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${materia.codigo}</p>
                     </div>
                     <div class="text-right">
-                        <span class="text-xs bg-gray-200 px-1.5 py-0.5 rounded">${materia.creditos} cr</span>
+                        <span class="text-xs bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded">${materia.creditos} cr</span>
                         ${gradeDisplay}
                     </div>
                 </div>
                 ${materia.prerrequisitos?.length ? 
                     `<p class="text-xs text-gray-400 mt-1">Req: ${materia.prerrequisitos.join(', ')}</p>` : ''}
-                <span class="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-white">${statusLabel}</span>
+                <span class="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300">${statusLabel}</span>
             </div>
         `;
     },

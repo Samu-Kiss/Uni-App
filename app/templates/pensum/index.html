@@ -7,26 +7,26 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Mi Pensum</h1>
-            <p class="text-sm text-gray-500 mt-1">Visualiza y gestiona tu plan de estudios</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mi Pensum</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Visualiza y gestiona tu plan de estudios</p>
         </div>
         <div class="flex flex-wrap gap-2">
             <button onclick="openImportModal()" 
-                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                 </svg>
                 Importar
             </button>
             <button onclick="exportPensum()" 
-                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>
                 Exportar
             </button>
             <button onclick="openNewMateriaModal()" 
-                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600 transition-colors">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -37,52 +37,52 @@
     
     <!-- Stats Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500">Promedio Acumulado</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Promedio Acumulado</p>
                     <p class="text-2xl font-bold text-accent-600" id="stat-gpa">--</p>
                 </div>
-                <div class="p-3 bg-accent-50 rounded-lg">
+                <div class="p-3 bg-accent-50 dark:bg-accent-900/30 rounded-lg">
                     <svg class="w-6 h-6 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500">Créditos Completados</p>
-                    <p class="text-2xl font-bold text-gray-900"><span id="stat-credits-done">0</span> / <span id="stat-credits-total">0</span></p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Créditos Completados</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white"><span id="stat-credits-done">0</span> / <span id="stat-credits-total">0</span></p>
                 </div>
-                <div class="p-3 bg-green-50 rounded-lg">
+                <div class="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
                     <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500">Materias Aprobadas</p>
-                    <p class="text-2xl font-bold text-gray-900" id="stat-passed">0</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Materias Aprobadas</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white" id="stat-passed">0</p>
                 </div>
-                <div class="p-3 bg-blue-50 rounded-lg">
+                <div class="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                     <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500">Progreso</p>
-                    <p class="text-2xl font-bold text-gray-900"><span id="stat-progress">0</span>%</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Progreso</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white"><span id="stat-progress">0</span>%</p>
                 </div>
-                <div class="p-3 bg-purple-50 rounded-lg">
+                <div class="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
                     <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                     </svg>
@@ -96,45 +96,45 @@
     
     <!-- View Toggle -->
     <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-2 bg-gray-100 p-1 rounded-lg">
+        <div class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg transition-colors">
             <button id="view-tree" onclick="setView('tree')"
-                    class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-700">
+                    class="px-3 py-1 text-sm font-medium rounded-md bg-white dark:bg-gray-700 shadow-sm text-gray-700 dark:text-gray-200 transition-colors">
                 Árbol
             </button>
             <button id="view-table" onclick="setView('table')" 
-                    class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700">
+                    class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                 Tabla
             </button>
         </div>
         <div class="flex items-center space-x-2">
-            <label class="text-sm text-gray-600">Simular pérdida:</label>
+            <label class="text-sm text-gray-600 dark:text-gray-400">Simular pérdida:</label>
             <select id="simulate-loss-select" onchange="simulateLoss(this.value)"
-                    class="text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                    class="text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-accent-500 focus:border-accent-500 transition-colors">
                 <option value="">Seleccionar materia...</option>
             </select>
         </div>
     </div>
     
     <!-- Pensum Table View -->
-    <div id="pensum-table-view" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div id="pensum-table-view" class="hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semestre</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materia</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Créditos</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Nota</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Semestre</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Código</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Materia</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Créditos</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nota</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="pensum-table-body" class="bg-white divide-y divide-gray-200">
+                <tbody id="pensum-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     <!-- Rows will be populated by JavaScript -->
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                            <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                            <svg class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
                             <p class="mt-2 text-sm">No hay materias en el pensum</p>
@@ -157,14 +157,14 @@
 <!-- Simulation Results Modal -->
 <div id="simulation-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeSimulationModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Simulación de Pérdida</h3>
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeSimulationModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full p-6 transition-colors">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Simulación de Pérdida</h3>
             <div id="simulation-results" class="space-y-4">
                 <!-- Results will be populated here -->
             </div>
             <div class="mt-6 flex justify-end">
-                <button onclick="closeSimulationModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                <button onclick="closeSimulationModal()" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                     Cerrar
                 </button>
             </div>
@@ -175,65 +175,65 @@
 <!-- New Materia Modal -->
 <div id="materia-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeMateriaModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
-            <h3 id="materia-modal-title" class="text-lg font-semibold text-gray-900 mb-4">Nueva Materia</h3>
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeMateriaModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 transition-colors">
+            <h3 id="materia-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nueva Materia</h3>
             <form id="materia-form" class="space-y-4">
                 <input type="hidden" id="materia-edit-code">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Código</label>
                         <input type="text" id="materia-code" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500"
                                placeholder="MAT101">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Créditos</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Créditos</label>
                         <input type="number" id="materia-credits" required min="1" max="10"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500"
                                placeholder="3">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
                     <input type="text" id="materia-name" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500"
                            placeholder="Cálculo Diferencial">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Semestre</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semestre</label>
                         <input type="number" id="materia-semester" required min="1" max="15"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500"
                                placeholder="1">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Color (opcional)</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Color (opcional)</label>
                         <input type="color" id="materia-color" value="#5091AF"
-                               class="w-full h-10 px-1 py-1 border border-gray-300 rounded-lg">
+                               class="w-full h-10 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded-lg">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Prerrequisitos (códigos separados por coma)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prerrequisitos (códigos separados por coma)</label>
                     <input type="text" id="materia-prerequisites"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500"
                            placeholder="MAT100, FIS100">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Correquisitos (códigos separados por coma)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Correquisitos (códigos separados por coma)</label>
                     <input type="text" id="materia-corequisites"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500"
                            placeholder="LAB101">
                 </div>
                 
                 <!-- Status and Grade Section (only visible when editing) -->
-                <div id="materia-status-grade-section" class="hidden border-t pt-4 mt-4">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Estado y Calificación</h4>
+                <div id="materia-status-grade-section" class="hidden border-t dark:border-gray-700 pt-4 mt-4">
+                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Estado y Calificación</h4>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estado</label>
                             <select id="materia-status"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500">
                                 <option value="pending">Pendiente</option>
                                 <option value="enrolled">En curso</option>
                                 <option value="passed">Aprobada</option>
@@ -242,24 +242,24 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nota Final</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nota Final</label>
                             <input type="number" id="materia-grade" min="0" max="5" step="0.1"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500"
                                    placeholder="3.5">
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                         La nota se guarda automáticamente y afecta tu promedio.
                     </p>
                 </div>
                 
                 <div class="flex justify-end space-x-3 pt-4">
                     <button type="button" onclick="closeMateriaModal()"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                            class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600 transition-colors">
                         Guardar
                     </button>
                 </div>
@@ -271,12 +271,12 @@
 <!-- Import Modal -->
 <div id="import-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeImportModal()"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Importar Pensum</h3>
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onclick="closeImportModal()"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 transition-colors">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Importar Pensum</h3>
             <div class="space-y-4">
                 <!-- Template Download -->
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+                <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between">
                     <div class="flex items-center">
                         <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>

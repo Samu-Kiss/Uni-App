@@ -78,11 +78,11 @@ const Schedule = {
         materias.forEach(m => {
             const clases = clasesByMateria[m.codigo] || [];
             html += `
-                <div class="materia-section bg-white rounded-lg p-4 mb-4 shadow">
+                <div class="materia-section bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 shadow transition-colors">
                     <div class="flex justify-between items-center mb-3">
                         <div>
-                            <h3 class="font-semibold text-gray-800">${m.nombre}</h3>
-                            <p class="text-sm text-gray-500">${m.codigo} • ${m.creditos} cr</p>
+                            <h3 class="font-semibold text-gray-800 dark:text-gray-100">${m.nombre}</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">${m.codigo} • ${m.creditos} cr</p>
                         </div>
                         <button onclick="Schedule.showAddClaseModal('${m.codigo}')"
                                 class="px-3 py-1 text-sm bg-accent text-white rounded hover:bg-accent-dark">
@@ -92,7 +92,7 @@ const Schedule = {
                     <div class="space-y-2">
                         ${clases.length > 0 ? 
                             clases.map(c => this.renderClaseCard(c)).join('') :
-                            '<p class="text-sm text-gray-400">No hay secciones agregadas</p>'
+                            '<p class="text-sm text-gray-400 dark:text-gray-500">No hay secciones agregadas</p>'
                         }
                     </div>
                 </div>
@@ -120,13 +120,13 @@ const Schedule = {
         ).join(', ');
 
         return `
-            <div class="clase-card bg-gray-50 rounded p-3 border-l-4 border-accent">
+            <div class="clase-card bg-gray-50 dark:bg-gray-700 rounded p-3 border-l-4 border-accent transition-colors">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="font-medium">${clase.nrc || clase.seccion || 'Sección'}</p>
-                        <p class="text-sm text-gray-600">${clase.profesor || 'Sin profesor'}</p>
-                        <p class="text-xs text-gray-500 mt-1">${horarios || 'Sin horario'}</p>
-                        ${clase.aula ? `<p class="text-xs text-gray-400">Aula: ${clase.aula}</p>` : ''}
+                        <p class="font-medium dark:text-gray-100">${clase.nrc || clase.seccion || 'Sección'}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">${clase.profesor || 'Sin profesor'}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${horarios || 'Sin horario'}</p>
+                        ${clase.aula ? `<p class="text-xs text-gray-400 dark:text-gray-500">Aula: ${clase.aula}</p>` : ''}
                     </div>
                     <div class="flex gap-1">
                         <button onclick="Schedule.editClase('${clase.id}')"
@@ -600,7 +600,7 @@ const Schedule = {
         const toShow = this.combinations.slice(0, 20);
         
         let html = `
-            <div class="mb-4 text-sm text-gray-600">
+            <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
                 ${this.combinations.length} combinaciones encontradas
                 ${this.combinations.length > 20 ? ' (mostrando las mejores 20)' : ''}
             </div>
@@ -608,19 +608,19 @@ const Schedule = {
 
         toShow.forEach((comb, i) => {
             html += `
-                <div class="combination-card bg-gray-50 rounded-lg p-4 mb-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                <div class="combination-card bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                      onclick="Schedule.selectCombination(${i})">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="font-medium">Opción ${i + 1}</span>
-                        <span class="text-sm text-gray-500">Puntuación: ${this.scoreCombination(comb)}</span>
+                        <span class="font-medium dark:text-gray-100">Opción ${i + 1}</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Puntuación: ${this.scoreCombination(comb)}</span>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
                         ${comb.map(clase => {
                             const materia = storage.getMaterias().find(m => m.codigo === clase.codigo_materia);
                             return `
-                                <div class="bg-white p-2 rounded border">
-                                    <p class="font-medium truncate">${materia?.nombre || clase.codigo_materia}</p>
-                                    <p class="text-xs text-gray-500">${clase.nrc || clase.seccion} - ${clase.profesor || 'TBA'}</p>
+                                <div class="bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-600 transition-colors">
+                                    <p class="font-medium truncate dark:text-gray-100">${materia?.nombre || clase.codigo_materia}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">${clase.nrc || clase.seccion} - ${clase.profesor || 'TBA'}</p>
                                 </div>
                             `;
                         }).join('')}
@@ -716,13 +716,13 @@ const Schedule = {
         // Header
         html += '<div class="h-10"></div>';
         dayNames.forEach(d => {
-            html += `<div class="h-10 flex items-center justify-center font-medium text-gray-700 bg-gray-50 rounded">${d}</div>`;
+            html += `<div class="h-10 flex items-center justify-center font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 rounded transition-colors">${d}</div>`;
         });
 
         // Time slots
         for (let h = minHour; h < maxHour; h++) {
             const hour = `${h.toString().padStart(2, '0')}:00`;
-            html += `<div class="h-16 flex items-start justify-end pr-2 text-xs text-gray-400 pt-1">${hour}</div>`;
+            html += `<div class="h-16 flex items-start justify-end pr-2 text-xs text-gray-400 dark:text-gray-500 pt-1">${hour}</div>`;
             
             days.forEach(day => {
                 // Find clase block for this slot
@@ -748,7 +748,7 @@ const Schedule = {
                     }
                     // Skip cells covered by multi-slot blocks
                 } else {
-                    html += '<div class="h-16 bg-gray-50 rounded"></div>';
+                    html += '<div class="h-16 bg-gray-50 dark:bg-gray-700 rounded transition-colors"></div>';
                 }
             });
         }

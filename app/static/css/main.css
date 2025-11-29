@@ -5,9 +5,156 @@
 
 /* ==================== CSS Variables ==================== */
 :root {
+    /* Accent Colors */
     --color-accent: #5091AF;
     --color-accent-dark: #3d7a94;
     --color-accent-light: #6ba8c4;
+    --color-accent-bg: rgba(80, 145, 175, 0.1);
+    
+    /* Background Colors */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --bg-hover: #f3f4f6;
+    
+    /* Text Colors */
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #6b7280;
+    --text-muted: #9ca3af;
+    
+    /* Border Colors */
+    --border-primary: #e5e7eb;
+    --border-secondary: #d1d5db;
+    --border-light: #f3f4f6;
+    
+    /* Shadow */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    /* Status Colors */
+    --status-pending-bg: #f3f4f6;
+    --status-pending-border: #d1d5db;
+    --status-pending-text: #4b5563;
+    
+    --status-enrolled-bg: rgba(80, 145, 175, 0.1);
+    --status-enrolled-border: var(--color-accent);
+    --status-enrolled-text: var(--color-accent);
+    
+    --status-passed-bg: #f0fdf4;
+    --status-passed-border: #4ade80;
+    --status-passed-text: #15803d;
+    
+    --status-failed-bg: #fef2f2;
+    --status-failed-border: #f87171;
+    --status-failed-text: #b91c1c;
+    
+    --status-dropped-bg: #fefce8;
+    --status-dropped-border: #facc15;
+    --status-dropped-text: #a16207;
+    
+    /* Component Colors */
+    --btn-secondary-bg: #f3f4f6;
+    --btn-secondary-text: #374151;
+    --btn-secondary-hover: #e5e7eb;
+    
+    --modal-bg: #ffffff;
+    --tooltip-bg: #1f2937;
+    --tooltip-text: #ffffff;
+    
+    --scrollbar-track: #f3f4f6;
+    --scrollbar-thumb: #d1d5db;
+    --scrollbar-thumb-hover: #9ca3af;
+    
+    /* Franja Colors */
+    --franja-blocked: #fecaca;
+    --franja-preferred: #bbf7d0;
+    
+    /* Badge Colors */
+    --badge-success-bg: #dcfce7;
+    --badge-success-text: #166534;
+    --badge-warning-bg: #fef3c7;
+    --badge-warning-text: #92400e;
+    --badge-danger-bg: #fee2e2;
+    --badge-danger-text: #991b1b;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    /* Accent Colors - slightly brighter for dark mode */
+    --color-accent: #6ba8c4;
+    --color-accent-dark: #5091AF;
+    --color-accent-light: #8dc6db;
+    --color-accent-bg: rgba(107, 168, 196, 0.15);
+    
+    /* Background Colors */
+    --bg-primary: #1f2937;
+    --bg-secondary: #111827;
+    --bg-tertiary: #374151;
+    --bg-hover: #374151;
+    
+    /* Text Colors */
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-tertiary: #9ca3af;
+    --text-muted: #6b7280;
+    
+    /* Border Colors */
+    --border-primary: #374151;
+    --border-secondary: #4b5563;
+    --border-light: #1f2937;
+    
+    /* Shadow - more subtle in dark mode */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    
+    /* Status Colors - adjusted for dark mode */
+    --status-pending-bg: #374151;
+    --status-pending-border: #4b5563;
+    --status-pending-text: #d1d5db;
+    
+    --status-enrolled-bg: rgba(107, 168, 196, 0.2);
+    --status-enrolled-border: var(--color-accent);
+    --status-enrolled-text: var(--color-accent);
+    
+    --status-passed-bg: rgba(34, 197, 94, 0.15);
+    --status-passed-border: #4ade80;
+    --status-passed-text: #86efac;
+    
+    --status-failed-bg: rgba(239, 68, 68, 0.15);
+    --status-failed-border: #f87171;
+    --status-failed-text: #fca5a5;
+    
+    --status-dropped-bg: rgba(234, 179, 8, 0.15);
+    --status-dropped-border: #facc15;
+    --status-dropped-text: #fde047;
+    
+    /* Component Colors */
+    --btn-secondary-bg: #374151;
+    --btn-secondary-text: #d1d5db;
+    --btn-secondary-hover: #4b5563;
+    
+    --modal-bg: #1f2937;
+    --tooltip-bg: #f9fafb;
+    --tooltip-text: #1f2937;
+    
+    --scrollbar-track: #1f2937;
+    --scrollbar-thumb: #4b5563;
+    --scrollbar-thumb-hover: #6b7280;
+    
+    /* Franja Colors */
+    --franja-blocked: rgba(239, 68, 68, 0.3);
+    --franja-preferred: rgba(34, 197, 94, 0.3);
+    
+    /* Badge Colors - adjusted for dark mode */
+    --badge-success-bg: rgba(34, 197, 94, 0.2);
+    --badge-success-text: #86efac;
+    --badge-warning-bg: rgba(234, 179, 8, 0.2);
+    --badge-warning-text: #fde047;
+    --badge-danger-bg: rgba(239, 68, 68, 0.2);
+    --badge-danger-text: #fca5a5;
 }
 
 /* ==================== Base Styles ==================== */
@@ -17,6 +164,9 @@ html {
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ==================== Accent Color Utilities ==================== */
@@ -65,9 +215,12 @@ input[type="time"],
 select,
 textarea {
     border-radius: 0.5rem;
-    border: 1px solid #d1d5db;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-secondary);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
     padding: 0.5rem 0.75rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 input[type="text"]:focus,
@@ -78,8 +231,13 @@ input[type="time"]:focus,
 select:focus,
 textarea:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(80, 145, 175, 0.3);
+    box-shadow: 0 0 0 3px var(--color-accent-bg);
     border-color: var(--color-accent);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted);
 }
 
 /* ==================== Buttons ==================== */
@@ -105,12 +263,12 @@ textarea:focus {
 }
 
 .btn-secondary {
-    background-color: #f3f4f6;
-    color: #374151;
+    background-color: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
 }
 
 .btn-secondary:hover {
-    background-color: #e5e7eb;
+    background-color: var(--btn-secondary-hover);
 }
 
 .btn-outline {
@@ -145,49 +303,50 @@ textarea:focus {
 
 /* ==================== Cards ==================== */
 .card {
-    background-color: white;
+    background-color: var(--bg-primary);
     border-radius: 0.5rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid #f3f4f6;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .card-hover {
-    transition: box-shadow 0.2s;
+    transition: box-shadow 0.2s, background-color 0.3s ease;
 }
 
 .card-hover:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-md);
 }
 
 /* ==================== Course Status Colors ==================== */
 .status-pending {
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
-    color: #4b5563;
+    background-color: var(--status-pending-bg);
+    border-color: var(--status-pending-border);
+    color: var(--status-pending-text);
 }
 
 .status-enrolled {
-    background-color: rgba(80, 145, 175, 0.1);
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+    background-color: var(--status-enrolled-bg);
+    border-color: var(--status-enrolled-border);
+    color: var(--status-enrolled-text);
 }
 
 .status-passed {
-    background-color: #f0fdf4;
-    border-color: #4ade80;
-    color: #15803d;
+    background-color: var(--status-passed-bg);
+    border-color: var(--status-passed-border);
+    color: var(--status-passed-text);
 }
 
 .status-failed {
-    background-color: #fef2f2;
-    border-color: #f87171;
-    color: #b91c1c;
+    background-color: var(--status-failed-bg);
+    border-color: var(--status-failed-border);
+    color: var(--status-failed-text);
 }
 
 .status-dropped {
-    background-color: #fefce8;
-    border-color: #facc15;
-    color: #a16207;
+    background-color: var(--status-dropped-bg);
+    border-color: var(--status-dropped-border);
+    color: var(--status-dropped-text);
 }
 
 /* ==================== Schedule Grid ==================== */
@@ -242,31 +401,34 @@ textarea:focus {
 }
 
 .modal-content {
-    background-color: white;
+    background-color: var(--modal-bg);
     border-radius: 0.75rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-lg);
     max-width: 28rem;
     width: 100%;
     margin: 1rem;
     max-height: 90vh;
     overflow-y: auto;
+    transition: background-color 0.3s ease;
 }
 
 .modal-header {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-light);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: var(--text-primary);
 }
 
 .modal-body {
     padding: 1rem 1.5rem;
+    color: var(--text-secondary);
 }
 
 .modal-footer {
     padding: 1rem 1.5rem;
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--border-light);
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
@@ -276,18 +438,18 @@ textarea:focus {
 .nav-link {
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
-    color: #4b5563;
+    color: var(--text-secondary);
     transition: all 0.15s;
 }
 
 .nav-link:hover {
     color: var(--color-accent);
-    background-color: #f9fafb;
+    background-color: var(--bg-hover);
 }
 
 .nav-link.active {
     color: var(--color-accent);
-    background-color: rgba(80, 145, 175, 0.1);
+    background-color: var(--color-accent-bg);
 }
 
 /* ==================== Alerts ==================== */
@@ -310,7 +472,7 @@ textarea:focus {
 .spinner {
     animation: spin 1s linear infinite;
     border-radius: 50%;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--border-primary);
     border-top-color: var(--color-accent);
 }
 
@@ -332,11 +494,11 @@ textarea:focus {
 }
 
 .franja-blocked {
-    background-color: #fecaca;
+    background-color: var(--franja-blocked);
 }
 
 .franja-preferred {
-    background-color: #bbf7d0;
+    background-color: var(--franja-preferred);
 }
 
 /* ==================== Scrollbar Styles ==================== */
@@ -346,17 +508,17 @@ textarea:focus {
 }
 
 ::-webkit-scrollbar-track {
-    background-color: #f3f4f6;
+    background-color: var(--scrollbar-track);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #d1d5db;
+    background-color: var(--scrollbar-thumb);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #9ca3af;
+    background-color: var(--scrollbar-thumb-hover);
 }
 
 /* ==================== Responsive Utilities ==================== */
@@ -419,8 +581,8 @@ textarea:focus {
     z-index: 50;
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
-    color: white;
-    background-color: #1f2937;
+    color: var(--tooltip-text);
+    background-color: var(--tooltip-bg);
     border-radius: 0.25rem;
     white-space: nowrap;
     bottom: 100%;
@@ -433,14 +595,14 @@ textarea:focus {
 .empty-state {
     text-align: center;
     padding: 3rem 0;
-    color: #6b7280;
+    color: var(--text-tertiary);
 }
 
 .empty-state svg {
     width: 4rem;
     height: 4rem;
     margin: 0 auto 1rem;
-    color: #d1d5db;
+    color: var(--border-secondary);
 }
 
 /* ==================== Badge ==================== */
@@ -454,23 +616,23 @@ textarea:focus {
 }
 
 .badge-accent {
-    background-color: rgba(80, 145, 175, 0.1);
+    background-color: var(--color-accent-bg);
     color: var(--color-accent);
 }
 
 .badge-success {
-    background-color: #dcfce7;
-    color: #166534;
+    background-color: var(--badge-success-bg);
+    color: var(--badge-success-text);
 }
 
 .badge-warning {
-    background-color: #fef3c7;
-    color: #92400e;
+    background-color: var(--badge-warning-bg);
+    color: var(--badge-warning-text);
 }
 
 .badge-danger {
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: var(--badge-danger-bg);
+    color: var(--badge-danger-text);
 }
 
 /* ==================== GPA Alert ==================== */
@@ -485,4 +647,46 @@ textarea:focus {
     50% {
         opacity: 0.7;
     }
+}
+
+/* ==================== Theme Toggle ==================== */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--bg-hover);
+    color: var(--color-accent);
+}
+
+.theme-toggle svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Hide sun in light mode, hide moon in dark mode */
+.theme-toggle .icon-sun {
+    display: none;
+}
+
+.theme-toggle .icon-moon {
+    display: block;
+}
+
+[data-theme="dark"] .theme-toggle .icon-sun {
+    display: block;
+}
+
+[data-theme="dark"] .theme-toggle .icon-moon {
+    display: none;
 }
