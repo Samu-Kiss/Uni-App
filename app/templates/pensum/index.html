@@ -422,6 +422,15 @@
                     Grafo
                 </span>
             </button>
+            <button id="view-stats" onclick="setView('stats')" 
+                    class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Stats
+                </span>
+            </button>
         </div>
         <div class="flex items-center space-x-2">
             <label class="text-sm text-gray-600 dark:text-gray-400">Simular pérdida:</label>
@@ -597,6 +606,215 @@
                     </h5>
                     <div id="bottleneck-list" class="space-y-1 text-xs text-gray-600 dark:text-gray-400"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pensum Stats View (Analytics Dashboard) -->
+    <div id="pensum-stats-view" class="hidden space-y-6">
+        <!-- Stats Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Academic Performance -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-medium text-gray-700 dark:text-gray-300">Rendimiento Académico</h4>
+                    <span class="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Promedio General</span>
+                        <span id="stats-gpa" class="font-semibold text-gray-900 dark:text-white">--</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Promedio Semestre Actual</span>
+                        <span id="stats-semester-gpa" class="font-semibold text-gray-900 dark:text-white">--</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Tendencia</span>
+                        <span id="stats-trend" class="font-semibold"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Stats -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-medium text-gray-700 dark:text-gray-300">Progreso General</h4>
+                    <span class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Materias Aprobadas</span>
+                        <span id="stats-passed-count" class="font-semibold text-gray-900 dark:text-white">0</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Materias Pendientes</span>
+                        <span id="stats-pending-count" class="font-semibold text-gray-900 dark:text-white">0</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Materias Reprobadas</span>
+                        <span id="stats-failed-count" class="font-semibold text-red-500">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Credits Stats -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-medium text-gray-700 dark:text-gray-300">Créditos</h4>
+                    <span class="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Completados</span>
+                        <span id="stats-credits-done" class="font-semibold text-gray-900 dark:text-white">0</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Cursando</span>
+                        <span id="stats-credits-enrolled" class="font-semibold text-gray-900 dark:text-white">0</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Pendientes</span>
+                        <span id="stats-credits-pending" class="font-semibold text-gray-900 dark:text-white">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Time Estimate -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-medium text-gray-700 dark:text-gray-300">Proyección</h4>
+                    <span class="p-2 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
+                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Semestres Restantes</span>
+                        <span id="stats-semesters-left" class="font-semibold text-gray-900 dark:text-white">--</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Graduación Estimada</span>
+                        <span id="stats-graduation-date" class="font-semibold text-gray-900 dark:text-white">--</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Ritmo Promedio</span>
+                        <span id="stats-avg-credits" class="font-semibold text-gray-900 dark:text-white">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- GPA Over Time Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+                <h4 class="font-semibold text-gray-800 dark:text-white mb-4">Evolución del Promedio por Semestre</h4>
+                <div class="relative overflow-hidden" style="height: 280px;">
+                    <canvas id="gpa-chart" class="absolute inset-0 w-full h-full"></canvas>
+                </div>
+            </div>
+            
+            <!-- Credits Distribution Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+                <h4 class="font-semibold text-gray-800 dark:text-white mb-4">Distribución de Créditos por Estado</h4>
+                <div class="relative overflow-hidden" style="height: 280px;">
+                    <canvas id="credits-chart" class="absolute inset-0 w-full h-full"></canvas>
+                </div>
+            </div>
+            
+            <!-- Grades Distribution -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+                <h4 class="font-semibold text-gray-800 dark:text-white mb-4">Distribución de Calificaciones</h4>
+                <div class="relative overflow-hidden" style="height: 280px;">
+                    <canvas id="grades-chart" class="absolute inset-0 w-full h-full"></canvas>
+                </div>
+            </div>
+            
+            <!-- Course Type Distribution -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+                <h4 class="font-semibold text-gray-800 dark:text-white mb-4">Distribución por Tipo de Materia</h4>
+                <div class="relative overflow-hidden" style="height: 280px;">
+                    <canvas id="types-chart" class="absolute inset-0 w-full h-full"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Tables Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Performance by Semester -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
+                <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h4 class="font-semibold text-gray-800 dark:text-white">Rendimiento por Semestre</h4>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-900">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Semestre</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Materias</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Créditos</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="semester-stats-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Top/Bottom Courses -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
+                <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h4 class="font-semibold text-gray-800 dark:text-white">Mejores y Peores Calificaciones</h4>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <h5 class="text-sm font-medium text-green-600 dark:text-green-400 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                            </svg>
+                            Mejores Calificaciones
+                        </h5>
+                        <div id="top-grades" class="space-y-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <h5 class="text-sm font-medium text-red-600 dark:text-red-400 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                            Calificaciones más Bajas
+                        </h5>
+                        <div id="bottom-grades" class="space-y-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Achievements/Milestones -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 transition-colors">
+            <h4 class="font-semibold text-gray-800 dark:text-white mb-4">Hitos y Logros</h4>
+            <div id="achievements-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <!-- Populated by JS -->
             </div>
         </div>
     </div>
@@ -1225,12 +1443,14 @@
         const tableView = document.getElementById('pensum-table-view');
         const treeView = document.getElementById('pensum-tree-view');
         const graphView = document.getElementById('pensum-graph-view');
+        const statsView = document.getElementById('pensum-stats-view');
         const tableBtn = document.getElementById('view-table');
         const treeBtn = document.getElementById('view-tree');
         const graphBtn = document.getElementById('view-graph');
+        const statsBtn = document.getElementById('view-stats');
         
         // Reset all buttons
-        [tableBtn, treeBtn, graphBtn].forEach(btn => {
+        [tableBtn, treeBtn, graphBtn, statsBtn].forEach(btn => {
             btn.classList.remove('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-gray-700', 'dark:text-gray-200');
             btn.classList.add('text-gray-500', 'dark:text-gray-400');
         });
@@ -1239,6 +1459,7 @@
         tableView.classList.add('hidden');
         treeView.classList.add('hidden');
         graphView.classList.add('hidden');
+        statsView.classList.add('hidden');
         
         // Show selected view
         if (view === 'table') {
@@ -1251,6 +1472,12 @@
             graphBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
             // Initialize graph when switching to this view
             setTimeout(() => initializeGraph(), 100);
+        } else if (view === 'stats') {
+            statsView.classList.remove('hidden');
+            statsBtn.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-gray-700', 'dark:text-gray-200');
+            statsBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
+            // Initialize stats when switching to this view
+            setTimeout(() => initializeStatsView(), 100);
         } else {
             treeView.classList.remove('hidden');
             treeBtn.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-gray-700', 'dark:text-gray-200');
@@ -2777,7 +3004,7 @@
         const canvas = graphState.canvas;
         if (!ctx || !canvas) return;
         
-        const isDarkMode = document.documentElement.classList.contains('dark');
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
         
         // Clear canvas
         ctx.fillStyle = isDarkMode ? '#1f2937' : '#ffffff';
@@ -3271,6 +3498,768 @@
             calculateNodePositions();
             drawGraph();
         }, 100);
+    }
+    
+    // ============================================
+    // STATS VIEW FUNCTIONALITY
+    // ============================================
+    
+    // Helper: Get grade for a materia from calificaciones
+    function getGradeForMateria(codigo) {
+        const cal = storage.getCalificacion(codigo);
+        return cal ? cal.nota : null;
+    }
+    
+    // Helper: Get materias with their grades merged
+    function getMateriasWithGrades() {
+        const materias = storage.getMaterias();
+        const calificaciones = storage.getCalificaciones();
+        
+        return materias.map(m => {
+            const cal = calificaciones.find(c => c.codigo_materia === m.codigo);
+            return {
+                ...m,
+                calificacion: cal ? cal.nota : null
+            };
+        });
+    }
+    
+    // Calculate GPA (Índice) from materias with grades
+    // Índice = suma(nota * créditos) / suma(créditos) para materias aprobadas
+    function calculateGPA(materiasWithGrades) {
+        const graded = materiasWithGrades.filter(m => m.estado === 'passed' && m.calificacion !== null);
+        if (graded.length === 0) return 0;
+        
+        let totalPoints = 0;
+        let totalCredits = 0;
+        
+        graded.forEach(m => {
+            const credits = m.creditos || 0;
+            const grade = m.calificacion || 0;
+            totalPoints += grade * credits;
+            totalCredits += credits;
+        });
+        
+        return totalCredits > 0 ? totalPoints / totalCredits : 0;
+    }
+    
+    let statsCharts = {
+        gpa: null,
+        credits: null,
+        grades: null,
+        types: null
+    };
+    
+    function initializeStatsView() {
+        console.log('Initializing stats view...');
+        updateStatsOverview();
+        renderGPAChart();
+        renderCreditsChart();
+        renderGradesChart();
+        renderTypesChart();
+        renderSemesterTable();
+        renderTopBottomGrades();
+        renderAchievements();
+        console.log('Stats view initialized');
+    }
+    
+    // Redraw charts when theme changes
+    window.addEventListener('themechange', () => {
+        if (currentView === 'stats') {
+            renderGPAChart();
+            renderCreditsChart();
+            renderGradesChart();
+            renderTypesChart();
+        }
+    });
+    
+    function updateStatsOverview() {
+        const materias = getMateriasWithGrades();
+        
+        // Calculate stats
+        const passed = materias.filter(m => m.estado === 'passed');
+        const enrolled = materias.filter(m => m.estado === 'enrolled');
+        const pending = materias.filter(m => m.estado === 'pending');
+        const failed = materias.filter(m => m.estado === 'failed');
+        
+        // Credits
+        const creditsDone = passed.reduce((sum, m) => sum + (m.creditos || 0), 0);
+        const creditsEnrolled = enrolled.reduce((sum, m) => sum + (m.creditos || 0), 0);
+        const creditsPending = pending.reduce((sum, m) => sum + (m.creditos || 0), 0) +
+                               failed.reduce((sum, m) => sum + (m.creditos || 0), 0);
+        const totalCredits = materias.reduce((sum, m) => sum + (m.creditos || 0), 0);
+        
+        // GPA (Índice académico = promedio ponderado por créditos)
+        const gpa = calculateGPA(materias);
+        const semesterGPA = calculateCurrentSemesterGPA(materias);
+        
+        // Update DOM
+        document.getElementById('stats-gpa').textContent = gpa ? gpa.toFixed(2) : '--';
+        document.getElementById('stats-semester-gpa').textContent = semesterGPA ? semesterGPA.toFixed(2) : '--';
+        document.getElementById('stats-passed-count').textContent = passed.length;
+        document.getElementById('stats-pending-count').textContent = pending.length + failed.length;
+        document.getElementById('stats-failed-count').textContent = failed.length;
+        document.getElementById('stats-credits-done').textContent = creditsDone;
+        document.getElementById('stats-credits-enrolled').textContent = creditsEnrolled;
+        document.getElementById('stats-credits-pending').textContent = creditsPending;
+        
+        // Trend
+        const trend = calculateGPATrend(materias);
+        const trendEl = document.getElementById('stats-trend');
+        if (trend > 0) {
+            trendEl.innerHTML = `<span class="text-green-500">↑ +${trend.toFixed(2)}</span>`;
+        } else if (trend < 0) {
+            trendEl.innerHTML = `<span class="text-red-500">↓ ${trend.toFixed(2)}</span>`;
+        } else {
+            trendEl.innerHTML = `<span class="text-gray-500">→ Estable</span>`;
+        }
+        
+        // Projections
+        const avgCreditsPerSemester = calculateAvgCreditsPerSemester(materias);
+        const semestersLeft = creditsPending > 0 && avgCreditsPerSemester > 0 
+            ? Math.ceil(creditsPending / avgCreditsPerSemester) 
+            : 0;
+        
+        document.getElementById('stats-semesters-left').textContent = semestersLeft > 0 ? semestersLeft : 'N/A';
+        document.getElementById('stats-avg-credits').textContent = avgCreditsPerSemester > 0 
+            ? `${avgCreditsPerSemester.toFixed(1)} cr/sem` 
+            : '--';
+        
+        // Graduation date estimate
+        if (semestersLeft > 0) {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            // Assume semesters start in Jan and Aug
+            let gradYear = currentYear;
+            let gradSemester = currentMonth < 6 ? 1 : 2;
+            
+            for (let i = 0; i < semestersLeft; i++) {
+                gradSemester++;
+                if (gradSemester > 2) {
+                    gradSemester = 1;
+                    gradYear++;
+                }
+            }
+            
+            const gradMonthName = gradSemester === 1 ? 'Junio' : 'Diciembre';
+            document.getElementById('stats-graduation-date').textContent = `${gradMonthName} ${gradYear}`;
+        } else {
+            document.getElementById('stats-graduation-date').textContent = '--';
+        }
+    }
+    
+    function calculateCurrentSemesterGPA(materias) {
+        const passed = materias.filter(m => m.estado === 'passed');
+        if (passed.length === 0) return 0;
+        
+        const maxSemester = Math.max(...passed.map(m => m.semestre || 1));
+        const currentSemesterMaterias = materias.filter(m => 
+            m.semestre === maxSemester && m.estado === 'passed' && m.calificacion !== null
+        );
+        return calculateGPA(currentSemesterMaterias);
+    }
+    
+    function calculateGPATrend(materias) {
+        const semesterGPAs = getSemesterGPAs(materias);
+        if (semesterGPAs.length < 2) return 0;
+        
+        const lastTwo = semesterGPAs.slice(-2);
+        return lastTwo[1].gpa - lastTwo[0].gpa;
+    }
+    
+    function calculateAvgCreditsPerSemester(materias) {
+        const passed = materias.filter(m => m.estado === 'passed');
+        if (passed.length === 0) return 0;
+        
+        const bySemester = {};
+        passed.forEach(m => {
+            const sem = m.semestre || 1;
+            if (!bySemester[sem]) bySemester[sem] = 0;
+            bySemester[sem] += m.creditos || 0;
+        });
+        
+        const semesters = Object.keys(bySemester).length;
+        const totalCredits = passed.reduce((sum, m) => sum + (m.creditos || 0), 0);
+        
+        return semesters > 0 ? totalCredits / semesters : 0;
+    }
+    
+    function getSemesterGPAs(materias) {
+        const bySemester = {};
+        
+        materias.filter(m => m.estado === 'passed' && m.calificacion !== null).forEach(m => {
+            const sem = m.semestre || 1;
+            if (!bySemester[sem]) bySemester[sem] = [];
+            bySemester[sem].push(m);
+        });
+        
+        return Object.entries(bySemester)
+            .map(([sem, mats]) => ({
+                semester: parseInt(sem),
+                gpa: calculateGPA(mats),
+                credits: mats.reduce((sum, m) => sum + (m.creditos || 0), 0),
+                count: mats.length
+            }))
+            .sort((a, b) => a.semester - b.semester);
+    }
+    
+    function renderGPAChart() {
+        console.log('Rendering GPA chart...');
+        const canvas = document.getElementById('gpa-chart');
+        if (!canvas) {
+            console.error('GPA canvas not found');
+            return;
+        }
+        
+        const rect = canvas.getBoundingClientRect();
+        console.log('Canvas rect:', rect.width, rect.height);
+        
+        const ctx = canvas.getContext('2d');
+        const materias = getMateriasWithGrades();
+        console.log('Materias count:', materias.length);
+        const semesterData = getSemesterGPAs(materias);
+        console.log('Semester data:', semesterData);
+        
+        if (semesterData.length === 0) {
+            drawEmptyChart(ctx, canvas, 'No hay datos de calificaciones');
+            return;
+        }
+        
+        // Destroy existing chart
+        if (statsCharts.gpa) {
+            statsCharts.gpa = null;
+        }
+        
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        drawLineChart(ctx, canvas, {
+            labels: semesterData.map(d => `Sem ${d.semester}`),
+            data: semesterData.map(d => d.gpa),
+            color: '#6366f1',
+            fillColor: isDarkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
+            textColor: isDarkMode ? '#ffffff' : '#374151',
+            gridColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+            min: 0,
+            max: 4
+        });
+    }
+    
+    function renderCreditsChart() {
+        const canvas = document.getElementById('credits-chart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const materias = storage.getMaterias();
+        
+        const passed = materias.filter(m => m.estado === 'passed').reduce((sum, m) => sum + (m.creditos || 0), 0);
+        const enrolled = materias.filter(m => m.estado === 'enrolled').reduce((sum, m) => sum + (m.creditos || 0), 0);
+        const pending = materias.filter(m => m.estado === 'pending').reduce((sum, m) => sum + (m.creditos || 0), 0);
+        const failed = materias.filter(m => m.estado === 'failed').reduce((sum, m) => sum + (m.creditos || 0), 0);
+        
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        drawDonutChart(ctx, canvas, {
+            data: [passed, enrolled, pending, failed],
+            labels: ['Aprobados', 'Cursando', 'Pendientes', 'Reprobados'],
+            colors: ['#22c55e', '#3b82f6', '#9ca3af', '#ef4444'],
+            textColor: isDarkMode ? '#ffffff' : '#374151'
+        });
+    }
+    
+    function renderGradesChart() {
+        const canvas = document.getElementById('grades-chart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const materias = getMateriasWithGrades();
+        const graded = materias.filter(m => m.estado === 'passed' && m.calificacion !== null);
+        
+        if (graded.length === 0) {
+            drawEmptyChart(ctx, canvas, 'No hay calificaciones registradas');
+            return;
+        }
+        
+        // Group by grade ranges
+        const ranges = {
+            'A (3.5-4.0)': graded.filter(m => m.calificacion >= 3.5).length,
+            'B (3.0-3.4)': graded.filter(m => m.calificacion >= 3.0 && m.calificacion < 3.5).length,
+            'C (2.5-2.9)': graded.filter(m => m.calificacion >= 2.5 && m.calificacion < 3.0).length,
+            'D (2.0-2.4)': graded.filter(m => m.calificacion >= 2.0 && m.calificacion < 2.5).length,
+            'F (<2.0)': graded.filter(m => m.calificacion < 2.0).length
+        };
+        
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        drawBarChart(ctx, canvas, {
+            labels: Object.keys(ranges),
+            data: Object.values(ranges),
+            colors: ['#22c55e', '#84cc16', '#eab308', '#f97316', '#ef4444'],
+            textColor: isDarkMode ? '#ffffff' : '#374151',
+            gridColor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'
+        });
+    }
+    
+    function renderTypesChart() {
+        const canvas = document.getElementById('types-chart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const materias = storage.getMaterias();
+        
+        // Group by user-defined type field, or show "Sin tipo" if not defined
+        const typeGroups = {};
+        materias.forEach(m => {
+            const tipo = m.tipo || 'Sin definir';
+            if (!typeGroups[tipo]) typeGroups[tipo] = 0;
+            typeGroups[tipo]++;
+        });
+        
+        const typeColors = {
+            'Núcleo': '#6366f1',
+            'Formación Social': '#8b5cf6', 
+            'Formación Profesional': '#a855f7',
+            'Electiva': '#d946ef',
+            'Complementaria': '#ec4899',
+            'Sin definir': '#9ca3af'
+        };
+        
+        const labels = Object.keys(typeGroups);
+        const data = Object.values(typeGroups);
+        const colors = labels.map(l => typeColors[l] || '#9ca3af');
+        
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        drawDonutChart(ctx, canvas, {
+            data: data,
+            labels: labels,
+            colors: colors,
+            textColor: isDarkMode ? '#ffffff' : '#374151'
+        });
+    }
+    
+    function renderSemesterTable() {
+        const tbody = document.getElementById('semester-stats-body');
+        if (!tbody) return;
+        
+        const materias = getMateriasWithGrades();
+        const semesterData = getSemesterGPAs(materias);
+        
+        tbody.innerHTML = semesterData.map(s => `
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">${s.semester}</td>
+                <td class="px-4 py-3 text-sm text-center text-gray-700 dark:text-gray-300">${s.count}</td>
+                <td class="px-4 py-3 text-sm text-center text-gray-700 dark:text-gray-300">${s.credits}</td>
+                <td class="px-4 py-3 text-sm text-center">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                        s.gpa >= 3.5 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                        s.gpa >= 3.0 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                        s.gpa >= 2.5 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    }">${s.gpa.toFixed(2)}</span>
+                </td>
+            </tr>
+        `).join('') || '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">No hay datos</td></tr>';
+    }
+    
+    function renderTopBottomGrades() {
+        const topDiv = document.getElementById('top-grades');
+        const bottomDiv = document.getElementById('bottom-grades');
+        if (!topDiv || !bottomDiv) return;
+        
+        const materias = getMateriasWithGrades();
+        const graded = materias.filter(m => m.calificacion !== null && m.estado === 'passed')
+            .sort((a, b) => b.calificacion - a.calificacion);
+        
+        const top5 = graded.slice(0, 5);
+        const bottom5 = graded.slice(-5).reverse();
+        
+        const renderGradeItem = (m, isTop) => `
+            <div class="flex items-center justify-between py-1">
+                <span class="text-sm text-gray-700 dark:text-gray-300 truncate" title="${m.nombre}">${m.nombre}</span>
+                <span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold ${
+                    isTop ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 
+                            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                }">${m.calificacion.toFixed(2)}</span>
+            </div>
+        `;
+        
+        topDiv.innerHTML = top5.map(m => renderGradeItem(m, true)).join('') || 
+            '<p class="text-sm text-gray-500 dark:text-gray-400">No hay calificaciones</p>';
+        bottomDiv.innerHTML = bottom5.map(m => renderGradeItem(m, false)).join('') || 
+            '<p class="text-sm text-gray-500 dark:text-gray-400">No hay calificaciones</p>';
+    }
+    
+    function renderAchievements() {
+        const grid = document.getElementById('achievements-grid');
+        if (!grid) return;
+        
+        const materias = getMateriasWithGrades();
+        const passed = materias.filter(m => m.estado === 'passed');
+        const graded = passed.filter(m => m.calificacion !== null);
+        const totalCredits = passed.reduce((sum, m) => sum + (m.creditos || 0), 0);
+        const gpa = calculateGPA(materias);
+        const perfectGrades = graded.filter(m => m.calificacion === 4.0).length;
+        
+        const achievements = [
+            {
+                id: 'first-course',
+                name: 'Primera Materia',
+                icon: '🎯',
+                description: 'Aprobaste tu primera materia',
+                earned: passed.length >= 1
+            },
+            {
+                id: '10-courses',
+                name: 'Diez Materias',
+                icon: '📚',
+                description: 'Aprobaste 10 materias',
+                earned: passed.length >= 10
+            },
+            {
+                id: '25-courses',
+                name: '25 Materias',
+                icon: '🏆',
+                description: 'Aprobaste 25 materias',
+                earned: passed.length >= 25
+            },
+            {
+                id: '50-courses',
+                name: 'Medio Camino',
+                icon: '⭐',
+                description: 'Aprobaste 50 materias',
+                earned: passed.length >= 50
+            },
+            {
+                id: 'honor-roll',
+                name: 'Cuadro de Honor',
+                icon: '🎖️',
+                description: 'Índice mayor a 3.5',
+                earned: gpa && gpa >= 3.5
+            },
+            {
+                id: 'perfect-gpa',
+                name: 'Perfección',
+                icon: '💎',
+                description: 'Índice de 4.0',
+                earned: gpa && gpa === 4.0
+            },
+            {
+                id: 'first-perfect',
+                name: 'Primera A',
+                icon: '✨',
+                description: 'Tu primera calificación perfecta',
+                earned: perfectGrades >= 1
+            },
+            {
+                id: '5-perfect',
+                name: 'Cinco Perfectas',
+                icon: '🌟',
+                description: '5 calificaciones de 4.0',
+                earned: perfectGrades >= 5
+            },
+            {
+                id: '30-credits',
+                name: '30 Créditos',
+                icon: '📖',
+                description: 'Completaste 30 créditos',
+                earned: totalCredits >= 30
+            },
+            {
+                id: '60-credits',
+                name: '60 Créditos',
+                icon: '📕',
+                description: 'Completaste 60 créditos',
+                earned: totalCredits >= 60
+            },
+            {
+                id: '100-credits',
+                name: '100 Créditos',
+                icon: '🎓',
+                description: 'Completaste 100 créditos',
+                earned: totalCredits >= 100
+            },
+            {
+                id: 'comeback',
+                name: 'Resiliencia',
+                icon: '💪',
+                description: 'Recuperaste una materia reprobada',
+                earned: materias.some(m => m.estado === 'passed' && m.intentos > 1)
+            }
+        ];
+        
+        grid.innerHTML = achievements.map(a => `
+            <div class="relative p-4 rounded-lg border-2 transition-all ${
+                a.earned 
+                    ? 'border-amber-300 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/20' 
+                    : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50 opacity-50'
+            }">
+                <div class="text-3xl mb-2 ${a.earned ? '' : 'grayscale'}">${a.icon}</div>
+                <h5 class="text-sm font-semibold text-gray-800 dark:text-white">${a.name}</h5>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${a.description}</p>
+                ${a.earned ? '<div class="absolute top-2 right-2 w-3 h-3 bg-green-500 rounded-full"></div>' : ''}
+            </div>
+        `).join('');
+    }
+    
+    // ============================================
+    // CHART DRAWING UTILITIES (Canvas-based)
+    // ============================================
+    
+    function getCanvasDimensions(canvas) {
+        // Use getBoundingClientRect for accurate dimensions
+        const rect = canvas.getBoundingClientRect();
+        const width = rect.width || 400;
+        const height = rect.height || 250;
+        
+        // Set canvas dimensions with device pixel ratio for sharp rendering
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        
+        return { width, height };
+    }
+    
+    function drawEmptyChart(ctx, canvas, message) {
+        const { width, height } = getCanvasDimensions(canvas);
+        
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        ctx.fillStyle = isDarkMode ? '#9ca3af' : '#6b7280';
+        ctx.font = '14px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(message, width / 2, height / 2);
+    }
+    
+    function drawLineChart(ctx, canvas, options) {
+        const { labels, data, color, fillColor, textColor, gridColor, min, max } = options;
+        
+        const { width, height } = getCanvasDimensions(canvas);
+        const padding = { top: 50, right: 20, bottom: 40, left: 50 };
+        
+        const chartWidth = width - padding.left - padding.right;
+        const chartHeight = height - padding.top - padding.bottom;
+        
+        // Draw grid
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        
+        const ySteps = 4;
+        for (let i = 0; i <= ySteps; i++) {
+            const y = padding.top + (chartHeight / ySteps) * i;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(width - padding.right, y);
+            ctx.stroke();
+            
+            // Y labels
+            const value = max - ((max - min) / ySteps) * i;
+            ctx.fillStyle = textColor;
+            ctx.font = '11px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(value.toFixed(1), padding.left - 8, y + 4);
+        }
+        
+        if (data.length === 0) return;
+        
+        // Draw fill
+        const xStep = chartWidth / (data.length - 1 || 1);
+        
+        ctx.beginPath();
+        ctx.moveTo(padding.left, padding.top + chartHeight);
+        
+        data.forEach((value, i) => {
+            const x = padding.left + i * xStep;
+            const y = padding.top + chartHeight - ((value - min) / (max - min)) * chartHeight;
+            ctx.lineTo(x, y);
+        });
+        
+        ctx.lineTo(padding.left + (data.length - 1) * xStep, padding.top + chartHeight);
+        ctx.closePath();
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+        
+        // Draw line
+        ctx.beginPath();
+        data.forEach((value, i) => {
+            const x = padding.left + i * xStep;
+            const y = padding.top + chartHeight - ((value - min) / (max - min)) * chartHeight;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Draw points and labels
+        data.forEach((value, i) => {
+            const x = padding.left + i * xStep;
+            const y = padding.top + chartHeight - ((value - min) / (max - min)) * chartHeight;
+            
+            // Point
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // X label
+            ctx.fillStyle = textColor;
+            ctx.font = '11px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(labels[i], x, height - padding.bottom + 20);
+        });
+    }
+    
+    function drawBarChart(ctx, canvas, options) {
+        const { labels, data, colors, textColor, gridColor } = options;
+        
+        const { width, height } = getCanvasDimensions(canvas);
+        const padding = { top: 20, right: 20, bottom: 60, left: 40 };
+        
+        const chartWidth = width - padding.left - padding.right;
+        const chartHeight = height - padding.top - padding.bottom;
+        
+        const maxValue = Math.max(...data, 1);
+        const barWidth = chartWidth / data.length * 0.6;
+        const gap = chartWidth / data.length * 0.4;
+        
+        // Draw grid
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        
+        const ySteps = 4;
+        for (let i = 0; i <= ySteps; i++) {
+            const y = padding.top + (chartHeight / ySteps) * i;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(width - padding.right, y);
+            ctx.stroke();
+        }
+        
+        // Draw bars
+        data.forEach((value, i) => {
+            const x = padding.left + (chartWidth / data.length) * i + gap / 2;
+            const barHeight = (value / maxValue) * chartHeight;
+            const y = padding.top + chartHeight - barHeight;
+            
+            // Bar
+            ctx.fillStyle = colors[i] || colors[0];
+            ctx.beginPath();
+            ctx.roundRect(x, y, barWidth, barHeight, 4);
+            ctx.fill();
+            
+            // Value on top
+            if (value > 0) {
+                ctx.fillStyle = textColor;
+                ctx.font = 'bold 12px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(value.toString(), x + barWidth / 2, y - 5);
+            }
+            
+            // X label
+            ctx.fillStyle = textColor;
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            
+            // Wrap label if needed
+            const label = labels[i];
+            const words = label.split(' ');
+            let line = '';
+            let lineY = height - padding.bottom + 15;
+            
+            words.forEach((word, wi) => {
+                const testLine = line + word + ' ';
+                if (ctx.measureText(testLine).width > barWidth + gap && wi > 0) {
+                    ctx.fillText(line.trim(), x + barWidth / 2, lineY);
+                    line = word + ' ';
+                    lineY += 12;
+                } else {
+                    line = testLine;
+                }
+            });
+            ctx.fillText(line.trim(), x + barWidth / 2, lineY);
+        });
+    }
+    
+    function drawDonutChart(ctx, canvas, options) {
+        const { data, labels, colors, textColor } = options;
+        
+        const total = data.reduce((sum, v) => sum + v, 0);
+        if (total === 0) {
+            drawEmptyChart(ctx, canvas, 'No hay datos');
+            return;
+        }
+        
+        const { width, height } = getCanvasDimensions(canvas);
+        
+        const centerX = width * 0.35;
+        const centerY = height / 2;
+        const radius = Math.min(width * 0.3, height * 0.4);
+        const innerRadius = radius * 0.6;
+        
+        let startAngle = -Math.PI / 2;
+        
+        data.forEach((value, i) => {
+            if (value === 0) return;
+            
+            const sliceAngle = (value / total) * Math.PI * 2;
+            const endAngle = startAngle + sliceAngle;
+            
+            // Draw slice
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = colors[i];
+            ctx.fill();
+            
+            startAngle = endAngle;
+        });
+        
+        // Draw inner circle (donut hole)
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+        ctx.fillStyle = isDarkMode ? '#1f2937' : '#ffffff';
+        ctx.fill();
+        
+        // Draw total in center
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 24px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(total.toString(), centerX, centerY - 8);
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillText('Total', centerX, centerY + 12);
+        
+        // Draw legend
+        const legendX = width * 0.65;
+        let legendY = (height - labels.length * 25) / 2;
+        
+        labels.forEach((label, i) => {
+            if (data[i] === 0) return;
+            
+            // Color box
+            ctx.fillStyle = colors[i];
+            ctx.beginPath();
+            ctx.roundRect(legendX, legendY, 12, 12, 2);
+            ctx.fill();
+            
+            // Label
+            ctx.fillStyle = textColor;
+            ctx.font = '12px Inter, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${label}: ${data[i]}`, legendX + 18, legendY + 6);
+            
+            legendY += 25;
+        });
     }
 </script>
 {% endblock %}
