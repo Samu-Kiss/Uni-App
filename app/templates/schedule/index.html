@@ -1,0 +1,1446 @@
+{% extends 'base.html' %}
+
+{% block title %}Horario - Uni-App{% endblock %}
+
+{% block content_class %}max-w-[1600px]{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Generador de Horarios</h1>
+            <p class="text-sm text-gray-500 mt-1">Crea y optimiza tu horario de clases</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openScheduleImportModal()" 
+                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                Importar
+            </button>
+            <button onclick="exportScheduleJSON()" 
+                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Exportar
+            </button>
+            <div class="flex items-center space-x-2 ml-2">
+                <label class="text-sm font-medium text-gray-700">Semestre:</label>
+                <select id="schedule-semester-select" onchange="loadSemesterClasses(this.value)"
+                        class="border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Layout: 2 columns -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column: Classes Management -->
+        <div class="lg:col-span-1 space-y-4">
+            <!-- Add Class Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Agregar Clase</h3>
+                <form id="add-class-form" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Materia</label>
+                        <select id="class-materia" required
+                                class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Sección</label>
+                            <input type="text" id="class-section" required placeholder="A1"
+                                   class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Profesor</label>
+                            <input type="text" id="class-professor" placeholder="Opcional"
+                                   class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                        </div>
+                    </div>
+                    
+                    <!-- Time blocks -->
+                    <div id="time-blocks-container" class="space-y-2">
+                        <label class="block text-xs font-medium text-gray-600">Bloques de horario</label>
+                        <div class="time-block flex items-center space-x-2">
+                            <select class="block-day text-xs border-gray-300 rounded focus:ring-accent-500">
+                                <option value="L">Lun</option>
+                                <option value="M">Mar</option>
+                                <option value="W">Mié</option>
+                                <option value="J">Jue</option>
+                                <option value="V">Vie</option>
+                                <option value="S">Sáb</option>
+                            </select>
+                            <input type="time" class="block-start text-xs border-gray-300 rounded focus:ring-accent-500" value="07:00">
+                            <span class="text-gray-400">-</span>
+                            <input type="time" class="block-end text-xs border-gray-300 rounded focus:ring-accent-500" value="09:00">
+                            <button type="button" onclick="removeTimeBlock(this)" class="text-red-400 hover:text-red-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addTimeBlock()"
+                            class="text-xs text-accent-500 hover:text-accent-600">
+                        + Agregar bloque
+                    </button>
+                    
+                    <button type="submit"
+                            class="w-full py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                        Agregar Clase
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Classes List -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Clases Registradas</h3>
+                <div id="classes-list" class="space-y-2 max-h-64 overflow-y-auto">
+                    <p class="text-sm text-gray-500 text-center py-4">No hay clases registradas</p>
+                </div>
+            </div>
+            
+            <!-- Time Preferences -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Preferencias de Horario</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Franjas bloqueadas</label>
+                        <div id="blocked-slots" class="space-y-1">
+                            <p class="text-xs text-gray-400">Ninguna</p>
+                        </div>
+                        <button type="button" onclick="openFranjaModal('blocked')"
+                                class="mt-1 text-xs text-accent-500 hover:text-accent-600">
+                            + Agregar franja bloqueada
+                        </button>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Franjas preferidas</label>
+                        <div id="preferred-slots" class="space-y-1">
+                            <p class="text-xs text-gray-400">Ninguna</p>
+                        </div>
+                        <button type="button" onclick="openFranjaModal('preferred')"
+                                class="mt-1 text-xs text-accent-500 hover:text-accent-600">
+                            + Agregar franja preferida
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Schedule Grid & Generation -->
+        <div class="lg:col-span-2 space-y-4">
+            <!-- Generate Button & Filters -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700">Generar Horarios</h3>
+                        <p class="text-xs text-gray-500">Se generarán todas las combinaciones válidas</p>
+                    </div>
+                    <button onclick="generateSchedules()"
+                            class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Generar
+                    </button>
+                </div>
+                
+                <!-- Warning banner for large combinations -->
+                <div id="generation-warning" class="hidden mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p class="text-sm text-yellow-700">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <span id="warning-text">Gran número de combinaciones posibles</span>
+                    </p>
+                </div>
+                
+                <!-- Optimization Presets -->
+                <div class="mt-4">
+                    <label class="block text-xs font-medium text-gray-600 mb-2">Optimizar por:</label>
+                    <div id="optimization-presets" class="flex flex-wrap gap-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Summary -->
+            <div id="results-summary" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700">Resultados</h3>
+                        <p class="text-xs text-gray-500">
+                            <span id="results-count">0</span> combinaciones válidas de <span id="results-total">0</span> posibles
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="prevCombination()" class="p-1 rounded hover:bg-gray-100" id="prev-btn" disabled>
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <span class="text-sm font-medium text-gray-700">
+                            <span id="current-combo">1</span> / <span id="total-combos">0</span>
+                        </span>
+                        <button onclick="nextCombination()" class="p-1 rounded hover:bg-gray-100" id="next-btn" disabled>
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Combination Metrics -->
+                <div id="combo-metrics" class="mt-3 grid grid-cols-4 gap-2 text-center">
+                    <div class="p-2 bg-gray-50 rounded">
+                        <p class="text-lg font-bold text-accent-600" id="metric-free-days">0</p>
+                        <p class="text-xs text-gray-500">Días libres</p>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded">
+                        <p class="text-lg font-bold text-gray-700" id="metric-gaps">0</p>
+                        <p class="text-xs text-gray-500">Huecos</p>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded">
+                        <p class="text-lg font-bold text-gray-700" id="metric-start">--:--</p>
+                        <p class="text-xs text-gray-500">Inicia</p>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded">
+                        <p class="text-lg font-bold text-gray-700" id="metric-end">--:--</p>
+                        <p class="text-xs text-gray-500">Termina</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Schedule Grid -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-gray-700">Vista del Horario</h3>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="exportToPNG()" class="text-xs text-gray-600 hover:text-accent-500">
+                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            PNG
+                        </button>
+                        <button onclick="exportToICS()" class="text-xs text-gray-600 hover:text-accent-500">
+                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            ICS
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Schedule Table -->
+                <div id="schedule-grid-container" class="overflow-x-auto">
+                    <table class="w-full border-collapse" id="schedule-grid">
+                        <thead>
+                            <tr>
+                                <th class="w-16 p-2 text-xs font-medium text-gray-500 border-b"></th>
+                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Lun</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Mar</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Mié</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Jue</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Vie</th>
+                                <th class="p-2 text-xs font-medium text-gray-500 border-b">Sáb</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedule-grid-body">
+                            <!-- Rows will be generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Franja Modal -->
+<div id="franja-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeFranjaModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 id="franja-modal-title" class="text-lg font-semibold text-gray-900 mb-4">Agregar Franja</h3>
+            <form id="franja-form" class="space-y-4">
+                <input type="hidden" id="franja-type">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Día</label>
+                    <select id="franja-day" required
+                            class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                        <option value="L">Lunes</option>
+                        <option value="M">Martes</option>
+                        <option value="W">Miércoles</option>
+                        <option value="J">Jueves</option>
+                        <option value="V">Viernes</option>
+                        <option value="S">Sábado</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Inicio</label>
+                        <input type="time" id="franja-start" required value="12:00"
+                               class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fin</label>
+                        <input type="time" id="franja-end" required value="14:00"
+                               class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeFranjaModal()"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                        Agregar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ICS Export Modal -->
+<div id="ics-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeICSModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Exportar a Calendario</h3>
+            <form id="ics-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Inicio del semestre</label>
+                    <input type="date" id="ics-start" required
+                           class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fin del semestre</label>
+                    <input type="date" id="ics-end" required
+                           class="w-full border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeICSModal()"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                        Descargar .ics
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Import Modal -->
+<div id="schedule-import-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeScheduleImportModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Importar Horario</h3>
+            <div class="space-y-4">
+                <!-- Template Download -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-sm text-blue-700">¿Primera vez? Descarga la plantilla</span>
+                    </div>
+                    <a href="{{ url_for('static', filename='templates/schedule_template.json') }}" 
+                       download="horario_template.json"
+                       class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Descargar
+                    </a>
+                </div>
+                
+                <!-- Import Options -->
+                <div class="flex items-center space-x-4 text-sm">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="import-replace" class="rounded border-gray-300 text-accent-500 focus:ring-accent-500">
+                        <span class="ml-2 text-gray-700">Reemplazar clases existentes</span>
+                    </label>
+                </div>
+                
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <input type="file" id="schedule-import-file" accept=".json" class="hidden" onchange="handleScheduleImportFile(event)">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-600">Arrastra un archivo JSON o</p>
+                    <button onclick="document.getElementById('schedule-import-file').click()"
+                            class="mt-2 text-sm text-accent-500 hover:text-accent-600 font-medium">
+                        selecciona un archivo
+                    </button>
+                </div>
+                <div id="schedule-import-preview" class="hidden">
+                    <p class="text-sm text-gray-600 mb-2">Vista previa:</p>
+                    <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                        <pre id="schedule-import-preview-content" class="text-xs text-gray-700"></pre>
+                    </div>
+                </div>
+                <div id="schedule-import-error" class="hidden text-sm text-red-600"></div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeScheduleImportModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    Cancelar
+                </button>
+                <button id="schedule-import-confirm-btn" onclick="confirmScheduleImport()" disabled
+                        class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Importar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Class Modal -->
+<div id="edit-class-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeEditClassModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Editar Clase</h3>
+            <form id="edit-class-form" class="space-y-4">
+                <input type="hidden" id="edit-class-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Materia</label>
+                    <input type="text" id="edit-class-materia" readonly
+                           class="w-full text-sm border-gray-300 rounded-lg bg-gray-50">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Sección</label>
+                        <input type="text" id="edit-class-section" required
+                               class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Profesor</label>
+                        <input type="text" id="edit-class-professor"
+                               class="w-full text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bloques de horario</label>
+                    <div id="edit-time-blocks-container" class="space-y-2"></div>
+                    <button type="button" onclick="addEditTimeBlock()"
+                            class="mt-2 text-sm text-accent-500 hover:text-accent-600">
+                        + Agregar bloque
+                    </button>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeEditClassModal()"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include 'components/alert.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Schedule Generator State
+    let currentSemester = 1;
+    let registeredClasses = [];
+    let generatedSchedules = [];
+    let currentScheduleIndex = 0;
+    let preferences = {
+        blocked: [],
+        preferred: []
+    };
+    
+    const DAYS = ['L', 'M', 'W', 'J', 'V', 'S'];
+    const DAY_NAMES = { 'L': 'Lun', 'M': 'Mar', 'W': 'Mié', 'J': 'Jue', 'V': 'Vie', 'S': 'Sáb' };
+    const HOURS = Array.from({length: 15}, (_, i) => i + 7); // 7am to 9pm
+    
+    // Helper function to format time blocks
+    function formatBloques(bloques) {
+        return bloques.map(b => DAY_NAMES[b.dia] + ' ' + b.hora_inicio + '-' + b.hora_fin).join(', ');
+    }
+    
+    const COLORS = [
+        'bg-blue-100 border-blue-300 text-blue-800',
+        'bg-green-100 border-green-300 text-green-800',
+        'bg-yellow-100 border-yellow-300 text-yellow-800',
+        'bg-purple-100 border-purple-300 text-purple-800',
+        'bg-pink-100 border-pink-300 text-pink-800',
+        'bg-indigo-100 border-indigo-300 text-indigo-800',
+        'bg-orange-100 border-orange-300 text-orange-800',
+        'bg-teal-100 border-teal-300 text-teal-800',
+    ];
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Populate semester selector
+        const select = document.getElementById('schedule-semester-select');
+        for (let i = 1; i <= 12; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Semestre ${i}`;
+            select.appendChild(option);
+        }
+        
+        // Load from localStorage
+        loadPreferences();
+        loadClasses();
+        
+        // Initialize grid
+        renderScheduleGrid();
+        
+        // Initialize optimization presets
+        renderOptimizationPresets();
+        
+        // Form handlers
+        document.getElementById('add-class-form').addEventListener('submit', handleAddClass);
+        document.getElementById('franja-form').addEventListener('submit', handleAddFranja);
+        document.getElementById('ics-form').addEventListener('submit', handleICSExport);
+        document.getElementById('edit-class-form').addEventListener('submit', handleEditClassSubmit);
+        
+        loadSemesterClasses(1);
+    });
+    
+    function loadSemesterClasses(semesterNum) {
+        currentSemester = parseInt(semesterNum);
+        
+        // Load materias for this semester to populate the dropdown
+        const materias = storage.getMaterias().filter(m => m.semestre === currentSemester);
+        const select = document.getElementById('class-materia');
+        select.innerHTML = '<option value="">Seleccionar...</option>';
+        
+        materias.forEach(m => {
+            const option = document.createElement('option');
+            option.value = m.codigo;
+            option.textContent = `${m.codigo} - ${m.nombre}`;
+            option.dataset.credits = m.creditos;
+            option.dataset.name = m.nombre;
+            select.appendChild(option);
+        });
+    }
+    
+    function loadPreferences() {
+        const config = storage.getConfig();
+        preferences.blocked = config.franjasBloqueadas || [];
+        preferences.preferred = config.franjasPreferidas || [];
+        renderFranjas();
+    }
+    
+    // Map to track color assignments per materia
+    let materiaColors = {};
+    
+    function loadClasses() {
+        registeredClasses = storage.getClases();
+        // Assign colors by unique materia
+        assignMateriaColors();
+        renderClassesList();
+    }
+    
+    function assignMateriaColors() {
+        materiaColors = {};
+        let colorIndex = 0;
+        registeredClasses.forEach(c => {
+            if (!materiaColors[c.codigo_materia]) {
+                materiaColors[c.codigo_materia] = COLORS[colorIndex % COLORS.length];
+                colorIndex++;
+            }
+            // Update class color to match its materia
+            c.color = materiaColors[c.codigo_materia];
+        });
+    }
+    
+    function getMateriaColor(codigoMateria) {
+        if (!materiaColors[codigoMateria]) {
+            const colorIndex = Object.keys(materiaColors).length;
+            materiaColors[codigoMateria] = COLORS[colorIndex % COLORS.length];
+        }
+        return materiaColors[codigoMateria];
+    }
+    
+    function renderScheduleGrid() {
+        const tbody = document.getElementById('schedule-grid-body');
+        tbody.innerHTML = '';
+        
+        HOURS.forEach(hour => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="p-1 text-xs text-gray-400 border-r">${hour}:00</td>
+                ${DAYS.map(day => `
+                    <td class="schedule-cell border border-gray-100 relative h-12" 
+                        data-day="${day}" data-hour="${hour}"></td>
+                `).join('')}
+            `;
+            tbody.appendChild(row);
+        });
+    }
+    
+    function renderOptimizationPresets() {
+        const container = document.getElementById('optimization-presets');
+        const presets = [
+            { id: 'free-days', label: 'Más días libres', icon: '📅' },
+            { id: 'less-gaps', label: 'Menos huecos', icon: '⏱️' },
+            { id: 'early-end', label: 'Terminar temprano', icon: '🌅' },
+            { id: 'late-start', label: 'Empezar tarde', icon: '🌙' }
+        ];
+        
+        container.innerHTML = presets.map((p, i) => `
+            <button type="button" onclick="sortSchedules('${p.id}')"
+                    class="px-3 py-1.5 text-xs font-medium rounded-full border ${i === 0 ? 'bg-accent-50 border-accent-300 text-accent-700' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'}">
+                ${p.icon} ${p.label}
+            </button>
+        `).join('');
+    }
+    
+    function handleAddClass(e) {
+        e.preventDefault();
+        
+        const materiaSelect = document.getElementById('class-materia');
+        const codigo = materiaSelect.value;
+        const option = materiaSelect.selectedOptions[0];
+        
+        if (!codigo) {
+            App.showAlert('Selecciona una materia', 'error');
+            return;
+        }
+        
+        const section = document.getElementById('class-section').value;
+        const professor = document.getElementById('class-professor').value;
+        
+        // Gather time blocks
+        const timeBlocks = [];
+        document.querySelectorAll('.time-block').forEach(block => {
+            const day = block.querySelector('.block-day').value;
+            const start = block.querySelector('.block-start').value;
+            const end = block.querySelector('.block-end').value;
+            if (day && start && end) {
+                timeBlocks.push({ dia: day, hora_inicio: start, hora_fin: end });
+            }
+        });
+        
+        if (timeBlocks.length === 0) {
+            App.showAlert('Agrega al menos un bloque de horario', 'error');
+            return;
+        }
+        
+        const clase = {
+            id: `${codigo}-${section}-${Date.now()}`,
+            codigo_materia: codigo,
+            nombre_materia: option.dataset.name,
+            seccion: section,
+            profesor: professor,
+            bloques: timeBlocks,
+            creditos: parseInt(option.dataset.credits) || 3,
+            color: getMateriaColor(codigo)
+        };
+        
+        registeredClasses.push(clase);
+        storage.saveClase(clase);
+        
+        renderClassesList();
+        e.target.reset();
+        App.showAlert('Clase agregada', 'success');
+    }
+    
+    function renderClassesList() {
+        const container = document.getElementById('classes-list');
+        
+        if (registeredClasses.length === 0) {
+            container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">No hay clases registradas</p>';
+            return;
+        }
+        
+        // Group classes by materia
+        const groupedByMateria = {};
+        registeredClasses.forEach(c => {
+            if (!groupedByMateria[c.codigo_materia]) {
+                groupedByMateria[c.codigo_materia] = {
+                    codigo: c.codigo_materia,
+                    nombre: c.nombre_materia,
+                    color: c.color,
+                    clases: []
+                };
+            }
+            groupedByMateria[c.codigo_materia].clases.push(c);
+        });
+        
+        container.innerHTML = Object.values(groupedByMateria).map(materia => `
+            <div class="rounded-lg border ${materia.color.split(' ')[1]} overflow-hidden">
+                <div class="${materia.color.split(' ')[0]} px-3 py-2 border-b ${materia.color.split(' ')[1]}">
+                    <p class="text-sm font-semibold ${materia.color.split(' ')[2]}">${materia.codigo}</p>
+                    <p class="text-xs opacity-75">${materia.nombre}</p>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    ${materia.clases.map(c => `
+                        <div class="flex items-center justify-between px-3 py-2 ${c.disabled ? 'bg-gray-100 opacity-60' : 'bg-white'} hover:bg-gray-50">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm font-medium ${c.disabled ? 'text-gray-500 line-through' : 'text-gray-800'}">Sección ${c.seccion}</p>
+                                    ${c.disabled ? '<span class="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">Deshabilitada</span>' : ''}
+                                </div>
+                                ${c.profesor ? `<p class="text-xs text-gray-500">${c.profesor}</p>` : ''}
+                                <p class="text-xs text-gray-400 truncate">${formatBloques(c.bloques)}</p>
+                            </div>
+                            <div class="flex items-center gap-1 ml-2">
+                                <!-- Edit -->
+                                <button onclick="openEditClassModal('${c.id}')" class="text-gray-400 hover:text-accent-500 p-1" title="Editar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <!-- Toggle disable -->
+                                <button onclick="toggleClassDisabled('${c.id}')" class="${c.disabled ? 'text-green-500 hover:text-green-600' : 'text-gray-400 hover:text-yellow-500'} p-1" title="${c.disabled ? 'Habilitar' : 'Deshabilitar'}">
+                                    ${c.disabled ? 
+                                        '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>' :
+                                        '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>'
+                                    }
+                                </button>
+                                <!-- Delete -->
+                                <button onclick="removeClass('${c.id}')" class="text-gray-400 hover:text-red-500 p-1" title="Eliminar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function removeClass(id) {
+        if (!confirm('¿Eliminar esta clase?')) return;
+        registeredClasses = registeredClasses.filter(c => c.id !== id);
+        storage.deleteClase(id);
+        // Reassign colors in case a materia was fully removed
+        assignMateriaColors();
+        renderClassesList();
+        App.showAlert('Clase eliminada', 'success');
+    }
+    
+    function toggleClassDisabled(id) {
+        const clase = registeredClasses.find(c => c.id === id);
+        if (clase) {
+            clase.disabled = !clase.disabled;
+            storage.saveClase(clase);
+            renderClassesList();
+            App.showAlert(clase.disabled ? 'Clase deshabilitada' : 'Clase habilitada', 'success');
+        }
+    }
+    
+    // Edit class modal
+    let editingClassId = null;
+    
+    function openEditClassModal(id) {
+        const clase = registeredClasses.find(c => c.id === id);
+        if (!clase) return;
+        
+        editingClassId = id;
+        document.getElementById('edit-class-id').value = id;
+        document.getElementById('edit-class-materia').value = `${clase.nombre_materia} (${clase.codigo_materia})`;
+        document.getElementById('edit-class-section').value = clase.seccion;
+        document.getElementById('edit-class-professor').value = clase.profesor || '';
+        
+        // Populate time blocks
+        const container = document.getElementById('edit-time-blocks-container');
+        container.innerHTML = '';
+        clase.bloques.forEach(b => {
+            addEditTimeBlock(b.dia, b.hora_inicio, b.hora_fin);
+        });
+        
+        document.getElementById('edit-class-modal').classList.remove('hidden');
+    }
+    
+    function closeEditClassModal() {
+        document.getElementById('edit-class-modal').classList.add('hidden');
+        editingClassId = null;
+    }
+    
+    function addEditTimeBlock(dia = 'L', inicio = '07:00', fin = '09:00') {
+        const container = document.getElementById('edit-time-blocks-container');
+        const block = document.createElement('div');
+        block.className = 'edit-time-block flex items-center space-x-2';
+        block.innerHTML = `
+            <select class="edit-block-day text-sm border-gray-300 rounded focus:ring-accent-500">
+                <option value="L" ${dia === 'L' ? 'selected' : ''}>Lun</option>
+                <option value="M" ${dia === 'M' ? 'selected' : ''}>Mar</option>
+                <option value="W" ${dia === 'W' ? 'selected' : ''}>Mié</option>
+                <option value="J" ${dia === 'J' ? 'selected' : ''}>Jue</option>
+                <option value="V" ${dia === 'V' ? 'selected' : ''}>Vie</option>
+                <option value="S" ${dia === 'S' ? 'selected' : ''}>Sáb</option>
+            </select>
+            <input type="time" class="edit-block-start text-sm border-gray-300 rounded focus:ring-accent-500" value="${inicio}">
+            <span class="text-gray-400">-</span>
+            <input type="time" class="edit-block-end text-sm border-gray-300 rounded focus:ring-accent-500" value="${fin}">
+            <button type="button" onclick="removeEditTimeBlock(this)" class="text-red-400 hover:text-red-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        `;
+        container.appendChild(block);
+    }
+    
+    function removeEditTimeBlock(btn) {
+        const blocks = document.querySelectorAll('.edit-time-block');
+        if (blocks.length > 1) {
+            btn.closest('.edit-time-block').remove();
+        }
+    }
+    
+    function handleEditClassSubmit(e) {
+        e.preventDefault();
+        
+        const clase = registeredClasses.find(c => c.id === editingClassId);
+        if (!clase) return;
+        
+        // Gather time blocks
+        const timeBlocks = [];
+        document.querySelectorAll('.edit-time-block').forEach(block => {
+            const day = block.querySelector('.edit-block-day').value;
+            const start = block.querySelector('.edit-block-start').value;
+            const end = block.querySelector('.edit-block-end').value;
+            if (day && start && end) {
+                timeBlocks.push({ dia: day, hora_inicio: start, hora_fin: end });
+            }
+        });
+        
+        if (timeBlocks.length === 0) {
+            App.showAlert('Agrega al menos un bloque de horario', 'error');
+            return;
+        }
+        
+        // Update class
+        clase.seccion = document.getElementById('edit-class-section').value;
+        clase.profesor = document.getElementById('edit-class-professor').value;
+        clase.bloques = timeBlocks;
+        
+        storage.saveClase(clase);
+        renderClassesList();
+        closeEditClassModal();
+        App.showAlert('Clase actualizada', 'success');
+    }
+    
+    function addTimeBlock() {
+        const container = document.getElementById('time-blocks-container');
+        const block = document.createElement('div');
+        block.className = 'time-block flex items-center space-x-2';
+        block.innerHTML = `
+            <select class="block-day text-xs border-gray-300 rounded focus:ring-accent-500">
+                <option value="L">Lun</option>
+                <option value="M">Mar</option>
+                <option value="W">Mié</option>
+                <option value="J">Jue</option>
+                <option value="V">Vie</option>
+                <option value="S">Sáb</option>
+            </select>
+            <input type="time" class="block-start text-xs border-gray-300 rounded focus:ring-accent-500" value="07:00">
+            <span class="text-gray-400">-</span>
+            <input type="time" class="block-end text-xs border-gray-300 rounded focus:ring-accent-500" value="09:00">
+            <button type="button" onclick="removeTimeBlock(this)" class="text-red-400 hover:text-red-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        `;
+        container.appendChild(block);
+    }
+    
+    function removeTimeBlock(btn) {
+        const blocks = document.querySelectorAll('.time-block');
+        if (blocks.length > 1) {
+            btn.closest('.time-block').remove();
+        }
+    }
+    
+    // Franja Modal
+    let currentFranjaType = 'blocked';
+    
+    function openFranjaModal(type) {
+        currentFranjaType = type;
+        document.getElementById('franja-type').value = type;
+        document.getElementById('franja-modal-title').textContent = 
+            type === 'blocked' ? 'Agregar Franja Bloqueada' : 'Agregar Franja Preferida';
+        document.getElementById('franja-modal').classList.remove('hidden');
+    }
+    
+    function closeFranjaModal() {
+        document.getElementById('franja-modal').classList.add('hidden');
+    }
+    
+    function handleAddFranja(e) {
+        e.preventDefault();
+        
+        const franja = {
+            dia: document.getElementById('franja-day').value,
+            hora_inicio: document.getElementById('franja-start').value,
+            hora_fin: document.getElementById('franja-end').value
+        };
+        
+        if (currentFranjaType === 'blocked') {
+            preferences.blocked.push(franja);
+        } else {
+            preferences.preferred.push(franja);
+        }
+        
+        // Save to config
+        const config = storage.getConfig();
+        config.franjasBloqueadas = preferences.blocked;
+        config.franjasPreferidas = preferences.preferred;
+        storage.saveConfig(config);
+        
+        renderFranjas();
+        closeFranjaModal();
+    }
+    
+    function renderFranjas() {
+        const blockedContainer = document.getElementById('blocked-slots');
+        const preferredContainer = document.getElementById('preferred-slots');
+        
+        if (preferences.blocked.length === 0) {
+            blockedContainer.innerHTML = '<p class="text-xs text-gray-400">Ninguna</p>';
+        } else {
+            blockedContainer.innerHTML = preferences.blocked.map((f, i) => `
+                <div class="flex items-center justify-between text-xs bg-red-50 px-2 py-1 rounded">
+                    <span>${DAY_NAMES[f.dia]} ${f.hora_inicio}-${f.hora_fin}</span>
+                    <button onclick="removeFranja('blocked', ${i})" class="text-red-400 hover:text-red-600">×</button>
+                </div>
+            `).join('');
+        }
+        
+        if (preferences.preferred.length === 0) {
+            preferredContainer.innerHTML = '<p class="text-xs text-gray-400">Ninguna</p>';
+        } else {
+            preferredContainer.innerHTML = preferences.preferred.map((f, i) => `
+                <div class="flex items-center justify-between text-xs bg-green-50 px-2 py-1 rounded">
+                    <span>${DAY_NAMES[f.dia]} ${f.hora_inicio}-${f.hora_fin}</span>
+                    <button onclick="removeFranja('preferred', ${i})" class="text-green-400 hover:text-green-600">×</button>
+                </div>
+            `).join('');
+        }
+    }
+    
+    function removeFranja(type, index) {
+        if (type === 'blocked') {
+            preferences.blocked.splice(index, 1);
+        } else {
+            preferences.preferred.splice(index, 1);
+        }
+        
+        const config = storage.getConfig();
+        config.franjasBloqueadas = preferences.blocked;
+        config.franjasPreferidas = preferences.preferred;
+        storage.saveConfig(config);
+        
+        renderFranjas();
+    }
+    
+    // Schedule Generation
+    function generateSchedules() {
+        // Filter out disabled classes
+        const activeClasses = registeredClasses.filter(c => !c.disabled);
+        
+        if (activeClasses.length === 0) {
+            App.showAlert('No hay clases habilitadas', 'error');
+            return;
+        }
+        
+        // Group classes by materia
+        const materiaGroups = {};
+        activeClasses.forEach(c => {
+            if (!materiaGroups[c.codigo_materia]) {
+                materiaGroups[c.codigo_materia] = [];
+            }
+            materiaGroups[c.codigo_materia].push(c);
+        });
+        
+        const materias = Object.keys(materiaGroups);
+        
+        // Generate all combinations
+        function getCombinations(arrays, current = []) {
+            if (arrays.length === 0) return [current];
+            const [first, ...rest] = arrays;
+            const results = [];
+            for (const item of first) {
+                results.push(...getCombinations(rest, [...current, item]));
+            }
+            return results;
+        }
+        
+        const allCombinations = getCombinations(materias.map(m => materiaGroups[m]));
+        
+        // Filter valid combinations (no conflicts)
+        generatedSchedules = allCombinations.filter(combo => !hasConflict(combo));
+        
+        // Sort by optimization criteria
+        sortSchedules('free-days');
+        
+        currentScheduleIndex = 0;
+        
+        // Show results
+        document.getElementById('results-summary').classList.remove('hidden');
+        document.getElementById('results-count').textContent = generatedSchedules.length;
+        document.getElementById('results-total').textContent = allCombinations.length;
+        document.getElementById('total-combos').textContent = generatedSchedules.length;
+        
+        if (generatedSchedules.length > 0) {
+            displaySchedule(0);
+        } else {
+            App.showAlert('No hay horarios válidos sin conflictos', 'warning');
+        }
+    }
+    
+    function hasConflict(classes) {
+        const blocks = [];
+        
+        for (const clase of classes) {
+            for (const bloque of clase.bloques) {
+                // Check against blocked preferences
+                for (const blocked of preferences.blocked) {
+                    if (bloque.dia === blocked.dia && 
+                        timeOverlap(bloque.hora_inicio, bloque.hora_fin, blocked.hora_inicio, blocked.hora_fin)) {
+                        return true;
+                    }
+                }
+                
+                // Check against other blocks
+                for (const existing of blocks) {
+                    if (bloque.dia === existing.dia && 
+                        timeOverlap(bloque.hora_inicio, bloque.hora_fin, existing.hora_inicio, existing.hora_fin)) {
+                        return true;
+                    }
+                }
+                
+                blocks.push(bloque);
+            }
+        }
+        
+        return false;
+    }
+    
+    function timeOverlap(start1, end1, start2, end2) {
+        return start1 < end2 && start2 < end1;
+    }
+    
+    function sortSchedules(criteria) {
+        // Update button styles
+        document.querySelectorAll('#optimization-presets button').forEach(btn => {
+            btn.className = 'px-3 py-1.5 text-xs font-medium rounded-full border bg-white border-gray-300 text-gray-600 hover:bg-gray-50';
+        });
+        event?.target?.classList?.remove('bg-white', 'border-gray-300', 'text-gray-600', 'hover:bg-gray-50');
+        event?.target?.classList?.add('bg-accent-50', 'border-accent-300', 'text-accent-700');
+        
+        generatedSchedules.sort((a, b) => {
+            const metricsA = calculateMetrics(a);
+            const metricsB = calculateMetrics(b);
+            
+            switch (criteria) {
+                case 'free-days':
+                    return metricsB.freeDays - metricsA.freeDays;
+                case 'less-gaps':
+                    return metricsA.gaps - metricsB.gaps;
+                case 'early-end':
+                    return metricsA.latestEnd.localeCompare(metricsB.latestEnd);
+                case 'late-start':
+                    return metricsB.earliestStart.localeCompare(metricsA.earliestStart);
+                default:
+                    return 0;
+            }
+        });
+        
+        if (generatedSchedules.length > 0) {
+            currentScheduleIndex = 0;
+            displaySchedule(0);
+        }
+    }
+    
+    function calculateMetrics(classes) {
+        const dayBlocks = {};
+        DAYS.forEach(d => dayBlocks[d] = []);
+        
+        classes.forEach(c => {
+            c.bloques.forEach(b => {
+                dayBlocks[b.dia].push({ start: b.hora_inicio, end: b.hora_fin });
+            });
+        });
+        
+        let freeDays = 0;
+        let gaps = 0;
+        let earliestStart = '23:59';
+        let latestEnd = '00:00';
+        
+        DAYS.forEach(day => {
+            const blocks = dayBlocks[day].sort((a, b) => a.start.localeCompare(b.start));
+            
+            if (blocks.length === 0) {
+                freeDays++;
+            } else {
+                // Calculate gaps
+                for (let i = 1; i < blocks.length; i++) {
+                    const prevEnd = blocks[i-1].end;
+                    const currStart = blocks[i].start;
+                    if (prevEnd < currStart) {
+                        gaps++;
+                    }
+                }
+                
+                // Update earliest/latest
+                blocks.forEach(b => {
+                    if (b.start < earliestStart) earliestStart = b.start;
+                    if (b.end > latestEnd) latestEnd = b.end;
+                });
+            }
+        });
+        
+        return { freeDays, gaps, earliestStart, latestEnd };
+    }
+    
+    function displaySchedule(index) {
+        const schedule = generatedSchedules[index];
+        if (!schedule) return;
+        
+        currentScheduleIndex = index;
+        document.getElementById('current-combo').textContent = index + 1;
+        
+        // Update navigation buttons
+        document.getElementById('prev-btn').disabled = index === 0;
+        document.getElementById('next-btn').disabled = index === generatedSchedules.length - 1;
+        
+        // Update metrics
+        const metrics = calculateMetrics(schedule);
+        document.getElementById('metric-free-days').textContent = metrics.freeDays;
+        document.getElementById('metric-gaps').textContent = metrics.gaps;
+        document.getElementById('metric-start').textContent = metrics.earliestStart;
+        document.getElementById('metric-end').textContent = metrics.latestEnd;
+        
+        // Render grid
+        renderScheduleGrid();
+        
+        schedule.forEach(clase => {
+            clase.bloques.forEach(bloque => {
+                const startHour = parseInt(bloque.hora_inicio.split(':')[0]);
+                const endHour = parseInt(bloque.hora_fin.split(':')[0]);
+                const duration = endHour - startHour;
+                
+                const cell = document.querySelector(`.schedule-cell[data-day="${bloque.dia}"][data-hour="${startHour}"]`);
+                if (cell) {
+                    // Build professor line if available
+                    const professorLine = clase.profesor ? `<p class="opacity-60 text-[9px] leading-tight">Prof: ${clase.profesor}</p>` : '';
+                    
+                    cell.innerHTML = `
+                        <div class="absolute inset-0.5 ${clase.color} rounded p-1 overflow-hidden text-[10px] leading-tight"
+                             style="height: ${duration * 48 - 4}px;">
+                            <p class="font-semibold">${clase.nombre_materia || clase.codigo_materia}</p>
+                            <p class="opacity-75 text-[9px]">(${clase.codigo_materia}) ${clase.seccion}</p>
+                            ${professorLine}
+                        </div>
+                    `;
+                }
+            });
+        });
+    }
+    
+    function prevCombination() {
+        if (currentScheduleIndex > 0) {
+            displaySchedule(currentScheduleIndex - 1);
+        }
+    }
+    
+    function nextCombination() {
+        if (currentScheduleIndex < generatedSchedules.length - 1) {
+            displaySchedule(currentScheduleIndex + 1);
+        }
+    }
+    
+    // Export functions
+    function exportToPNG() {
+        if (generatedSchedules.length === 0) {
+            App.showAlert('Genera un horario primero', 'error');
+            return;
+        }
+        
+        const container = document.getElementById('schedule-grid-container');
+        html2canvas(container).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `horario-${currentScheduleIndex + 1}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+    
+    function exportToICS() {
+        if (generatedSchedules.length === 0) {
+            App.showAlert('Genera un horario primero', 'error');
+            return;
+        }
+        
+        // Set default dates
+        const today = new Date();
+        const threeMonthsLater = new Date();
+        threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+        
+        document.getElementById('ics-start').value = today.toISOString().split('T')[0];
+        document.getElementById('ics-end').value = threeMonthsLater.toISOString().split('T')[0];
+        
+        document.getElementById('ics-modal').classList.remove('hidden');
+    }
+    
+    function closeICSModal() {
+        document.getElementById('ics-modal').classList.add('hidden');
+    }
+    
+    function handleICSExport(e) {
+        e.preventDefault();
+        
+        const startDate = document.getElementById('ics-start').value;
+        const endDate = document.getElementById('ics-end').value;
+        const schedule = generatedSchedules[currentScheduleIndex];
+        
+        // Generate ICS content
+        let ics = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Uni-App//Schedule//ES
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+`;
+        
+        const dayMap = { 'L': 1, 'M': 2, 'W': 3, 'J': 4, 'V': 5, 'S': 6 };
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        schedule.forEach(clase => {
+            clase.bloques.forEach(bloque => {
+                const dayOfWeek = dayMap[bloque.dia];
+                const eventStart = new Date(start);
+                
+                // Find first occurrence of this day
+                while (eventStart.getDay() !== dayOfWeek) {
+                    eventStart.setDate(eventStart.getDate() + 1);
+                }
+                
+                const [startHour, startMin] = bloque.hora_inicio.split(':');
+                const [endHour, endMin] = bloque.hora_fin.split(':');
+                
+                eventStart.setHours(parseInt(startHour), parseInt(startMin), 0);
+                const eventEnd = new Date(eventStart);
+                eventEnd.setHours(parseInt(endHour), parseInt(endMin), 0);
+                
+                const formatDate = (d) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                
+                ics += `BEGIN:VEVENT
+DTSTART:${formatDate(eventStart)}
+DTEND:${formatDate(eventEnd)}
+RRULE:FREQ=WEEKLY;UNTIL=${end.toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+SUMMARY:${clase.codigo_materia} - ${clase.seccion}
+DESCRIPTION:${clase.nombre_materia}${clase.profesor ? '\\nProfesor: ' + clase.profesor : ''}
+END:VEVENT
+`;
+            });
+        });
+        
+        ics += 'END:VCALENDAR';
+        
+        // Download
+        const blob = new Blob([ics], { type: 'text/calendar' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'horario.ics';
+        link.click();
+        
+        closeICSModal();
+        App.showAlert('Archivo ICS descargado', 'success');
+    }
+    
+    // JSON Import/Export functions
+    let scheduleImportData = null;
+    
+    function openScheduleImportModal() {
+        document.getElementById('schedule-import-modal').classList.remove('hidden');
+        document.getElementById('schedule-import-preview').classList.add('hidden');
+        document.getElementById('schedule-import-error').classList.add('hidden');
+        document.getElementById('schedule-import-confirm-btn').disabled = true;
+        document.getElementById('schedule-import-file').value = '';
+        document.getElementById('import-replace').checked = false;
+        scheduleImportData = null;
+    }
+    
+    function closeScheduleImportModal() {
+        document.getElementById('schedule-import-modal').classList.add('hidden');
+        scheduleImportData = null;
+    }
+    
+    function handleScheduleImportFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                scheduleImportData = JSON.parse(e.target.result);
+                document.getElementById('schedule-import-preview').classList.remove('hidden');
+                
+                let preview = '';
+                const clases = scheduleImportData.clases || [];
+                const franjas = scheduleImportData.franjas || [];
+                
+                preview = `${clases.length} clases, ${franjas.length} franjas bloqueadas`;
+                if (clases.length > 0) {
+                    preview += '\n\nClases:\n' + clases.slice(0, 3).map(c => 
+                        `- ${c.codigo_materia} ${c.seccion}`
+                    ).join('\n');
+                    if (clases.length > 3) preview += `\n... y ${clases.length - 3} más`;
+                }
+                
+                document.getElementById('schedule-import-preview-content').textContent = preview;
+                document.getElementById('schedule-import-confirm-btn').disabled = false;
+                document.getElementById('schedule-import-error').classList.add('hidden');
+            } catch (err) {
+                document.getElementById('schedule-import-error').textContent = 'Error: Archivo JSON inválido';
+                document.getElementById('schedule-import-error').classList.remove('hidden');
+                document.getElementById('schedule-import-confirm-btn').disabled = true;
+                scheduleImportData = null;
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    function confirmScheduleImport() {
+        if (!scheduleImportData) return;
+        
+        const replaceExisting = document.getElementById('import-replace').checked;
+        
+        // Import clases
+        const clases = scheduleImportData.clases || [];
+        let clasesImported = 0;
+        
+        if (replaceExisting) {
+            // Clear existing clases
+            storage.saveClases([]);
+        }
+        
+        clases.forEach(c => {
+            if (c.codigo_materia && c.seccion) {
+                storage.saveClase({
+                    codigo_materia: c.codigo_materia,
+                    nombre_materia: c.nombre_materia || '',
+                    seccion: c.seccion,
+                    profesor: c.profesor || '',
+                    bloques: c.bloques || [],
+                    creditos: c.creditos || 0
+                });
+                clasesImported++;
+            }
+        });
+        
+        // Import franjas into config (not storage.franjas)
+        const franjas = scheduleImportData.franjas || [];
+        let franjasImported = 0;
+        
+        const config = storage.getConfig();
+        
+        if (replaceExisting && franjas.length > 0) {
+            config.franjasBloqueadas = [];
+            config.franjasPreferidas = [];
+        }
+        
+        // Initialize if not exists
+        if (!config.franjasBloqueadas) config.franjasBloqueadas = [];
+        if (!config.franjasPreferidas) config.franjasPreferidas = [];
+        
+        franjas.forEach(f => {
+            if (f.dia && f.hora_inicio && f.hora_fin) {
+                const franja = {
+                    dia: f.dia,
+                    hora_inicio: f.hora_inicio,
+                    hora_fin: f.hora_fin
+                };
+                if (f.tipo === 'preferred') {
+                    config.franjasPreferidas.push(franja);
+                } else {
+                    config.franjasBloqueadas.push(franja);
+                }
+                franjasImported++;
+            }
+        });
+        
+        storage.saveConfig(config);
+        
+        closeScheduleImportModal();
+        loadClasses();
+        loadPreferences();
+        
+        let message = `${clasesImported} clases importadas`;
+        if (franjasImported > 0) {
+            message += `, ${franjasImported} franjas importadas`;
+        }
+        App.showAlert(message, 'success');
+    }
+    
+    function exportScheduleJSON() {
+        const clases = storage.getClases();
+        const config = storage.getConfig();
+        const franjasBloqueadas = config.franjasBloqueadas || [];
+        const franjasPreferidas = config.franjasPreferidas || [];
+        
+        // Combine franjas with tipo indicator
+        const franjas = [
+            ...franjasBloqueadas.map(f => ({ ...f, tipo: 'blocked' })),
+            ...franjasPreferidas.map(f => ({ ...f, tipo: 'preferred' }))
+        ];
+        
+        const data = {
+            version: '1.0',
+            exportedAt: new Date().toISOString(),
+            clases: clases.map(c => ({
+                codigo_materia: c.codigo_materia,
+                nombre_materia: c.nombre_materia,
+                seccion: c.seccion,
+                profesor: c.profesor,
+                creditos: c.creditos,
+                bloques: c.bloques
+            })),
+            franjas: franjas.map(f => ({
+                tipo: f.tipo,
+                dia: f.dia,
+                hora_inicio: f.hora_inicio,
+                hora_fin: f.hora_fin
+            })),
+            _comentarios: {
+                bloques: "Cada bloque tiene: dia (L/M/W/J/V/S), hora_inicio (HH:MM), hora_fin (HH:MM)",
+                franjas_tipo: "blocked = franja bloqueada, preferred = franja preferida",
+                dias: "L=Lunes, M=Martes, W=Miércoles, J=Jueves, V=Viernes, S=Sábado"
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `horario-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        App.showAlert('Horario exportado', 'success');
+    }
+</script>
+{% endblock %}
