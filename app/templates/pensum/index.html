@@ -1,0 +1,1074 @@
+{% extends 'base.html' %}
+
+{% block title %}Pensum - Uni-App{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Mi Pensum</h1>
+            <p class="text-sm text-gray-500 mt-1">Visualiza y gestiona tu plan de estudios</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <button onclick="openImportModal()" 
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                Importar
+            </button>
+            <button onclick="exportPensum()" 
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Exportar
+            </button>
+            <button onclick="openNewMateriaModal()" 
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Nueva Materia
+            </button>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Promedio Acumulado</p>
+                    <p class="text-2xl font-bold text-accent-600" id="stat-gpa">--</p>
+                </div>
+                <div class="p-3 bg-accent-50 rounded-lg">
+                    <svg class="w-6 h-6 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Créditos Completados</p>
+                    <p class="text-2xl font-bold text-gray-900"><span id="stat-credits-done">0</span> / <span id="stat-credits-total">0</span></p>
+                </div>
+                <div class="p-3 bg-green-50 rounded-lg">
+                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Materias Aprobadas</p>
+                    <p class="text-2xl font-bold text-gray-900" id="stat-passed">0</p>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Progreso</p>
+                    <p class="text-2xl font-bold text-gray-900"><span id="stat-progress">0</span>%</p>
+                </div>
+                <div class="p-3 bg-purple-50 rounded-lg">
+                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GPA Alerts -->
+    <div id="gpa-alerts-container" class="space-y-2"></div>
+    
+    <!-- View Toggle -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2 bg-gray-100 p-1 rounded-lg">
+            <button id="view-tree" onclick="setView('tree')"
+                    class="px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-gray-700">
+                Árbol
+            </button>
+            <button id="view-table" onclick="setView('table')" 
+                    class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700">
+                Tabla
+            </button>
+        </div>
+        <div class="flex items-center space-x-2">
+            <label class="text-sm text-gray-600">Simular pérdida:</label>
+            <select id="simulate-loss-select" onchange="simulateLoss(this.value)"
+                    class="text-sm border-gray-300 rounded-lg focus:ring-accent-500 focus:border-accent-500">
+                <option value="">Seleccionar materia...</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Pensum Table View -->
+    <div id="pensum-table-view" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semestre</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materia</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Créditos</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Nota</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="pensum-table-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Rows will be populated by JavaScript -->
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <p class="mt-2 text-sm">No hay materias en el pensum</p>
+                            <button onclick="openNewMateriaModal()" class="mt-2 text-sm text-accent-500 hover:text-accent-600">
+                                Agregar primera materia
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Pensum Tree View (by semester) -->
+    <div id="pensum-tree-view" class="space-y-6">
+        <!-- Will be populated by JavaScript -->
+    </div>
+</div>
+
+<!-- Simulation Results Modal -->
+<div id="simulation-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeSimulationModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Simulación de Pérdida</h3>
+            <div id="simulation-results" class="space-y-4">
+                <!-- Results will be populated here -->
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeSimulationModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Materia Modal -->
+<div id="materia-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeMateriaModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+            <h3 id="materia-modal-title" class="text-lg font-semibold text-gray-900 mb-4">Nueva Materia</h3>
+            <form id="materia-form" class="space-y-4">
+                <input type="hidden" id="materia-edit-code">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                        <input type="text" id="materia-code" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                               placeholder="MAT101">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Créditos</label>
+                        <input type="number" id="materia-credits" required min="1" max="10"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                               placeholder="3">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <input type="text" id="materia-name" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                           placeholder="Cálculo Diferencial">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Semestre</label>
+                        <input type="number" id="materia-semester" required min="1" max="15"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                               placeholder="1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Color (opcional)</label>
+                        <input type="color" id="materia-color" value="#5091AF"
+                               class="w-full h-10 px-1 py-1 border border-gray-300 rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Prerrequisitos (códigos separados por coma)</label>
+                    <input type="text" id="materia-prerequisites"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                           placeholder="MAT100, FIS100">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Correquisitos (códigos separados por coma)</label>
+                    <input type="text" id="materia-corequisites"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                           placeholder="LAB101">
+                </div>
+                
+                <!-- Status and Grade Section (only visible when editing) -->
+                <div id="materia-status-grade-section" class="hidden border-t pt-4 mt-4">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Estado y Calificación</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <select id="materia-status"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500">
+                                <option value="pending">Pendiente</option>
+                                <option value="enrolled">En curso</option>
+                                <option value="passed">Aprobada</option>
+                                <option value="failed">Reprobada</option>
+                                <option value="dropped">Retirada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nota Final</label>
+                            <input type="number" id="materia-grade" min="0" max="5" step="0.1"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500"
+                                   placeholder="3.5">
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">
+                        La nota se guarda automáticamente y afecta tu promedio.
+                    </p>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeMateriaModal()"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div id="import-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeImportModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Importar Pensum</h3>
+            <div class="space-y-4">
+                <!-- Template Download -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-sm text-blue-700">¿Primera vez? Descarga la plantilla</span>
+                    </div>
+                    <a href="{{ url_for('static', filename='templates/pensum_template.json') }}" 
+                       download="pensum_template.json"
+                       class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Descargar plantilla
+                    </a>
+                </div>
+                
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="handleImportFile(event)">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-600">Arrastra un archivo JSON o</p>
+                    <button onclick="document.getElementById('import-file').click()"
+                            class="mt-2 text-sm text-accent-500 hover:text-accent-600 font-medium">
+                        selecciona un archivo
+                    </button>
+                </div>
+                <div id="import-preview" class="hidden">
+                    <p class="text-sm text-gray-600 mb-2">Vista previa:</p>
+                    <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                        <pre id="import-preview-content" class="text-xs text-gray-700"></pre>
+                    </div>
+                </div>
+                <div id="import-error" class="hidden text-sm text-red-600"></div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeImportModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    Cancelar
+                </button>
+                <button id="import-confirm-btn" onclick="confirmImport()" disabled
+                        class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Importar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'components/course_modal.html' %}
+{% include 'components/alert.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Current view mode (tree is default)
+    let currentView = 'tree';
+    
+    // Initialize pensum when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadPensumData();
+        setupMateriaForm();
+        populateSimulateSelect();
+    });
+    
+    function loadPensumData() {
+        const materias = storage.getMaterias();
+        renderTable(materias);
+        renderTree(materias);
+        updateStats(materias);
+    }
+    
+    function renderTable(materias) {
+        const tbody = document.getElementById('pensum-table-body');
+        if (!tbody) return;
+        
+        if (materias.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                        <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <p class="mt-2 text-sm">No hay materias en el pensum</p>
+                        <button onclick="openNewMateriaModal()" class="mt-2 text-sm text-accent-500 hover:text-accent-600">
+                            Agregar primera materia
+                        </button>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        // Sort by semester then code
+        const sorted = [...materias].sort((a, b) => {
+            if (a.semestre !== b.semestre) return a.semestre - b.semestre;
+            return a.codigo.localeCompare(b.codigo);
+        });
+        
+        const statusConfig = {
+            'pending': { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Pendiente' },
+            'enrolled': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'En curso' },
+            'passed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Aprobada' },
+            'failed': { bg: 'bg-red-100', text: 'text-red-700', label: 'Reprobada' },
+            'dropped': { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Retirada' }
+        };
+        
+        tbody.innerHTML = sorted.map(m => {
+            const status = statusConfig[m.estado] || statusConfig.pending;
+            const cal = storage.getCalificacion(m.codigo);
+            const nota = cal?.nota;
+            
+            return `
+                <tr class="hover:bg-gray-50 cursor-pointer" onclick="openEditMateriaModal('${m.codigo}')">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${m.semestre}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${m.codigo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${m.nombre}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">${m.creditos}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${status.bg} ${status.text}">${status.label}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center ${nota !== undefined ? (nota >= 3 ? 'text-green-600 font-bold' : 'text-red-600 font-bold') : 'text-gray-400'}">
+                        ${nota !== undefined ? nota.toFixed(1) : '--'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                        <button onclick="event.stopPropagation(); deleteMateria('${m.codigo}')" class="text-red-500 hover:text-red-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+    
+    // Drag and drop state
+    let draggedMateria = null;
+    
+    function renderTree(materias) {
+        const container = document.getElementById('pensum-tree-view');
+        if (!container) return;
+        
+        // Group by semester
+        const bySemester = {};
+        materias.forEach(m => {
+            const sem = m.semestre || 1;
+            if (!bySemester[sem]) bySemester[sem] = [];
+            bySemester[sem].push(m);
+        });
+        
+        const maxSem = Math.max(...Object.keys(bySemester).map(Number), 10);
+        
+        const statusConfig = {
+            'pending': { border: 'border-gray-300', bg: 'bg-gray-50' },
+            'enrolled': { border: 'border-blue-400', bg: 'bg-blue-50' },
+            'passed': { border: 'border-green-400', bg: 'bg-green-50' },
+            'failed': { border: 'border-red-400', bg: 'bg-red-50' },
+            'dropped': { border: 'border-yellow-400', bg: 'bg-yellow-50' }
+        };
+        
+        let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">';
+        
+        for (let sem = 1; sem <= maxSem; sem++) {
+            const semMaterias = bySemester[sem] || [];
+            const totalCredits = semMaterias.reduce((s, m) => s + (m.creditos || 0), 0);
+            
+            html += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 semester-drop-zone transition-all"
+                     data-semester="${sem}"
+                     ondragover="handleDragOver(event, ${sem})"
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event, ${sem})">
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b">
+                        <h3 class="font-semibold text-gray-800">Semestre ${sem}</h3>
+                        <span class="text-xs text-gray-500 semester-credits">${totalCredits} cr</span>
+                    </div>
+                    <div class="space-y-2 min-h-[60px] semester-materias" data-semester="${sem}">
+            `;
+            
+            if (semMaterias.length === 0) {
+                html += '<p class="text-sm text-gray-400 text-center py-4 empty-message">Arrastra materias aquí</p>';
+            } else {
+                semMaterias.forEach(m => {
+                    const st = statusConfig[m.estado] || statusConfig.pending;
+                    const cal = storage.getCalificacion(m.codigo);
+                    const isDraggable = m.estado !== 'passed' && m.estado !== 'failed';
+                    html += `
+                        <div class="p-2 rounded-lg border-l-4 ${st.border} ${st.bg} hover:shadow-sm transition-all group relative ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''}"
+                             draggable="${isDraggable}"
+                             data-codigo="${m.codigo}"
+                             ondragstart="handleDragStart(event, '${m.codigo}')"
+                             ondragend="handleDragEnd(event)">
+                            <div class="cursor-pointer" onclick="openEditMateriaModal('${m.codigo}')">
+                                <div class="flex justify-between">
+                                    <p class="font-medium text-sm text-gray-800">${m.nombre}</p>
+                                    <span class="text-xs text-gray-500">${m.creditos}cr</span>
+                                </div>
+                                <p class="text-xs text-gray-500">${m.codigo}</p>
+                                ${cal?.nota !== undefined ? `<p class="text-xs font-bold ${cal.nota >= 3 ? 'text-green-600' : 'text-red-600'}">${cal.nota.toFixed(1)}</p>` : ''}
+                            </div>
+                            <button onclick="event.stopPropagation(); deleteMateria('${m.codigo}')"
+                                    class="absolute top-1 right-1 p-1 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="Eliminar materia">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `
+                    </div>
+                    <a href="/semester?sem=${sem}" class="block mt-3 text-center text-xs text-accent-500 hover:text-accent-600">
+                        Ver semestre →
+                    </a>
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    // Drag and Drop handlers
+    function handleDragStart(event, codigo) {
+        draggedMateria = storage.getMateria(codigo);
+        event.target.classList.add('opacity-50', 'scale-95');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', codigo);
+        
+        // Highlight valid drop zones
+        setTimeout(() => highlightValidDropZones(draggedMateria), 0);
+    }
+    
+    function handleDragEnd(event) {
+        event.target.classList.remove('opacity-50', 'scale-95');
+        draggedMateria = null;
+        
+        // Remove all highlights
+        document.querySelectorAll('.semester-drop-zone').forEach(zone => {
+            zone.classList.remove('ring-2', 'ring-green-400', 'ring-red-400', 'bg-green-50', 'bg-red-50');
+        });
+    }
+    
+    function handleDragOver(event, targetSemester) {
+        event.preventDefault();
+        if (!draggedMateria) return;
+        
+        const validation = canMoveTo(draggedMateria, targetSemester);
+        event.dataTransfer.dropEffect = validation.valid ? 'move' : 'none';
+    }
+    
+    function handleDragLeave(event) {
+        // Only handle if leaving the drop zone entirely
+        if (event.target.classList.contains('semester-drop-zone')) {
+            event.target.classList.remove('bg-green-100', 'bg-red-100');
+        }
+    }
+    
+    function handleDrop(event, targetSemester) {
+        event.preventDefault();
+        if (!draggedMateria) return;
+        
+        const validation = canMoveTo(draggedMateria, targetSemester);
+        
+        if (!validation.valid) {
+            App.showAlert(validation.reason, 'error');
+            return;
+        }
+        
+        // Move the materia
+        draggedMateria.semestre = targetSemester;
+        storage.saveMateria(draggedMateria);
+        
+        // Move corequisites together
+        if (draggedMateria.correquisitos?.length > 0) {
+            draggedMateria.correquisitos.forEach(coreCodigo => {
+                const coreMateria = storage.getMateria(coreCodigo);
+                if (coreMateria && coreMateria.estado !== 'passed' && coreMateria.estado !== 'failed') {
+                    coreMateria.semestre = targetSemester;
+                    storage.saveMateria(coreMateria);
+                }
+            });
+            App.showAlert(`Materia y correquisitos movidos al semestre ${targetSemester}`, 'success');
+        } else {
+            App.showAlert(`Materia movida al semestre ${targetSemester}`, 'success');
+        }
+        
+        loadPensumData();
+    }
+    
+    function highlightValidDropZones(materia) {
+        const materias = storage.getMaterias();
+        
+        document.querySelectorAll('.semester-drop-zone').forEach(zone => {
+            const sem = parseInt(zone.dataset.semester);
+            const validation = canMoveTo(materia, sem);
+            
+            zone.classList.remove('ring-2', 'ring-green-400', 'ring-red-400', 'bg-green-50', 'bg-red-50');
+            
+            if (validation.valid) {
+                zone.classList.add('ring-2', 'ring-green-400', 'bg-green-50');
+            } else {
+                zone.classList.add('ring-2', 'ring-red-400', 'bg-red-50');
+            }
+        });
+    }
+    
+    function canMoveTo(materia, targetSemester) {
+        const materias = storage.getMaterias();
+        
+        // Can't move passed or failed subjects
+        if (materia.estado === 'passed' || materia.estado === 'failed') {
+            return { valid: false, reason: 'No puedes mover materias aprobadas o reprobadas' };
+        }
+        
+        // Check prerequisites - must be in earlier semesters
+        if (materia.prerrequisitos?.length > 0) {
+            for (const prereqCodigo of materia.prerrequisitos) {
+                const prereq = materias.find(m => m.codigo === prereqCodigo);
+                if (prereq) {
+                    // If prereq is passed, it's ok
+                    if (prereq.estado === 'passed') continue;
+                    
+                    // Otherwise, prereq must be in an earlier semester
+                    if (prereq.semestre >= targetSemester) {
+                        return { 
+                            valid: false, 
+                            reason: `Prerrequisito "${prereq.nombre}" debe estar en un semestre anterior` 
+                        };
+                    }
+                }
+            }
+        }
+        
+        // Check if any subject depends on this one (has this as prereq)
+        const dependents = materias.filter(m => 
+            m.prerrequisitos?.includes(materia.codigo) && 
+            m.estado !== 'passed' && 
+            m.estado !== 'failed'
+        );
+        
+        for (const dep of dependents) {
+            if (dep.semestre <= targetSemester) {
+                return { 
+                    valid: false, 
+                    reason: `"${dep.nombre}" requiere esta materia y está en semestre ${dep.semestre}` 
+                };
+            }
+        }
+        
+        // Check corequisites - must be in the same semester or will be moved together
+        if (materia.correquisitos?.length > 0) {
+            for (const coreCodigo of materia.correquisitos) {
+                const coreq = materias.find(m => m.codigo === coreCodigo);
+                if (coreq && coreq.estado === 'passed' && coreq.semestre !== targetSemester) {
+                    return { 
+                        valid: false, 
+                        reason: `Correquisito "${coreq.nombre}" ya está aprobado en otro semestre` 
+                    };
+                }
+            }
+        }
+        
+        return { valid: true };
+    }
+
+    function updateStats(materias) {
+        const calificaciones = storage.getCalificaciones();
+        
+        // Total and completed credits
+        const totalCredits = materias.reduce((s, m) => s + (m.creditos || 0), 0);
+        const passedMaterias = materias.filter(m => m.estado === 'passed');
+        const completedCredits = passedMaterias.reduce((s, m) => s + (m.creditos || 0), 0);
+        
+        document.getElementById('stat-credits-done').textContent = completedCredits;
+        document.getElementById('stat-credits-total').textContent = totalCredits;
+        document.getElementById('stat-passed').textContent = passedMaterias.length;
+        
+        // Progress
+        const progress = totalCredits > 0 ? Math.round((completedCredits / totalCredits) * 100) : 0;
+        document.getElementById('stat-progress').textContent = progress;
+        
+        // GPA
+        let totalPoints = 0, gradedCredits = 0;
+        calificaciones.forEach(cal => {
+            const m = materias.find(mat => mat.codigo === cal.codigo_materia);
+            if (m && cal.nota !== undefined && cal.nota !== null) {
+                totalPoints += cal.nota * m.creditos;
+                gradedCredits += m.creditos;
+            }
+        });
+        
+        const gpa = gradedCredits > 0 ? (totalPoints / gradedCredits) : 0;
+        const gpaEl = document.getElementById('stat-gpa');
+        gpaEl.textContent = gpa > 0 ? gpa.toFixed(2) : '--';
+        
+        if (gpa > 0 && gpa < 3.0) {
+            gpaEl.classList.add('text-red-600');
+            gpaEl.classList.remove('text-accent-600');
+        } else {
+            gpaEl.classList.remove('text-red-600');
+            gpaEl.classList.add('text-accent-600');
+        }
+    }
+    
+    function populateSimulateSelect() {
+        const select = document.getElementById('simulate-loss-select');
+        if (!select) return;
+        
+        const materias = storage.getMaterias().filter(m => m.estado !== 'passed');
+        select.innerHTML = '<option value="">Seleccionar materia...</option>' +
+            materias.map(m => `<option value="${m.codigo}">${m.codigo} - ${m.nombre}</option>`).join('');
+    }
+    
+    // View toggle
+    function setView(view) {
+        currentView = view;
+        const tableView = document.getElementById('pensum-table-view');
+        const treeView = document.getElementById('pensum-tree-view');
+        const tableBtn = document.getElementById('view-table');
+        const treeBtn = document.getElementById('view-tree');
+        
+        if (view === 'table') {
+            tableView.classList.remove('hidden');
+            treeView.classList.add('hidden');
+            tableBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-700');
+            tableBtn.classList.remove('text-gray-500');
+            treeBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-700');
+            treeBtn.classList.add('text-gray-500');
+        } else {
+            tableView.classList.add('hidden');
+            treeView.classList.remove('hidden');
+            treeBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-700');
+            treeBtn.classList.remove('text-gray-500');
+            tableBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-700');
+            tableBtn.classList.add('text-gray-500');
+        }
+    }
+    
+    // Modal functions
+    function openNewMateriaModal() {
+        document.getElementById('materia-modal-title').textContent = 'Nueva Materia';
+        document.getElementById('materia-form').reset();
+        document.getElementById('materia-edit-code').value = '';
+        document.getElementById('materia-code').disabled = false;
+        document.getElementById('materia-status-grade-section').classList.add('hidden');
+        document.getElementById('materia-modal').classList.remove('hidden');
+    }
+    
+    function openEditMateriaModal(codigo) {
+        const materia = storage.getMateria(codigo);
+        if (!materia) return;
+        
+        document.getElementById('materia-modal-title').textContent = 'Editar Materia';
+        document.getElementById('materia-edit-code').value = codigo;
+        document.getElementById('materia-code').value = materia.codigo;
+        document.getElementById('materia-code').disabled = true;
+        document.getElementById('materia-name').value = materia.nombre;
+        document.getElementById('materia-credits').value = materia.creditos;
+        document.getElementById('materia-semester').value = materia.semestre;
+        document.getElementById('materia-prerequisites').value = (materia.prerrequisitos || []).join(', ');
+        document.getElementById('materia-corequisites').value = (materia.correquisitos || []).join(', ');
+        document.getElementById('materia-color').value = materia.color || '#5091AF';
+        
+        // Show and populate status/grade section
+        document.getElementById('materia-status-grade-section').classList.remove('hidden');
+        document.getElementById('materia-status').value = materia.estado || 'pending';
+        
+        // Get calificacion if exists
+        const cal = storage.getCalificacion(codigo);
+        document.getElementById('materia-grade').value = cal?.nota ?? '';
+        
+        document.getElementById('materia-modal').classList.remove('hidden');
+    }
+    
+    function closeMateriaModal() {
+        document.getElementById('materia-modal').classList.add('hidden');
+    }
+    
+    function setupMateriaForm() {
+        const form = document.getElementById('materia-form');
+        if (!form) return;
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const editCode = document.getElementById('materia-edit-code').value;
+            const codigo = document.getElementById('materia-code').value.trim().toUpperCase();
+            const nombre = document.getElementById('materia-name').value.trim();
+            const creditos = parseInt(document.getElementById('materia-credits').value);
+            const semestre = parseInt(document.getElementById('materia-semester').value);
+            const prerrequisitos = document.getElementById('materia-prerequisites').value
+                .split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            const correquisitos = document.getElementById('materia-corequisites').value
+                .split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            const color = document.getElementById('materia-color').value;
+            
+            if (!codigo || !nombre || !creditos || !semestre) {
+                App.showAlert('Por favor completa todos los campos requeridos', 'error');
+                return;
+            }
+            
+            // Check duplicate on new
+            if (!editCode) {
+                const existing = storage.getMateria(codigo);
+                if (existing) {
+                    App.showAlert('Ya existe una materia con este código', 'error');
+                    return;
+                }
+            }
+            
+            // Get status (only when editing)
+            let estado = 'pending';
+            if (editCode) {
+                estado = document.getElementById('materia-status').value;
+            }
+            
+            const materia = {
+                codigo: editCode || codigo,
+                nombre,
+                creditos,
+                semestre,
+                prerrequisitos,
+                correquisitos,
+                color,
+                estado
+            };
+            
+            storage.saveMateria(materia);
+            
+            // Save grade if editing and value provided
+            if (editCode) {
+                const gradeInput = document.getElementById('materia-grade').value;
+                if (gradeInput !== '') {
+                    const nota = parseFloat(gradeInput);
+                    if (!isNaN(nota) && nota >= 0 && nota <= 5) {
+                        storage.saveCalificacion({
+                            codigo_materia: editCode,
+                            nota: nota,
+                            fecha: new Date().toISOString()
+                        });
+                    }
+                }
+                
+                // Handle failed subject: create a copy in the next semester
+                if (estado === 'failed') {
+                    handleFailedSubject(materia);
+                }
+            }
+            
+            closeMateriaModal();
+            loadPensumData();
+            populateSimulateSelect();
+            App.showAlert(editCode ? 'Materia actualizada' : 'Materia agregada', 'success');
+        });
+    }
+    
+    function deleteMateria(codigo) {
+        if (!confirm('¿Eliminar esta materia?')) return;
+        storage.deleteMateria(codigo);
+        loadPensumData();
+        populateSimulateSelect();
+        App.showAlert('Materia eliminada', 'success');
+    }
+    
+    // Handle failed subject: create a copy in the next semester and update dependencies
+    function handleFailedSubject(failedMateria) {
+        const materias = storage.getMaterias();
+        const nextSemester = failedMateria.semestre + 1;
+        
+        // Generate new code for the repeated subject (e.g., MAT101 -> MAT101-R1)
+        let repeatCount = 1;
+        let newCodigo = `${failedMateria.codigo}-R${repeatCount}`;
+        while (materias.some(m => m.codigo === newCodigo)) {
+            repeatCount++;
+            newCodigo = `${failedMateria.codigo}-R${repeatCount}`;
+        }
+        
+        // Create new materia for next semester
+        const repeatedMateria = {
+            codigo: newCodigo,
+            nombre: `${failedMateria.nombre} (Repetición)`,
+            creditos: failedMateria.creditos,
+            semestre: nextSemester,
+            prerrequisitos: [], // No prerequisites since you're repeating
+            correquisitos: failedMateria.correquisitos || [],
+            estado: 'pending',
+            originalCodigo: failedMateria.codigo // Track which subject this is repeating
+        };
+        
+        storage.saveMateria(repeatedMateria);
+        
+        // Update any materias that have the failed subject as prerequisite
+        // They now need to wait for the repeated version
+        materias.forEach(m => {
+            if (m.prerrequisitos?.includes(failedMateria.codigo)) {
+                // Push dependent subjects to future semesters if needed
+                if (m.semestre <= nextSemester && m.estado === 'pending') {
+                    m.semestre = nextSemester + 1;
+                    storage.saveMateria(m);
+                }
+            }
+            // Also check correquisites - they need to move together
+            if (m.correquisitos?.includes(failedMateria.codigo) && m.estado === 'pending') {
+                if (m.semestre < nextSemester) {
+                    m.semestre = nextSemester;
+                    storage.saveMateria(m);
+                }
+            }
+        });
+        
+        App.showAlert(`Materia reprogramada para semestre ${nextSemester}`, 'info');
+    }
+    
+    function openImportModal() {
+        document.getElementById('import-modal').classList.remove('hidden');
+        document.getElementById('import-preview').classList.add('hidden');
+        document.getElementById('import-error').classList.add('hidden');
+        document.getElementById('import-confirm-btn').disabled = true;
+        document.getElementById('import-file').value = '';
+    }
+    
+    function closeImportModal() {
+        document.getElementById('import-modal').classList.add('hidden');
+    }
+    
+    let importData = null;
+    
+    function handleImportFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                importData = JSON.parse(e.target.result);
+                document.getElementById('import-preview').classList.remove('hidden');
+                
+                let preview = '';
+                if (Array.isArray(importData)) {
+                    preview = `${importData.length} materias encontradas`;
+                } else if (importData.materias) {
+                    preview = `${importData.materias.length} materias encontradas`;
+                } else {
+                    preview = JSON.stringify(importData, null, 2).substring(0, 300);
+                }
+                
+                document.getElementById('import-preview-content').textContent = preview;
+                document.getElementById('import-confirm-btn').disabled = false;
+                document.getElementById('import-error').classList.add('hidden');
+            } catch (err) {
+                document.getElementById('import-error').textContent = 'Error: Archivo JSON inválido';
+                document.getElementById('import-error').classList.remove('hidden');
+                document.getElementById('import-confirm-btn').disabled = true;
+                importData = null;
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    function confirmImport() {
+        if (!importData) return;
+        
+        let materias = [];
+        let calificaciones = [];
+        
+        if (Array.isArray(importData)) {
+            materias = importData;
+        } else if (importData.materias) {
+            materias = importData.materias;
+            calificaciones = importData.calificaciones || [];
+        }
+        
+        // Import materias
+        let materiasImported = 0;
+        materias.forEach(m => {
+            if (m.codigo && m.nombre) {
+                storage.saveMateria({
+                    codigo: m.codigo,
+                    nombre: m.nombre,
+                    creditos: m.creditos || 0,
+                    semestre: m.semestre || 1,
+                    prerrequisitos: m.prerrequisitos || [],
+                    correquisitos: m.correquisitos || [],
+                    estado: m.estado || 'pending'
+                });
+                materiasImported++;
+            }
+        });
+        
+        // Import calificaciones
+        let calificacionesImported = 0;
+        calificaciones.forEach(c => {
+            if (c.codigo_materia) {
+                storage.saveCalificacion({
+                    codigo_materia: c.codigo_materia,
+                    nota: c.nota ?? null,
+                    componentes: c.componentes || [],
+                    fecha: c.fecha || new Date().toISOString()
+                });
+                calificacionesImported++;
+            }
+        });
+        
+        closeImportModal();
+        loadPensumData();
+        populateSimulateSelect();
+        
+        let message = `${materiasImported} materias importadas`;
+        if (calificacionesImported > 0) {
+            message += `, ${calificacionesImported} calificaciones importadas`;
+        }
+        App.showAlert(message, 'success');
+        importData = null;
+    }
+    
+    function exportPensum() {
+        const data = {
+            version: '1.0',
+            exportedAt: new Date().toISOString(),
+            materias: storage.getMaterias(),
+            calificaciones: storage.getCalificaciones()
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `pensum-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        App.showAlert('Pensum exportado', 'success');
+    }
+    
+    function simulateLoss(codigo) {
+        if (!codigo) return;
+        
+        const materia = storage.getMateria(codigo);
+        if (!materia) return;
+        
+        const materias = storage.getMaterias();
+        const affected = [];
+        
+        function findDependents(code) {
+            materias.forEach(m => {
+                if (m.prerrequisitos?.includes(code) && !affected.find(a => a.codigo === m.codigo)) {
+                    affected.push(m);
+                    findDependents(m.codigo);
+                }
+            });
+        }
+        
+        findDependents(codigo);
+        
+        const resultsDiv = document.getElementById('simulation-results');
+        if (affected.length === 0) {
+            resultsDiv.innerHTML = `
+                <p class="text-green-600">
+                    <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Perder <strong>${materia.nombre}</strong> no afectará otras materias directamente.
+                </p>
+            `;
+        } else {
+            resultsDiv.innerHTML = `
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p class="text-yellow-800 font-medium mb-2">
+                        Perder <strong>${materia.nombre}</strong> afectará ${affected.length} materia(s):
+                    </p>
+                    <ul class="space-y-1">
+                        ${affected.map(a => `
+                            <li class="text-sm text-yellow-700">
+                                <span class="font-medium">${a.codigo}</span> - ${a.nombre} (Semestre ${a.semestre})
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        document.getElementById('simulation-modal').classList.remove('hidden');
+    }
+    
+    function closeSimulationModal() {
+        document.getElementById('simulation-modal').classList.add('hidden');
+    }
+</script>
+{% endblock %}
