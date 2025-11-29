@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Email - Uni-App{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-16">
+    <div id="confirm-card" class="bg-white rounded-xl shadow-lg p-8 text-center">
+        <!-- Loading State -->
+        <div id="confirm-loading">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-accent-500 border-t-transparent mx-auto mb-4"></div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Verificando tu email...</h2>
+            <p class="text-gray-500">Por favor espera un momento</p>
+        </div>
+        
+        <!-- Success State -->
+        <div id="confirm-success" class="hidden">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">¡Email verificado!</h2>
+            <p class="text-gray-500 mb-6">Tu cuenta ha sido confirmada exitosamente.</p>
+            <a href="{{ url_for('pensum.index') }}" 
+               class="inline-block px-6 py-2 bg-accent-500 text-white font-medium rounded-lg hover:bg-accent-600 transition-colors">
+                Ir a la aplicación
+            </a>
+        </div>
+        
+        <!-- Error State -->
+        <div id="confirm-error" class="hidden">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Error de verificación</h2>
+            <p id="error-message" class="text-gray-500 mb-6">Ha ocurrido un error al verificar tu email.</p>
+            
+            <div id="error-actions" class="space-y-3">
+                <!-- Resend email option -->
+                <div id="resend-section" class="hidden">
+                    <p class="text-sm text-gray-500 mb-3">¿Necesitas un nuevo enlace de verificación?</p>
+                    <form id="resend-form" class="space-y-3">
+                        <input type="email" id="resend-email" placeholder="tu@email.com" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500">
+                        <button type="submit" id="resend-btn"
+                                class="w-full px-4 py-2 bg-accent-500 text-white font-medium rounded-lg hover:bg-accent-600 transition-colors">
+                            Reenviar email de verificación
+                        </button>
+                    </form>
+                </div>
+                
+                <a href="{{ url_for('pensum.index') }}" 
+                   class="inline-block px-6 py-2 text-accent-500 font-medium hover:underline">
+                    Volver al inicio
+                </a>
+            </div>
+        </div>
+        
+        <!-- Already Confirmed -->
+        <div id="confirm-already" class="hidden">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Email ya verificado</h2>
+            <p class="text-gray-500 mb-6">Tu cuenta ya estaba confirmada. Puedes iniciar sesión normalmente.</p>
+            <a href="{{ url_for('pensum.index') }}" 
+               class="inline-block px-6 py-2 bg-accent-500 text-white font-medium rounded-lg hover:bg-accent-600 transition-colors">
+                Ir a iniciar sesión
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    
+    // Supabase sends tokens in URL hash or query params
+    let accessToken = urlParams.get('access_token');
+    let refreshToken = urlParams.get('refresh_token');
+    let type = urlParams.get('type');
+    let errorCode = urlParams.get('error_code');
+    let errorDescription = urlParams.get('error_description');
+    
+    // Parse hash if present (Supabase sometimes uses hash)
+    if (hash) {
+        const hashParams = new URLSearchParams(hash.substring(1));
+        accessToken = accessToken || hashParams.get('access_token');
+        refreshToken = refreshToken || hashParams.get('refresh_token');
+        type = type || hashParams.get('type');
+        errorCode = errorCode || hashParams.get('error_code');
+        errorDescription = errorDescription || hashParams.get('error_description');
+    }
+    
+    // Handle errors from URL
+    if (errorCode || errorDescription) {
+        showError(getErrorMessage(errorCode, errorDescription));
+        return;
+    }
+    
+    // If we have tokens, verify them
+    if (accessToken) {
+        try {
+            const response = await fetch('/api/auth/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    access_token: accessToken,
+                    refresh_token: refreshToken,
+                    type: type
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.user) {
+                // Save auth data
+                localStorage.setItem('auth_user', JSON.stringify(data.user));
+                if (data.session) {
+                    localStorage.setItem('auth_session', JSON.stringify(data.session));
+                }
+                showSuccess();
+            } else if (data.error) {
+                showError(getErrorMessage(data.error_code, data.error));
+            } else {
+                showError('No se pudo verificar el email. Intenta de nuevo.');
+            }
+        } catch (error) {
+            console.error('Verification error:', error);
+            showError('Error de conexión. Por favor intenta de nuevo.');
+        }
+    } else {
+        // No tokens in URL
+        showError('Enlace de verificación inválido o incompleto.', true);
+    }
+});
+
+function getErrorMessage(errorCode, errorDescription) {
+    const errorMessages = {
+        'otp_expired': 'El enlace de verificación ha expirado. Solicita uno nuevo.',
+        'otp_disabled': 'La verificación por email está deshabilitada.',
+        'email_not_confirmed': 'El email aún no ha sido confirmado.',
+        'invalid_token': 'El enlace de verificación es inválido.',
+        'expired_token': 'El enlace de verificación ha expirado. Solicita uno nuevo.',
+        'user_not_found': 'No se encontró el usuario asociado a este enlace.',
+        'email_link_invalid': 'El enlace de verificación es inválido o ya fue usado.',
+        'flow_state_expired': 'La sesión de verificación ha expirado. Solicita un nuevo enlace.',
+        'flow_state_not_found': 'No se encontró la sesión de verificación.',
+    };
+    
+    // Check for specific error codes
+    if (errorCode && errorMessages[errorCode]) {
+        return errorMessages[errorCode];
+    }
+    
+    // Check for error description containing known patterns
+    if (errorDescription) {
+        const desc = errorDescription.toLowerCase();
+        if (desc.includes('expired') || desc.includes('otp_expired')) {
+            return 'El enlace de verificación ha expirado. Solicita uno nuevo.';
+        }
+        if (desc.includes('invalid')) {
+            return 'El enlace de verificación es inválido.';
+        }
+        if (desc.includes('already') || desc.includes('confirmed')) {
+            showAlreadyConfirmed();
+            return null;
+        }
+        return decodeURIComponent(errorDescription);
+    }
+    
+    return 'Ha ocurrido un error al verificar tu email.';
+}
+
+function showSuccess() {
+    document.getElementById('confirm-loading').classList.add('hidden');
+    document.getElementById('confirm-success').classList.remove('hidden');
+}
+
+function showError(message, showResend = true) {
+    if (!message) return; // Already handled (e.g., already confirmed)
+    
+    document.getElementById('confirm-loading').classList.add('hidden');
+    document.getElementById('confirm-error').classList.remove('hidden');
+    document.getElementById('error-message').textContent = message;
+    
+    if (showResend || message.includes('expirado') || message.includes('expired')) {
+        document.getElementById('resend-section').classList.remove('hidden');
+    }
+}
+
+function showAlreadyConfirmed() {
+    document.getElementById('confirm-loading').classList.add('hidden');
+    document.getElementById('confirm-already').classList.remove('hidden');
+}
+
+// Resend verification email
+document.getElementById('resend-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('resend-email').value;
+    const btn = document.getElementById('resend-btn');
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="animate-pulse">Enviando...</span>';
+    
+    try {
+        const response = await fetch('/api/auth/resend-verification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            btn.innerHTML = '✓ Email enviado';
+            btn.classList.remove('bg-accent-500', 'hover:bg-accent-600');
+            btn.classList.add('bg-green-500');
+            
+            setTimeout(() => {
+                document.getElementById('error-message').textContent = 
+                    'Revisa tu bandeja de entrada para el nuevo enlace de verificación.';
+                document.getElementById('resend-section').classList.add('hidden');
+            }, 2000);
+        } else {
+            throw new Error(data.error || 'Error al reenviar email');
+        }
+    } catch (error) {
+        btn.innerHTML = 'Reenviar email de verificación';
+        btn.disabled = false;
+        alert(error.message);
+    }
+});
+</script>
+{% endblock %}
