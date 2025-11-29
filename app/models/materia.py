@@ -16,6 +16,16 @@ class MateriaStatus(str, Enum):
     BLOCKED = "blocked"      # Cannot take due to prerequisites
 
 
+class MateriaTipo(str, Enum):
+    """Type/category of a course"""
+    NUCLEO = "nucleo"                # Núcleo Carrera
+    BASICAS = "basicas"              # Ciencias Básicas
+    SOCIOHUMANO = "sociohumano"      # Socio Humano
+    ENFASIS = "enfasis"              # Énfasis
+    COMPLEMENTARIAS = "complementarias"  # Complementarias
+    ELECTIVAS = "electivas"          # Electivas
+
+
 class Materia(BaseModel):
     """
     Represents a course/subject in the academic pensum
@@ -27,6 +37,7 @@ class Materia(BaseModel):
     prerequisites: list[str] = Field(default_factory=list, description="List of prerequisite course codes")
     corequisites: list[str] = Field(default_factory=list, description="List of corequisite/coterminal course codes")
     color: Optional[str] = Field(default=None, pattern=r'^#[0-9A-Fa-f]{6}$', description="Hex color for UI")
+    tipo: Optional[str] = Field(default=None, description="Course type/category")
     status: MateriaStatus = Field(default=MateriaStatus.PENDING, description="Current status of the course")
     grade: Optional[float] = Field(default=None, ge=0.0, le=5.0, description="Final grade (0-5 scale)")
     

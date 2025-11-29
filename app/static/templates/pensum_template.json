@@ -7,7 +7,9 @@
       "semestre": 1,
       "prerrequisitos": [],
       "correquisitos": [],
-      "estado": "passed"
+      "estado": "passed",
+      "color": "#5091AF",
+      "tipo": "basicas"
     },
     {
       "codigo": "MAT102",
@@ -16,7 +18,9 @@
       "semestre": 2,
       "prerrequisitos": ["MAT101"],
       "correquisitos": [],
-      "estado": "enrolled"
+      "estado": "enrolled",
+      "color": "#5091AF",
+      "tipo": "basicas"
     },
     {
       "codigo": "FIS101",
@@ -25,7 +29,9 @@
       "semestre": 1,
       "prerrequisitos": [],
       "correquisitos": ["FIS101L"],
-      "estado": "passed"
+      "estado": "passed",
+      "color": "#6366f1",
+      "tipo": "basicas"
     },
     {
       "codigo": "FIS101L",
@@ -34,7 +40,9 @@
       "semestre": 1,
       "prerrequisitos": [],
       "correquisitos": ["FIS101"],
-      "estado": "passed"
+      "estado": "passed",
+      "color": "#6366f1",
+      "tipo": "basicas"
     },
     {
       "codigo": "FIS102",
@@ -43,7 +51,9 @@
       "semestre": 2,
       "prerrequisitos": ["FIS101", "MAT101"],
       "correquisitos": ["FIS102L"],
-      "estado": "pending"
+      "estado": "pending",
+      "color": "#6366f1",
+      "tipo": "basicas"
     },
     {
       "codigo": "FIS102L",
@@ -52,7 +62,9 @@
       "semestre": 2,
       "prerrequisitos": ["FIS101L"],
       "correquisitos": ["FIS102"],
-      "estado": "pending"
+      "estado": "pending",
+      "color": "#6366f1",
+      "tipo": "basicas"
     },
     {
       "codigo": "PRG101",
@@ -61,7 +73,9 @@
       "semestre": 1,
       "prerrequisitos": [],
       "correquisitos": [],
-      "estado": "passed"
+      "estado": "passed",
+      "color": "#10b981",
+      "tipo": "nucleo"
     }
   ],
   "calificaciones": [
@@ -104,6 +118,16 @@
   ],
   "_comentarios": {
     "estados_validos": ["pending", "enrolled", "passed", "failed", "dropped"],
+    "tipos_validos": ["nucleo", "basicas", "sociohumano", "enfasis", "complementarias", "electivas"],
+    "tipos_descripcion": {
+      "nucleo": "Núcleo Carrera - Materias fundamentales de la carrera",
+      "basicas": "Ciencias Básicas - Matemáticas, física, química, etc.",
+      "sociohumano": "Socio Humano - Formación humanística y social",
+      "enfasis": "Énfasis - Especialización dentro de la carrera",
+      "complementarias": "Complementarias - Materias de apoyo",
+      "electivas": "Electivas - Materias de libre elección"
+    },
+    "color": "Color hexadecimal para la materia (ej: #5091AF)",
     "nota_rango": "0.0 a 5.0",
     "porcentaje_total": "Los porcentajes de componentes deberían sumar 100%, pero el cálculo funciona con cualquier porcentaje",
     "prerrequisitos": "Array de códigos de materias que deben estar aprobadas ANTES de cursar esta materia",
