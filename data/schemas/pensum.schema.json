@@ -1,0 +1,260 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://uniapp.example.com/schemas/pensum.json",
+    "title": "Pensum Export Schema",
+    "description": "Schema for validating Uni-App pensum export files",
+    "type": "object",
+    "required": ["version", "data"],
+    "properties": {
+        "version": {
+            "type": "string",
+            "description": "Export format version",
+            "pattern": "^\\d+\\.\\d+$"
+        },
+        "exportDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 date when the export was created"
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "materias": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/materia" }
+                },
+                "clases": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/clase" }
+                },
+                "franjas": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/franja" }
+                },
+                "calificaciones": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/calificacion" }
+                },
+                "configuracion": { "$ref": "#/definitions/configuracion" },
+                "selectedSchedule": {
+                    "type": ["array", "null"],
+                    "items": { "$ref": "#/definitions/clase" }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "materia": {
+            "type": "object",
+            "required": ["codigo", "nombre", "creditos", "semestre"],
+            "properties": {
+                "codigo": {
+                    "type": "string",
+                    "description": "Unique course code",
+                    "minLength": 1,
+                    "maxLength": 20
+                },
+                "nombre": {
+                    "type": "string",
+                    "description": "Course name",
+                    "minLength": 1,
+                    "maxLength": 200
+                },
+                "creditos": {
+                    "type": "integer",
+                    "description": "Number of credits",
+                    "minimum": 0,
+                    "maximum": 20
+                },
+                "semestre": {
+                    "type": "integer",
+                    "description": "Semester number",
+                    "minimum": 1,
+                    "maximum": 20
+                },
+                "estado": {
+                    "type": "string",
+                    "description": "Course status",
+                    "enum": ["pending", "enrolled", "passed", "failed", "dropped"],
+                    "default": "pending"
+                },
+                "prerrequisitos": {
+                    "type": "array",
+                    "description": "List of prerequisite course codes",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
+                },
+                "correquisitos": {
+                    "type": "array",
+                    "description": "List of corequisite course codes",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
+                },
+                "descripcion": {
+                    "type": "string",
+                    "description": "Optional course description",
+                    "maxLength": 1000
+                }
+            }
+        },
+        "clase": {
+            "type": "object",
+            "required": ["codigo_materia"],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Unique class section ID"
+                },
+                "codigo_materia": {
+                    "type": "string",
+                    "description": "Course code this class belongs to"
+                },
+                "nrc": {
+                    "type": "string",
+                    "description": "NRC (National Registration Code) or section number",
+                    "maxLength": 20
+                },
+                "seccion": {
+                    "type": "string",
+                    "description": "Section identifier",
+                    "maxLength": 10
+                },
+                "profesor": {
+                    "type": "string",
+                    "description": "Professor name",
+                    "maxLength": 200
+                },
+                "aula": {
+                    "type": "string",
+                    "description": "Classroom location",
+                    "maxLength": 50
+                },
+                "bloques_horario": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/bloque_horario" }
+                }
+            }
+        },
+        "bloque_horario": {
+            "type": "object",
+            "required": ["dia", "hora_inicio", "hora_fin"],
+            "properties": {
+                "dia": {
+                    "type": "string",
+                    "description": "Day of the week",
+                    "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                },
+                "hora_inicio": {
+                    "type": "string",
+                    "description": "Start time in HH:MM format",
+                    "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "hora_fin": {
+                    "type": "string",
+                    "description": "End time in HH:MM format",
+                    "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                }
+            }
+        },
+        "franja": {
+            "type": "object",
+            "required": ["dia", "hora_inicio", "hora_fin", "tipo"],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Unique franja ID"
+                },
+                "dia": {
+                    "type": "string",
+                    "description": "Day of the week",
+                    "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                },
+                "hora_inicio": {
+                    "type": "string",
+                    "description": "Start time in HH:MM format",
+                    "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "hora_fin": {
+                    "type": "string",
+                    "description": "End time in HH:MM format",
+                    "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "tipo": {
+                    "type": "string",
+                    "description": "Type of time slot preference",
+                    "enum": ["blocked", "preferred"]
+                }
+            }
+        },
+        "calificacion": {
+            "type": "object",
+            "required": ["codigo_materia", "nota"],
+            "properties": {
+                "codigo_materia": {
+                    "type": "string",
+                    "description": "Course code"
+                },
+                "nota": {
+                    "type": "number",
+                    "description": "Grade (0-5 scale)",
+                    "minimum": 0,
+                    "maximum": 5
+                },
+                "fecha": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date when grade was recorded"
+                },
+                "periodo": {
+                    "type": "string",
+                    "description": "Academic period (e.g., '2024-1')",
+                    "maxLength": 20
+                }
+            }
+        },
+        "configuracion": {
+            "type": "object",
+            "properties": {
+                "max_creditos_semestre": {
+                    "type": "integer",
+                    "description": "Maximum credits per semester",
+                    "minimum": 1,
+                    "maximum": 30,
+                    "default": 18
+                },
+                "umbral_gpa": {
+                    "type": "number",
+                    "description": "GPA threshold for alerts",
+                    "minimum": 0,
+                    "maximum": 5,
+                    "default": 2.0
+                },
+                "mostrar_alertas": {
+                    "type": "boolean",
+                    "description": "Whether to show GPA alerts",
+                    "default": true
+                },
+                "tema": {
+                    "type": "string",
+                    "description": "UI theme",
+                    "enum": ["light", "dark"],
+                    "default": "light"
+                },
+                "semester_start": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Semester start date"
+                },
+                "semester_end": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Semester end date"
+                }
+            }
+        }
+    }
+}
