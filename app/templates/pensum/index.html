@@ -907,6 +907,19 @@
                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500"
                            placeholder="Cálculo Diferencial">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Materia</label>
+                    <select id="materia-tipo"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-accent-500">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="nucleo">Núcleo Carrera</option>
+                        <option value="basicas">Ciencias Básicas</option>
+                        <option value="sociohumano">Socio Humano</option>
+                        <option value="enfasis">Énfasis</option>
+                        <option value="complementarias">Complementarias</option>
+                        <option value="electivas">Electivas</option>
+                    </select>
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semestre</label>
@@ -1930,6 +1943,7 @@
         document.getElementById('materia-prerequisites').value = (materia.prerrequisitos || []).join(', ');
         document.getElementById('materia-corequisites').value = (materia.correquisitos || []).join(', ');
         document.getElementById('materia-color').value = materia.color || '#5091AF';
+        document.getElementById('materia-tipo').value = materia.tipo || '';
         
         // Show and populate status/grade section
         document.getElementById('materia-status-grade-section').classList.remove('hidden');
@@ -1963,6 +1977,7 @@
             const correquisitos = document.getElementById('materia-corequisites').value
                 .split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
             const color = document.getElementById('materia-color').value;
+            const tipo = document.getElementById('materia-tipo').value;
             
             if (!codigo || !nombre || !creditos || !semestre) {
                 App.showAlert('Por favor completa todos los campos requeridos', 'error');
@@ -1992,6 +2007,7 @@
                 prerrequisitos,
                 correquisitos,
                 color,
+                tipo,
                 estado
             };
             
@@ -4227,20 +4243,32 @@
         const ctx = canvas.getContext('2d');
         const materias = storage.getMaterias();
         
+        // Map tipo codes to display names
+        const tipoLabels = {
+            'nucleo': 'Núcleo Carrera',
+            'basicas': 'Ciencias Básicas',
+            'sociohumano': 'Socio Humano',
+            'enfasis': 'Énfasis',
+            'complementarias': 'Complementarias',
+            'electivas': 'Electivas'
+        };
+        
         // Group by user-defined type field, or show "Sin tipo" if not defined
         const typeGroups = {};
         materias.forEach(m => {
-            const tipo = m.tipo || 'Sin definir';
-            if (!typeGroups[tipo]) typeGroups[tipo] = 0;
-            typeGroups[tipo]++;
+            const tipoKey = m.tipo || 'undefined';
+            const tipoLabel = tipoLabels[tipoKey] || 'Sin definir';
+            if (!typeGroups[tipoLabel]) typeGroups[tipoLabel] = 0;
+            typeGroups[tipoLabel]++;
         });
         
         const typeColors = {
-            'Núcleo': '#6366f1',
-            'Formación Social': '#8b5cf6', 
-            'Formación Profesional': '#a855f7',
-            'Electiva': '#d946ef',
-            'Complementaria': '#ec4899',
+            'Núcleo Carrera': '#6366f1',
+            'Ciencias Básicas': '#8b5cf6', 
+            'Socio Humano': '#a855f7',
+            'Énfasis': '#d946ef',
+            'Complementarias': '#ec4899',
+            'Electivas': '#f43f5e',
             'Sin definir': '#9ca3af'
         };
         
