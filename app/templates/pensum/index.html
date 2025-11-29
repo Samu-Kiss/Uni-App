@@ -11,6 +11,32 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Visualiza y gestiona tu plan de estudios</p>
         </div>
         <div class="flex flex-wrap gap-2">
+            <!-- Undo/Redo Buttons -->
+            <div class="inline-flex items-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 overflow-hidden">
+                <button onclick="performUndo()" id="undo-btn" disabled
+                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Deshacer (Ctrl+Z)">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                    </svg>
+                </button>
+                <div class="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
+                <button onclick="performRedo()" id="redo-btn" disabled
+                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Rehacer (Ctrl+Y)">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path>
+                    </svg>
+                </button>
+                <div class="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
+                <button onclick="toggleHistoryPanel()" id="history-btn"
+                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        title="Ver historial">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </button>
+            </div>
             <button onclick="toggleSimulationMode()" id="sim-toggle-btn"
                     class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,6 +487,50 @@
         </div>
     </div>
 </div>
+
+<!-- History Panel (Slide-out) -->
+<div id="history-panel" class="fixed inset-y-0 right-0 w-80 bg-white dark:bg-gray-800 shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+    <div class="flex flex-col h-full">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Historial</h3>
+            </div>
+            <button onclick="toggleHistoryPanel()" class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- History List -->
+        <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-2">
+            <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-sm">No hay cambios registrados</p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+            <button onclick="clearHistory()" id="clear-history-btn" disabled
+                    class="w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Limpiar historial
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- History Panel Overlay -->
+<div id="history-overlay" onclick="toggleHistoryPanel()" class="fixed inset-0 bg-black/20 dark:bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300 z-40"></div>
 
 {% include 'components/course_modal.html' %}
 {% include 'components/alert.html' %}
@@ -1537,8 +1607,8 @@
     function applySimulation() {
         if (simulatedCourses.length === 0) return;
         
-        const config = storage.getConfiguracion?.() || { creditos_max: 21 };
-        const maxCredits = config.creditos_max || 21;
+        const config = storage.getConfiguracion?.() || { creditos_max: 24 };
+        const maxCredits = config.creditos_max || 24;
         const totalCredits = getSimulatedCredits();
         
         if (totalCredits > maxCredits) {
@@ -1547,14 +1617,41 @@
             }
         }
         
-        // Apply simulation - change status to enrolled
+        // Build batch history entry
+        const batchChanges = [];
+        simulatedCourses.forEach(codigo => {
+            const materia = storage.getMateria(codigo);
+            if (materia) {
+                batchChanges.push({
+                    type: 'materia',
+                    codigo: codigo,
+                    before: { ...materia },
+                    after: { ...materia, estado: 'enrolled' }
+                });
+            }
+        });
+        
+        // Record batch in history BEFORE making changes
+        if (batchChanges.length > 0) {
+            historyManager.push(
+                'simulation:apply',
+                `Inscribió ${batchChanges.length} materia(s) desde simulación`,
+                {},
+                {},
+                batchChanges
+            );
+        }
+        
+        // Apply simulation - change status to enrolled (without individual history tracking)
+        historyManager.isUndoRedo = true; // Prevent individual tracking
         simulatedCourses.forEach(codigo => {
             const materia = storage.getMateria(codigo);
             if (materia) {
                 materia.estado = 'enrolled';
-                storage.saveMateria(materia);
+                originalSaveMateria(materia);
             }
         });
+        historyManager.isUndoRedo = false;
         
         App.showAlert(`${simulatedCourses.length} materia(s) inscrita(s) correctamente`, 'success');
         
@@ -1595,5 +1692,214 @@
         
         addToSimulation(draggedMateria.codigo);
     }
+    
+    // ==================== HISTORY FUNCTIONS ====================
+    
+    function toggleHistoryPanel() {
+        const panel = document.getElementById('history-panel');
+        const overlay = document.getElementById('history-overlay');
+        const isOpen = !panel.classList.contains('translate-x-full');
+        
+        if (isOpen) {
+            panel.classList.add('translate-x-full');
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+        } else {
+            panel.classList.remove('translate-x-full');
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            renderHistoryList();
+        }
+    }
+    
+    function renderHistoryList() {
+        const container = document.getElementById('history-list');
+        const history = historyManager.getRecentHistory(30);
+        const clearBtn = document.getElementById('clear-history-btn');
+        
+        if (history.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-sm">No hay cambios registrados</p>
+                </div>
+            `;
+            clearBtn.disabled = true;
+            return;
+        }
+        
+        clearBtn.disabled = false;
+        container.innerHTML = history.map((entry, index) => `
+            <div class="p-3 rounded-lg border ${index === 0 ? 'border-accent-200 dark:border-accent-700 bg-accent-50 dark:bg-accent-900/20' : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50'} transition-colors">
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                        ${getHistoryIcon(entry.action)}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${entry.description}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${HistoryManager.timeAgo(entry.timestamp)}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function getHistoryIcon(action) {
+        const icons = {
+            'materia:add': '<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>',
+            'materia:update': '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>',
+            'materia:delete': '<svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>',
+            'materia:status': '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+            'materia:move': '<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>',
+            'calificacion:update': '<svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>',
+            'simulation:apply': '<svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>',
+            'import:apply': '<svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>'
+        };
+        return icons[action] || '<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+    }
+    
+    function performUndo() {
+        if (historyManager.undo()) {
+            loadPensumData();
+            App.showAlert('Cambio deshecho', 'info');
+        }
+    }
+    
+    function performRedo() {
+        if (historyManager.redo()) {
+            loadPensumData();
+            App.showAlert('Cambio rehecho', 'info');
+        }
+    }
+    
+    function clearHistory() {
+        if (confirm('¿Estás seguro de que deseas limpiar todo el historial? Esta acción no se puede deshacer.')) {
+            historyManager.clearHistory();
+            renderHistoryList();
+            App.showAlert('Historial limpiado', 'info');
+        }
+    }
+    
+    function updateUndoRedoButtons() {
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        
+        if (undoBtn) {
+            undoBtn.disabled = !historyManager.canUndo();
+            undoBtn.classList.toggle('text-gray-700', historyManager.canUndo());
+            undoBtn.classList.toggle('dark:text-gray-300', historyManager.canUndo());
+        }
+        if (redoBtn) {
+            redoBtn.disabled = !historyManager.canRedo();
+            redoBtn.classList.toggle('text-gray-700', historyManager.canRedo());
+            redoBtn.classList.toggle('dark:text-gray-300', historyManager.canRedo());
+        }
+    }
+    
+    // Listen for history changes
+    window.addEventListener('historyChanged', (event) => {
+        updateUndoRedoButtons();
+        if (document.getElementById('history-panel') && !document.getElementById('history-panel').classList.contains('translate-x-full')) {
+            renderHistoryList();
+        }
+    });
+    
+    // Keyboard shortcuts for undo/redo
+    document.addEventListener('keydown', (event) => {
+        if (event.ctrlKey || event.metaKey) {
+            if (event.key === 'z' && !event.shiftKey) {
+                event.preventDefault();
+                performUndo();
+            } else if (event.key === 'y' || (event.key === 'z' && event.shiftKey)) {
+                event.preventDefault();
+                performRedo();
+            }
+        }
+    });
+    
+    // Initialize undo/redo button states
+    updateUndoRedoButtons();
+    
+    // ==================== HISTORY-AWARE SAVE FUNCTIONS ====================
+    
+    // Wrap materia saves with history tracking
+    const originalSaveMateria = storage.saveMateria.bind(storage);
+    storage.saveMateria = function(materia) {
+        if (!historyManager.isUndoRedo) {
+            const existingMateria = storage.getMateria(materia.codigo);
+            const isNew = !existingMateria;
+            
+            if (isNew) {
+                historyManager.push(
+                    'materia:add',
+                    `Agregó materia: ${materia.nombre}`,
+                    { materia: null },
+                    { materia: { ...materia } }
+                );
+            } else {
+                // Determine what changed
+                let action = 'materia:update';
+                let description = `Actualizó ${materia.nombre}`;
+                
+                if (existingMateria.estado !== materia.estado) {
+                    action = 'materia:status';
+                    const statusLabels = {
+                        'pending': 'Pendiente',
+                        'enrolled': 'Inscrita',
+                        'passed': 'Aprobada',
+                        'failed': 'Reprobada',
+                        'dropped': 'Retirada'
+                    };
+                    description = `Cambió estado de ${materia.nombre} a ${statusLabels[materia.estado] || materia.estado}`;
+                } else if (existingMateria.semestre !== materia.semestre) {
+                    action = 'materia:move';
+                    description = `Movió ${materia.nombre} al semestre ${materia.semestre}`;
+                }
+                
+                historyManager.push(
+                    action,
+                    description,
+                    { materia: { ...existingMateria } },
+                    { materia: { ...materia } }
+                );
+            }
+        }
+        return originalSaveMateria(materia);
+    };
+    
+    // Wrap materia deletion with history tracking
+    const originalDeleteMateria = storage.deleteMateria.bind(storage);
+    storage.deleteMateria = function(codigo) {
+        if (!historyManager.isUndoRedo) {
+            const existingMateria = storage.getMateria(codigo);
+            if (existingMateria) {
+                historyManager.push(
+                    'materia:delete',
+                    `Eliminó materia: ${existingMateria.nombre}`,
+                    { materia: { ...existingMateria } },
+                    { materia: { ...existingMateria, _deleted: true } }
+                );
+            }
+        }
+        return originalDeleteMateria(codigo);
+    };
+    
+    // Wrap calificacion save with history tracking
+    const originalSaveCalificacion = storage.saveCalificacion.bind(storage);
+    storage.saveCalificacion = function(calificacion) {
+        if (!historyManager.isUndoRedo) {
+            const existingCal = storage.getCalificacion(calificacion.codigo_materia);
+            const materia = storage.getMateria(calificacion.codigo_materia);
+            const materiaName = materia ? materia.nombre : calificacion.codigo_materia;
+            
+            historyManager.push(
+                'calificacion:update',
+                `Actualizó nota de ${materiaName}: ${calificacion.nota}`,
+                { calificacion: existingCal ? { ...existingCal } : null },
+                { calificacion: { ...calificacion } }
+            );
+        }
+        return originalSaveCalificacion(calificacion);
+    };
 </script>
 {% endblock %}

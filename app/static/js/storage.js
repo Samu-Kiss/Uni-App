@@ -516,10 +516,289 @@ class StorageManager {
     saveConfig(config) { return this.saveConfiguracion(config); }
 }
 
+// ==================== HISTORY MANAGER ====================
+
+/**
+ * History Manager - Handles undo/redo functionality
+ * Tracks changes to materias and calificaciones
+ */
+class HistoryManager {
+    constructor(storageManager) {
+        this.storage = storageManager;
+        this.historyKey = 'uniapp_history';
+        this.maxEntries = 50;
+        this.history = this.loadHistory();
+        this.currentIndex = this.history.length - 1;
+        this.isUndoRedo = false; // Flag to prevent recording during undo/redo
+    }
+
+    /**
+     * Load history from localStorage
+     */
+    loadHistory() {
+        try {
+            const data = localStorage.getItem(this.historyKey);
+            return data ? JSON.parse(data) : [];
+        } catch (error) {
+            console.error('Error loading history:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Save history to localStorage
+     */
+    saveHistory() {
+        try {
+            // Trim history if exceeds max
+            if (this.history.length > this.maxEntries) {
+                this.history = this.history.slice(-this.maxEntries);
+                this.currentIndex = this.history.length - 1;
+            }
+            localStorage.setItem(this.historyKey, JSON.stringify(this.history));
+        } catch (error) {
+            console.error('Error saving history:', error);
+        }
+    }
+
+    /**
+     * Generate unique ID for history entry
+     */
+    generateId() {
+        return `hist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    /**
+     * Push a new history entry
+     * @param {string} action - Action type (materia:add, materia:update, etc.)
+     * @param {string} description - Human-readable description
+     * @param {object} before - State before change
+     * @param {object} after - State after change
+     * @param {array} batch - For batch operations, array of {type, codigo, before, after}
+     */
+    push(action, description, before, after, batch = null) {
+        if (this.isUndoRedo) return; // Don't record during undo/redo
+
+        // If we're not at the end of history, remove future entries
+        if (this.currentIndex < this.history.length - 1) {
+            this.history = this.history.slice(0, this.currentIndex + 1);
+        }
+
+        const entry = {
+            id: this.generateId(),
+            timestamp: new Date().toISOString(),
+            action,
+            description,
+            before,
+            after,
+            batch
+        };
+
+        this.history.push(entry);
+        this.currentIndex = this.history.length - 1;
+        this.saveHistory();
+        
+        // Dispatch event for UI updates
+        window.dispatchEvent(new CustomEvent('historyChanged', { 
+            detail: { canUndo: this.canUndo(), canRedo: this.canRedo() }
+        }));
+    }
+
+    /**
+     * Check if undo is possible
+     */
+    canUndo() {
+        return this.currentIndex >= 0;
+    }
+
+    /**
+     * Check if redo is possible
+     */
+    canRedo() {
+        return this.currentIndex < this.history.length - 1;
+    }
+
+    /**
+     * Undo the last action
+     */
+    undo() {
+        if (!this.canUndo()) return false;
+
+        this.isUndoRedo = true;
+        const entry = this.history[this.currentIndex];
+
+        try {
+            if (entry.batch) {
+                // Batch operation - restore all items
+                entry.batch.forEach(item => {
+                    this.restoreState(item.type, item.before);
+                });
+            } else {
+                // Single operation
+                if (entry.before.materia !== undefined) {
+                    this.restoreState('materia', entry.before.materia);
+                }
+                if (entry.before.calificacion !== undefined) {
+                    this.restoreState('calificacion', entry.before.calificacion);
+                }
+            }
+
+            this.currentIndex--;
+            
+            // Dispatch event for UI updates
+            window.dispatchEvent(new CustomEvent('historyChanged', { 
+                detail: { canUndo: this.canUndo(), canRedo: this.canRedo(), action: 'undo' }
+            }));
+            
+            return true;
+        } catch (error) {
+            console.error('Error during undo:', error);
+            return false;
+        } finally {
+            this.isUndoRedo = false;
+        }
+    }
+
+    /**
+     * Redo the last undone action
+     */
+    redo() {
+        if (!this.canRedo()) return false;
+
+        this.isUndoRedo = true;
+        this.currentIndex++;
+        const entry = this.history[this.currentIndex];
+
+        try {
+            if (entry.batch) {
+                // Batch operation - apply all items
+                entry.batch.forEach(item => {
+                    this.restoreState(item.type, item.after);
+                });
+            } else {
+                // Single operation
+                if (entry.after.materia !== undefined) {
+                    this.restoreState('materia', entry.after.materia);
+                }
+                if (entry.after.calificacion !== undefined) {
+                    this.restoreState('calificacion', entry.after.calificacion);
+                }
+            }
+            
+            // Dispatch event for UI updates
+            window.dispatchEvent(new CustomEvent('historyChanged', { 
+                detail: { canUndo: this.canUndo(), canRedo: this.canRedo(), action: 'redo' }
+            }));
+            
+            return true;
+        } catch (error) {
+            console.error('Error during redo:', error);
+            this.currentIndex--;
+            return false;
+        } finally {
+            this.isUndoRedo = false;
+        }
+    }
+
+    /**
+     * Restore state for a specific type
+     */
+    restoreState(type, state) {
+        if (type === 'materia') {
+            if (state === null) {
+                // Item was added, so we need to remove it - but we need the codigo
+                // This case is handled by storing the full object in 'after' when adding
+            } else {
+                const materias = this.storage.getMaterias();
+                const index = materias.findIndex(m => m.codigo === state.codigo);
+                
+                if (state._deleted) {
+                    // Item should be deleted
+                    if (index >= 0) {
+                        materias.splice(index, 1);
+                    }
+                } else if (index >= 0) {
+                    // Update existing
+                    materias[index] = state;
+                } else {
+                    // Re-add deleted item
+                    materias.push(state);
+                }
+                
+                this.storage.saveMaterias(materias);
+            }
+        } else if (type === 'calificacion') {
+            if (state === null) {
+                // No grade existed before
+            } else {
+                const calificaciones = this.storage.getCalificaciones();
+                const index = calificaciones.findIndex(c => c.codigo_materia === state.codigo_materia);
+                
+                if (state._deleted) {
+                    if (index >= 0) {
+                        calificaciones.splice(index, 1);
+                    }
+                } else if (index >= 0) {
+                    calificaciones[index] = state;
+                } else {
+                    calificaciones.push(state);
+                }
+                
+                this.storage.saveCalificaciones(calificaciones);
+            }
+        }
+    }
+
+    /**
+     * Get history entries for display
+     */
+    getHistory() {
+        return this.history.map((entry, index) => ({
+            ...entry,
+            isCurrent: index === this.currentIndex,
+            canRestore: index <= this.currentIndex
+        }));
+    }
+
+    /**
+     * Get recent history (last N entries from current position)
+     */
+    getRecentHistory(count = 10) {
+        const start = Math.max(0, this.currentIndex - count + 1);
+        return this.history.slice(start, this.currentIndex + 1).reverse();
+    }
+
+    /**
+     * Clear all history
+     */
+    clearHistory() {
+        this.history = [];
+        this.currentIndex = -1;
+        localStorage.removeItem(this.historyKey);
+        
+        window.dispatchEvent(new CustomEvent('historyChanged', { 
+            detail: { canUndo: false, canRedo: false }
+        }));
+    }
+
+    /**
+     * Get human-readable time ago string
+     */
+    static timeAgo(timestamp) {
+        const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
+        
+        if (seconds < 60) return 'Hace un momento';
+        if (seconds < 3600) return `Hace ${Math.floor(seconds / 60)} min`;
+        if (seconds < 86400) return `Hace ${Math.floor(seconds / 3600)} horas`;
+        return `Hace ${Math.floor(seconds / 86400)} días`;
+    }
+}
+
 // Global instance
 const storage = new StorageManager();
+const historyManager = new HistoryManager(storage);
 
 // Export for modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { StorageManager, storage };
+    module.exports = { StorageManager, storage, HistoryManager, historyManager };
 }
