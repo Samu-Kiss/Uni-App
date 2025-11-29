@@ -95,6 +95,22 @@ def resend_verification():
     return jsonify(result)
 
 
+@api_bp.route('/auth/refresh', methods=['POST'])
+def refresh_token():
+    """Refresh access token using refresh token"""
+    data = request.get_json()
+    refresh_token = data.get('refresh_token')
+    
+    if not refresh_token:
+        return jsonify({'error': 'Refresh token requerido'}), 400
+    
+    result = DatabaseService.refresh_session(refresh_token)
+    if 'error' in result:
+        return jsonify(result), 401
+    
+    return jsonify(result)
+
+
 # ==================== Sync Endpoints ====================
 
 @api_bp.route('/sync', methods=['POST'])
@@ -115,6 +131,7 @@ def sync_data():
     
     result = DatabaseService.sync_all_data(user_id, data, access_token)
     if 'error' in result:
+        # Include details for debugging
         return jsonify(result), 400
     
     return jsonify(result)

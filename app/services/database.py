@@ -170,6 +170,40 @@ class DatabaseService:
             return {'error': str(e)}
     
     @classmethod
+    def refresh_session(cls, refresh_token: str) -> dict:
+        """
+        Refresh the access token using the refresh token
+        
+        Args:
+            refresh_token: The refresh token
+            
+        Returns:
+            New session data or error
+        """
+        client = cls.get_client()
+        if not client:
+            return {'error': 'Database not configured'}
+        
+        try:
+            response = client.auth.refresh_session(refresh_token)
+            
+            if response and response.session:
+                return {
+                    'session': {
+                        'access_token': response.session.access_token,
+                        'refresh_token': response.session.refresh_token
+                    },
+                    'user': {
+                        'id': response.user.id,
+                        'email': response.user.email
+                    } if response.user else None
+                }
+            else:
+                return {'error': 'Could not refresh session'}
+        except Exception as e:
+            return {'error': str(e)}
+    
+    @classmethod
     def sign_out(cls, access_token: str) -> dict:
         """Sign out user"""
         client = cls.get_client()
