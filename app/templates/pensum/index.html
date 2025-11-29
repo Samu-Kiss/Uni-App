@@ -11,6 +11,13 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Visualiza y gestiona tu plan de estudios</p>
         </div>
         <div class="flex flex-wrap gap-2">
+            <button onclick="toggleSimulationMode()" id="sim-toggle-btn"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <span id="sim-toggle-text">Simular Semestre</span>
+            </button>
             <button onclick="openImportModal()" 
                     class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,6 +100,135 @@
     
     <!-- GPA Alerts -->
     <div id="gpa-alerts-container" class="space-y-2"></div>
+    
+    <!-- Simulation Mode Panel -->
+    <div id="simulation-panel" class="hidden">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg overflow-hidden">
+            <!-- Simulation Header -->
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-white/20 rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Modo Simulación</h2>
+                        <p class="text-sm text-white/80">Planifica tu próximo semestre</p>
+                    </div>
+                </div>
+                <button onclick="toggleSimulationMode()" class="p-2 hover:bg-white/20 rounded-lg transition-colors" title="Cerrar simulación">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Simulation Content -->
+            <div class="bg-white dark:bg-gray-800 p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left: Simulated Courses List -->
+                    <div class="lg:col-span-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-gray-800 dark:text-white">Materias a Inscribir</h3>
+                            <span class="text-sm text-gray-500 dark:text-gray-400" id="sim-course-count">0 materias</span>
+                        </div>
+                        
+                        <!-- Drop Zone for Simulation -->
+                        <div id="simulation-drop-zone" 
+                             class="min-h-[120px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 transition-all"
+                             ondragover="handleSimDragOver(event)"
+                             ondragleave="handleSimDragLeave(event)"
+                             ondrop="handleSimDrop(event)">
+                            <div id="sim-empty-state" class="text-center py-6">
+                                <svg class="mx-auto w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Arrastra materias aquí o haz clic en el botón <strong>+</strong> de cada materia</p>
+                            </div>
+                            <div id="sim-courses-list" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                        </div>
+                        
+                        <!-- Validation Warnings -->
+                        <div id="sim-warnings" class="hidden mt-4 space-y-2"></div>
+                    </div>
+                    
+                    <!-- Right: Summary & GPA Projection -->
+                    <div class="space-y-4">
+                        <!-- Credits Summary -->
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Resumen de Créditos</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Créditos simulados:</span>
+                                    <span class="font-bold text-indigo-600 dark:text-indigo-400" id="sim-credits">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Límite máximo:</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300" id="sim-max-credits">24</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mt-2">
+                                    <div id="sim-credits-bar" class="bg-indigo-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- GPA Projection -->
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Proyección de Promedio</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="gpa-method" value="fixed" checked onchange="updateGpaProjection()" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-sm text-gray-600 dark:text-gray-400">Nota fija para todas:</span>
+                                    </label>
+                                    <input type="number" id="sim-fixed-grade" min="0" max="5" step="0.1" value="4.0" 
+                                           onchange="updateGpaProjection()"
+                                           class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="gpa-method" value="weighted" onchange="updateGpaProjection()" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-sm text-gray-600 dark:text-gray-400">Promedio ponderado por créditos</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="pt-3 border-t border-gray-200 dark:border-gray-600">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600 dark:text-gray-400">Promedio actual:</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300" id="sim-current-gpa">--</span>
+                                    </div>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="text-sm text-gray-600 dark:text-gray-400">Promedio proyectado:</span>
+                                        <span class="font-bold text-lg text-indigo-600 dark:text-indigo-400" id="sim-projected-gpa">--</span>
+                                    </div>
+                                    <div id="sim-gpa-change" class="text-right text-sm mt-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col space-y-2">
+                            <button onclick="applySimulation()" id="sim-apply-btn" disabled
+                                    class="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Aplicar Inscripción
+                            </button>
+                            <button onclick="clearSimulation()"
+                                    class="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Limpiar Simulación
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- View Toggle -->
     <div class="flex items-center justify-between">
@@ -336,11 +472,16 @@
     // Current view mode (tree is default)
     let currentView = 'tree';
     
+    // Simulation state
+    let simulationMode = false;
+    let simulatedCourses = []; // Array of course codes being simulated
+    
     // Initialize pensum when page loads
     document.addEventListener('DOMContentLoaded', function() {
         loadPensumData();
         setupMateriaForm();
         populateSimulateSelect();
+        updateSimMaxCredits();
     });
     
     function loadPensumData() {
@@ -432,11 +573,11 @@
         const maxSem = Math.max(...Object.keys(bySemester).map(Number), 10);
         
         const statusConfig = {
-            'pending': { border: 'border-gray-300', bg: 'bg-gray-50' },
-            'enrolled': { border: 'border-blue-400', bg: 'bg-blue-50' },
-            'passed': { border: 'border-green-400', bg: 'bg-green-50' },
-            'failed': { border: 'border-red-400', bg: 'bg-red-50' },
-            'dropped': { border: 'border-yellow-400', bg: 'bg-yellow-50' }
+            'pending': { border: 'border-gray-300 dark:border-gray-600', bg: 'bg-gray-50 dark:bg-gray-700' },
+            'enrolled': { border: 'border-blue-400 dark:border-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/30' },
+            'passed': { border: 'border-green-400 dark:border-green-500', bg: 'bg-green-50 dark:bg-green-900/30' },
+            'failed': { border: 'border-red-400 dark:border-red-500', bg: 'bg-red-50 dark:bg-red-900/30' },
+            'dropped': { border: 'border-yellow-400 dark:border-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/30' }
         };
         
         let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">';
@@ -446,39 +587,56 @@
             const totalCredits = semMaterias.reduce((s, m) => s + (m.creditos || 0), 0);
             
             html += `
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 semester-drop-zone transition-all"
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 semester-drop-zone transition-all"
                      data-semester="${sem}"
                      ondragover="handleDragOver(event, ${sem})"
                      ondragleave="handleDragLeave(event)"
                      ondrop="handleDrop(event, ${sem})">
-                    <div class="flex justify-between items-center mb-3 pb-2 border-b">
-                        <h3 class="font-semibold text-gray-800">Semestre ${sem}</h3>
-                        <span class="text-xs text-gray-500 semester-credits">${totalCredits} cr</span>
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b dark:border-gray-700">
+                        <h3 class="font-semibold text-gray-800 dark:text-gray-100">Semestre ${sem}</h3>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 semester-credits">${totalCredits} cr</span>
                     </div>
                     <div class="space-y-2 min-h-[60px] semester-materias" data-semester="${sem}">
             `;
             
             if (semMaterias.length === 0) {
-                html += '<p class="text-sm text-gray-400 text-center py-4 empty-message">Arrastra materias aquí</p>';
+                html += '<p class="text-sm text-gray-400 dark:text-gray-500 text-center py-4 empty-message">Arrastra materias aquí</p>';
             } else {
                 semMaterias.forEach(m => {
                     const st = statusConfig[m.estado] || statusConfig.pending;
                     const cal = storage.getCalificacion(m.codigo);
                     const isDraggable = m.estado !== 'passed' && m.estado !== 'failed';
+                    const canSimulate = m.estado === 'pending' && canEnrollInSimulation(m.codigo).valid;
+                    const isSimulated = simulatedCourses.includes(m.codigo);
+                    
                     html += `
-                        <div class="p-2 rounded-lg border-l-4 ${st.border} ${st.bg} hover:shadow-sm transition-all group relative ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''}"
+                        <div class="p-2 rounded-lg border-l-4 ${st.border} ${st.bg} hover:shadow-sm transition-all group relative ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''} ${isSimulated ? 'ring-2 ring-indigo-500 ring-offset-1' : ''}"
                              draggable="${isDraggable}"
                              data-codigo="${m.codigo}"
                              ondragstart="handleDragStart(event, '${m.codigo}')"
                              ondragend="handleDragEnd(event)">
                             <div class="cursor-pointer" onclick="openEditMateriaModal('${m.codigo}')">
                                 <div class="flex justify-between">
-                                    <p class="font-medium text-sm text-gray-800">${m.nombre}</p>
-                                    <span class="text-xs text-gray-500">${m.creditos}cr</span>
+                                    <p class="font-medium text-sm text-gray-800 dark:text-gray-100">${m.nombre}</p>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">${m.creditos}cr</span>
                                 </div>
-                                <p class="text-xs text-gray-500">${m.codigo}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">${m.codigo}</p>
                                 ${cal?.nota !== undefined ? `<p class="text-xs font-bold ${cal.nota >= 3 ? 'text-green-600' : 'text-red-600'}">${cal.nota.toFixed(1)}</p>` : ''}
                             </div>
+                            ${simulationMode && canSimulate && !isSimulated ? `
+                                <button onclick="event.stopPropagation(); addToSimulation('${m.codigo}')"
+                                        class="absolute bottom-1 right-1 p-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full shadow-sm transition-all sim-add-btn"
+                                        title="Agregar a simulación">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                </button>
+                            ` : ''}
+                            ${isSimulated ? `
+                                <span class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-indigo-500 text-white text-xs rounded-full">
+                                    Simulado
+                                </span>
+                            ` : ''}
                             <button onclick="event.stopPropagation(); deleteMateria('${m.codigo}')"
                                     class="absolute top-1 right-1 p-1 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
                                     title="Eliminar materia">
@@ -1069,6 +1227,373 @@
     
     function closeSimulationModal() {
         document.getElementById('simulation-modal').classList.add('hidden');
+    }
+    
+    // ============================================
+    // SIMULATION MODE FUNCTIONS
+    // ============================================
+    
+    function toggleSimulationMode() {
+        simulationMode = !simulationMode;
+        const panel = document.getElementById('simulation-panel');
+        const toggleBtn = document.getElementById('sim-toggle-btn');
+        const toggleText = document.getElementById('sim-toggle-text');
+        
+        if (simulationMode) {
+            panel.classList.remove('hidden');
+            toggleBtn.classList.add('bg-indigo-100', 'dark:bg-indigo-800');
+            toggleText.textContent = 'Cerrar Simulación';
+            updateSimCurrentGpa();
+        } else {
+            panel.classList.add('hidden');
+            toggleBtn.classList.remove('bg-indigo-100', 'dark:bg-indigo-800');
+            toggleText.textContent = 'Simular Semestre';
+        }
+        
+        // Re-render to show/hide simulation buttons
+        loadPensumData();
+    }
+    
+    function updateSimMaxCredits() {
+        const config = storage.getConfiguracion?.() || { creditos_max: 24 };
+        const maxCredits = config.creditos_max || 24;
+        document.getElementById('sim-max-credits').textContent = maxCredits;
+    }
+    
+    function updateSimCurrentGpa() {
+        const materias = storage.getMaterias();
+        const calificaciones = storage.getCalificaciones();
+        
+        let totalPoints = 0, gradedCredits = 0;
+        calificaciones.forEach(cal => {
+            const m = materias.find(mat => mat.codigo === cal.codigo_materia);
+            if (m && cal.nota !== undefined && cal.nota !== null) {
+                totalPoints += cal.nota * m.creditos;
+                gradedCredits += m.creditos;
+            }
+        });
+        
+        const gpa = gradedCredits > 0 ? (totalPoints / gradedCredits) : 0;
+        document.getElementById('sim-current-gpa').textContent = gpa > 0 ? gpa.toFixed(2) : '--';
+    }
+    
+    function canEnrollInSimulation(codigo) {
+        const materia = storage.getMateria(codigo);
+        if (!materia) return { valid: false, reason: 'Materia no encontrada' };
+        
+        // Can only simulate pending courses
+        if (materia.estado !== 'pending') {
+            return { valid: false, reason: 'Solo puedes simular materias pendientes' };
+        }
+        
+        // Check prerequisites
+        const materias = storage.getMaterias();
+        const passedCodes = new Set(
+            materias.filter(m => m.estado === 'passed').map(m => m.codigo)
+        );
+        
+        // Also consider already simulated courses as "will be passed"
+        simulatedCourses.forEach(code => passedCodes.add(code));
+        
+        if (materia.prerrequisitos?.length > 0) {
+            const unmetPrereqs = materia.prerrequisitos.filter(prereq => !passedCodes.has(prereq));
+            if (unmetPrereqs.length > 0) {
+                const prereqNames = unmetPrereqs.map(code => {
+                    const p = materias.find(m => m.codigo === code);
+                    return p ? p.nombre : code;
+                }).join(', ');
+                return { valid: false, reason: `Prerrequisitos no cumplidos: ${prereqNames}` };
+            }
+        }
+        
+        return { valid: true };
+    }
+    
+    function addToSimulation(codigo) {
+        const validation = canEnrollInSimulation(codigo);
+        if (!validation.valid) {
+            App.showAlert(validation.reason, 'error');
+            return;
+        }
+        
+        if (simulatedCourses.includes(codigo)) {
+            App.showAlert('Esta materia ya está en la simulación', 'info');
+            return;
+        }
+        
+        // Check credit limit
+        const materia = storage.getMateria(codigo);
+        const config = storage.getConfiguracion?.() || { creditos_max: 24 };
+        const maxCredits = config.creditos_max || 24;
+        const currentSimCredits = getSimulatedCredits();
+        
+        if (currentSimCredits + materia.creditos > maxCredits) {
+            App.showAlert(`Excederías el límite de ${maxCredits} créditos`, 'warning');
+            // Still allow adding, just warn
+        }
+        
+        simulatedCourses.push(codigo);
+        updateSimulationUI();
+        loadPensumData(); // Re-render to update card styles
+    }
+    
+    function removeFromSimulation(codigo) {
+        simulatedCourses = simulatedCourses.filter(c => c !== codigo);
+        updateSimulationUI();
+        loadPensumData();
+    }
+    
+    function getSimulatedCredits() {
+        return simulatedCourses.reduce((sum, codigo) => {
+            const m = storage.getMateria(codigo);
+            return sum + (m?.creditos || 0);
+        }, 0);
+    }
+    
+    function updateSimulationUI() {
+        const emptyState = document.getElementById('sim-empty-state');
+        const coursesList = document.getElementById('sim-courses-list');
+        const applyBtn = document.getElementById('sim-apply-btn');
+        const courseCount = document.getElementById('sim-course-count');
+        const creditsDisplay = document.getElementById('sim-credits');
+        const creditsBar = document.getElementById('sim-credits-bar');
+        const warningsDiv = document.getElementById('sim-warnings');
+        
+        const config = storage.getConfiguracion?.() || { creditos_max: 21 };
+        const maxCredits = config.creditos_max || 21;
+        const totalCredits = getSimulatedCredits();
+        
+        // Update credits display
+        creditsDisplay.textContent = totalCredits;
+        const percentage = Math.min((totalCredits / maxCredits) * 100, 100);
+        creditsBar.style.width = `${percentage}%`;
+        
+        // Color based on usage
+        if (totalCredits > maxCredits) {
+            creditsBar.classList.remove('bg-indigo-500', 'bg-yellow-500');
+            creditsBar.classList.add('bg-red-500');
+        } else if (totalCredits > maxCredits * 0.8) {
+            creditsBar.classList.remove('bg-indigo-500', 'bg-red-500');
+            creditsBar.classList.add('bg-yellow-500');
+        } else {
+            creditsBar.classList.remove('bg-yellow-500', 'bg-red-500');
+            creditsBar.classList.add('bg-indigo-500');
+        }
+        
+        courseCount.textContent = `${simulatedCourses.length} materia${simulatedCourses.length !== 1 ? 's' : ''}`;
+        
+        if (simulatedCourses.length === 0) {
+            emptyState.classList.remove('hidden');
+            coursesList.classList.add('hidden');
+            applyBtn.disabled = true;
+        } else {
+            emptyState.classList.add('hidden');
+            coursesList.classList.remove('hidden');
+            applyBtn.disabled = false;
+            
+            // Render simulated courses
+            coursesList.innerHTML = simulatedCourses.map(codigo => {
+                const m = storage.getMateria(codigo);
+                if (!m) return '';
+                return `
+                    <div class="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg border border-indigo-200 dark:border-indigo-700">
+                        <div>
+                            <p class="font-medium text-sm text-gray-800 dark:text-gray-100">${m.nombre}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${m.codigo} • ${m.creditos} créditos</p>
+                        </div>
+                        <button onclick="removeFromSimulation('${codigo}')"
+                                class="p-1 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
+                                title="Quitar de simulación">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Check for warnings
+        const warnings = [];
+        if (totalCredits > maxCredits) {
+            warnings.push({
+                type: 'error',
+                message: `Excedes el límite de ${maxCredits} créditos por ${totalCredits - maxCredits} créditos`
+            });
+        }
+        
+        // Check corequisites
+        simulatedCourses.forEach(codigo => {
+            const m = storage.getMateria(codigo);
+            if (m?.correquisitos?.length > 0) {
+                m.correquisitos.forEach(coreq => {
+                    const coreqMateria = storage.getMateria(coreq);
+                    if (coreqMateria && coreqMateria.estado !== 'passed' && !simulatedCourses.includes(coreq)) {
+                        warnings.push({
+                            type: 'warning',
+                            message: `"${m.nombre}" tiene como correquisito "${coreqMateria.nombre}" que no está en la simulación`
+                        });
+                    }
+                });
+            }
+        });
+        
+        if (warnings.length > 0) {
+            warningsDiv.classList.remove('hidden');
+            warningsDiv.innerHTML = warnings.map(w => `
+                <div class="flex items-start p-3 rounded-lg ${w.type === 'error' ? 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800' : 'bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800'}">
+                    <svg class="w-5 h-5 ${w.type === 'error' ? 'text-red-500' : 'text-yellow-500'} mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <span class="text-sm ${w.type === 'error' ? 'text-red-700 dark:text-red-300' : 'text-yellow-700 dark:text-yellow-300'}">${w.message}</span>
+                </div>
+            `).join('');
+        } else {
+            warningsDiv.classList.add('hidden');
+        }
+        
+        // Update GPA projection
+        updateGpaProjection();
+    }
+    
+    function updateGpaProjection() {
+        if (simulatedCourses.length === 0) {
+            document.getElementById('sim-projected-gpa').textContent = '--';
+            document.getElementById('sim-gpa-change').innerHTML = '';
+            return;
+        }
+        
+        const materias = storage.getMaterias();
+        const calificaciones = storage.getCalificaciones();
+        const method = document.querySelector('input[name="gpa-method"]:checked')?.value || 'fixed';
+        
+        // Calculate current GPA data
+        let currentPoints = 0, currentCredits = 0;
+        calificaciones.forEach(cal => {
+            const m = materias.find(mat => mat.codigo === cal.codigo_materia);
+            if (m && cal.nota !== undefined && cal.nota !== null) {
+                currentPoints += cal.nota * m.creditos;
+                currentCredits += m.creditos;
+            }
+        });
+        
+        const currentGpa = currentCredits > 0 ? (currentPoints / currentCredits) : 0;
+        
+        // Calculate simulated credits and points
+        let simCredits = 0;
+        let simPoints = 0;
+        
+        if (method === 'fixed') {
+            const fixedGrade = parseFloat(document.getElementById('sim-fixed-grade').value) || 4.0;
+            simulatedCourses.forEach(codigo => {
+                const m = storage.getMateria(codigo);
+                if (m) {
+                    simCredits += m.creditos;
+                    simPoints += fixedGrade * m.creditos;
+                }
+            });
+        } else {
+            // Weighted average - use current GPA as the expected grade
+            const expectedGrade = currentGpa > 0 ? currentGpa : 3.5;
+            simulatedCourses.forEach(codigo => {
+                const m = storage.getMateria(codigo);
+                if (m) {
+                    simCredits += m.creditos;
+                    simPoints += expectedGrade * m.creditos;
+                }
+            });
+        }
+        
+        // Calculate projected GPA
+        const totalCredits = currentCredits + simCredits;
+        const totalPoints = currentPoints + simPoints;
+        const projectedGpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
+        
+        document.getElementById('sim-projected-gpa').textContent = projectedGpa.toFixed(2);
+        
+        // Show change indicator
+        const changeDiv = document.getElementById('sim-gpa-change');
+        if (currentGpa > 0) {
+            const change = projectedGpa - currentGpa;
+            if (change > 0) {
+                changeDiv.innerHTML = `<span class="text-green-600">+${change.toFixed(2)}</span>`;
+            } else if (change < 0) {
+                changeDiv.innerHTML = `<span class="text-red-600">${change.toFixed(2)}</span>`;
+            } else {
+                changeDiv.innerHTML = `<span class="text-gray-500">Sin cambio</span>`;
+            }
+        } else {
+            changeDiv.innerHTML = '';
+        }
+    }
+    
+    function clearSimulation() {
+        simulatedCourses = [];
+        updateSimulationUI();
+        loadPensumData();
+        App.showAlert('Simulación limpiada', 'info');
+    }
+    
+    function applySimulation() {
+        if (simulatedCourses.length === 0) return;
+        
+        const config = storage.getConfiguracion?.() || { creditos_max: 21 };
+        const maxCredits = config.creditos_max || 21;
+        const totalCredits = getSimulatedCredits();
+        
+        if (totalCredits > maxCredits) {
+            if (!confirm(`Estás excediendo el límite de ${maxCredits} créditos. ¿Deseas continuar de todas formas?`)) {
+                return;
+            }
+        }
+        
+        // Apply simulation - change status to enrolled
+        simulatedCourses.forEach(codigo => {
+            const materia = storage.getMateria(codigo);
+            if (materia) {
+                materia.estado = 'enrolled';
+                storage.saveMateria(materia);
+            }
+        });
+        
+        App.showAlert(`${simulatedCourses.length} materia(s) inscrita(s) correctamente`, 'success');
+        
+        // Clear simulation and close panel
+        simulatedCourses = [];
+        simulationMode = false;
+        document.getElementById('simulation-panel').classList.add('hidden');
+        document.getElementById('sim-toggle-btn').classList.remove('bg-indigo-100', 'dark:bg-indigo-800');
+        document.getElementById('sim-toggle-text').textContent = 'Simular Semestre';
+        
+        loadPensumData();
+        populateSimulateSelect();
+    }
+    
+    // Simulation drag handlers
+    function handleSimDragOver(event) {
+        event.preventDefault();
+        if (!draggedMateria || !simulationMode) return;
+        
+        const validation = canEnrollInSimulation(draggedMateria.codigo);
+        if (validation.valid && !simulatedCourses.includes(draggedMateria.codigo)) {
+            event.currentTarget.classList.add('ring-2', 'ring-indigo-400', 'bg-indigo-50', 'dark:bg-indigo-900/20');
+            event.dataTransfer.dropEffect = 'copy';
+        } else {
+            event.dataTransfer.dropEffect = 'none';
+        }
+    }
+    
+    function handleSimDragLeave(event) {
+        event.currentTarget.classList.remove('ring-2', 'ring-indigo-400', 'bg-indigo-50', 'dark:bg-indigo-900/20');
+    }
+    
+    function handleSimDrop(event) {
+        event.preventDefault();
+        event.currentTarget.classList.remove('ring-2', 'ring-indigo-400', 'bg-indigo-50', 'dark:bg-indigo-900/20');
+        
+        if (!draggedMateria || !simulationMode) return;
+        
+        addToSimulation(draggedMateria.codigo);
     }
 </script>
 {% endblock %}
