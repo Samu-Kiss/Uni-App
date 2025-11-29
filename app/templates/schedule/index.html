@@ -518,11 +518,37 @@
         document.getElementById('ics-form').addEventListener('submit', handleICSExport);
         document.getElementById('edit-class-form').addEventListener('submit', handleEditClassSubmit);
         
-        loadSemesterClasses(1);
+        // Initialize semester from URL query param
+        initializeSemesterFromURL();
     });
     
-    function loadSemesterClasses(semesterNum) {
+    // Initialize semester from URL query parameter
+    function initializeSemesterFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const semParam = urlParams.get('sem');
+        
+        if (semParam) {
+            const semNum = parseInt(semParam);
+            if (semNum >= 1 && semNum <= 12) {
+                document.getElementById('schedule-semester-select').value = semNum;
+                loadSemesterClasses(semNum);
+                return;
+            }
+        }
+        
+        // Default to semester 1
+        loadSemesterClasses(1);
+    }
+    
+    function loadSemesterClasses(semesterNum, updateURL = true) {
         currentSemester = parseInt(semesterNum);
+        
+        // Update URL query param without page reload
+        if (updateURL) {
+            const url = new URL(window.location);
+            url.searchParams.set('sem', currentSemester);
+            history.pushState(null, '', url);
+        }
         
         // Load materias for this semester to populate the dropdown
         const materias = storage.getMaterias().filter(m => m.semestre === currentSemester);
@@ -537,6 +563,20 @@
             option.dataset.name = m.nombre;
             select.appendChild(option);
         });
+    }
+    
+    // Handle browser back/forward
+    window.addEventListener('popstate', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const semParam = urlParams.get('sem');
+        if (semParam) {
+            const semNum = parseInt(semParam);
+            if (semNum >= 1 && semNum <= 12) {
+                document.getElementById('schedule-semester-select').value = semNum;
+                loadSemesterClasses(semNum, false);
+            }
+        }
+    });
     }
     
     function loadPreferences() {

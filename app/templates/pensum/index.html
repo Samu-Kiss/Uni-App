@@ -1186,6 +1186,9 @@
     let simulationMode = false;
     let simulatedCourses = []; // Array of course codes being simulated
     
+    // Valid views for hash routing
+    const validViews = ['tree', 'table', 'graph', 'stats'];
+    
     // Initialize pensum when page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Migrate to plans support and initialize
@@ -1196,7 +1199,29 @@
         setupMateriaForm();
         populateSimulateSelect();
         updateSimMaxCredits();
+        
+        // Initialize view from URL hash
+        initializeFromHash();
     });
+    
+    // Listen for hash changes (browser back/forward)
+    window.addEventListener('hashchange', function() {
+        const hash = window.location.hash.slice(1); // Remove #
+        if (validViews.includes(hash)) {
+            setView(hash, false); // Don't update hash again
+        }
+    });
+    
+    // Initialize view from URL hash
+    function initializeFromHash() {
+        const hash = window.location.hash.slice(1); // Remove #
+        if (hash && validViews.includes(hash)) {
+            setView(hash, false);
+        } else {
+            // Set default hash if none or invalid
+            setView('tree', true);
+        }
+    }
     
     // Listen for plan changes
     window.addEventListener('planChanged', function(e) {
@@ -1828,8 +1853,14 @@
     }
     
     // View toggle
-    function setView(view) {
+    function setView(view, updateHash = true) {
         currentView = view;
+        
+        // Update URL hash without triggering hashchange event loop
+        if (updateHash && window.location.hash.slice(1) !== view) {
+            history.pushState(null, '', `#${view}`);
+        }
+        
         const tableView = document.getElementById('pensum-table-view');
         const treeView = document.getElementById('pensum-tree-view');
         const graphView = document.getElementById('pensum-graph-view');
