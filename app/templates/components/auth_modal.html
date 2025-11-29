@@ -1,0 +1,481 @@
+<!-- Auth Modal -->
+<div id="authModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onclick="closeAuthModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="relative inline-block w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white rounded-xl shadow-xl">
+            <!-- Close button -->
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-500">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <!-- Tabs -->
+            <div class="flex space-x-4 border-b border-gray-200 mb-6">
+                <button id="tab-signin" onclick="switchAuthTab('signin')" 
+                        class="pb-2 px-1 text-sm font-medium border-b-2 border-accent-500 text-accent-600">
+                    Iniciar sesión
+                </button>
+                <button id="tab-signup" onclick="switchAuthTab('signup')"
+                        class="pb-2 px-1 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                    Crear cuenta
+                </button>
+            </div>
+            
+            <!-- Sign In Form -->
+            <form id="signin-form" class="space-y-4">
+                <div>
+                    <label for="signin-email" class="block text-sm font-medium text-gray-700 mb-1">
+                        Correo electrónico
+                    </label>
+                    <input type="email" id="signin-email" name="email" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                           placeholder="tu@email.com">
+                </div>
+                <div>
+                    <label for="signin-password" class="block text-sm font-medium text-gray-700 mb-1">
+                        Contraseña
+                    </label>
+                    <input type="password" id="signin-password" name="password" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                           placeholder="••••••••">
+                </div>
+                <div id="signin-error" class="hidden text-sm text-red-600"></div>
+                <button type="submit" 
+                        class="w-full py-2 px-4 bg-accent-500 text-white font-medium rounded-lg hover:bg-accent-600 transition-colors">
+                    Iniciar sesión
+                </button>
+            </form>
+            
+            <!-- Sign Up Form -->
+            <form id="signup-form" class="hidden space-y-4">
+                <div>
+                    <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-1">
+                        Correo electrónico
+                    </label>
+                    <input type="email" id="signup-email" name="email" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                           placeholder="tu@email.com">
+                </div>
+                <div>
+                    <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-1">
+                        Contraseña
+                    </label>
+                    <input type="password" id="signup-password" name="password" required minlength="6"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                           placeholder="••••••••">
+                </div>
+                <div>
+                    <label for="signup-password-confirm" class="block text-sm font-medium text-gray-700 mb-1">
+                        Confirmar contraseña
+                    </label>
+                    <input type="password" id="signup-password-confirm" name="password_confirm" required minlength="6"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                           placeholder="••••••••">
+                </div>
+                <div id="signup-error" class="hidden text-sm text-red-600"></div>
+                <button type="submit"
+                        class="w-full py-2 px-4 bg-accent-500 text-white font-medium rounded-lg hover:bg-accent-600 transition-colors">
+                    Crear cuenta
+                </button>
+            </form>
+            
+            <!-- Info about local storage -->
+            <div class="mt-6 pt-4 border-t border-gray-200">
+                <p class="text-xs text-gray-500 text-center">
+                    💡 Tus datos se guardan localmente. Crea una cuenta para sincronizarlos en la nube.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auth state
+let currentUser = null;
+let authSession = null;
+
+// Auth modal functions
+function openAuthModal() {
+    document.getElementById('authModal').classList.remove('hidden');
+    // Reset forms
+    document.getElementById('signin-form').reset();
+    document.getElementById('signup-form').reset();
+    hideAuthErrors();
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').classList.add('hidden');
+    hideAuthErrors();
+}
+
+function hideAuthErrors() {
+    document.getElementById('signin-error').classList.add('hidden');
+    document.getElementById('signup-error').classList.add('hidden');
+}
+
+function showError(formType, message) {
+    const errorEl = document.getElementById(`${formType}-error`);
+    errorEl.textContent = message;
+    errorEl.classList.remove('hidden');
+}
+
+function switchAuthTab(tab) {
+    const signinForm = document.getElementById('signin-form');
+    const signupForm = document.getElementById('signup-form');
+    const tabSignin = document.getElementById('tab-signin');
+    const tabSignup = document.getElementById('tab-signup');
+    
+    hideAuthErrors();
+    
+    if (tab === 'signin') {
+        signinForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+        tabSignin.classList.add('border-accent-500', 'text-accent-600');
+        tabSignin.classList.remove('border-transparent', 'text-gray-500');
+        tabSignup.classList.remove('border-accent-500', 'text-accent-600');
+        tabSignup.classList.add('border-transparent', 'text-gray-500');
+    } else {
+        signinForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        tabSignup.classList.add('border-accent-500', 'text-accent-600');
+        tabSignup.classList.remove('border-transparent', 'text-gray-500');
+        tabSignin.classList.remove('border-accent-500', 'text-accent-600');
+        tabSignin.classList.add('border-transparent', 'text-gray-500');
+    }
+}
+
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+}
+
+// Toggle user dropdown menu
+function toggleUserMenu() {
+    const menu = document.getElementById('user-menu');
+    menu.classList.toggle('hidden');
+}
+
+// Close user menu when clicking outside
+document.addEventListener('click', function(e) {
+    const userMenu = document.getElementById('user-menu');
+    const authButton = document.getElementById('auth-button');
+    if (userMenu && !userMenu.contains(e.target) && !authButton.contains(e.target)) {
+        userMenu.classList.add('hidden');
+    }
+});
+
+// Sign In
+document.getElementById('signin-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    hideAuthErrors();
+    
+    const email = document.getElementById('signin-email').value;
+    const password = document.getElementById('signin-password').value;
+    const submitBtn = this.querySelector('button[type="submit"]');
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="animate-pulse">Iniciando sesión...</span>';
+    
+    try {
+        const response = await fetch('/api/auth/signin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok || data.error) {
+            throw new Error(data.error || 'Error al iniciar sesión');
+        }
+        
+        // Save auth data
+        saveAuthData(data.user, data.session);
+        
+        // Update UI
+        updateAuthUI(true, data.user.email);
+        closeAuthModal();
+        
+        if (typeof App !== 'undefined' && App.showAlert) {
+            App.showAlert('¡Bienvenido!', 'success');
+        }
+        
+        // Optionally pull data from cloud
+        await pullFromCloud();
+        
+    } catch (error) {
+        showError('signin', error.message);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Iniciar sesión';
+    }
+});
+
+// Sign Up
+document.getElementById('signup-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    hideAuthErrors();
+    
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const passwordConfirm = document.getElementById('signup-password-confirm').value;
+    const submitBtn = this.querySelector('button[type="submit"]');
+    
+    // Validate passwords match
+    if (password !== passwordConfirm) {
+        showError('signup', 'Las contraseñas no coinciden');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showError('signup', 'La contraseña debe tener al menos 6 caracteres');
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="animate-pulse">Creando cuenta...</span>';
+    
+    try {
+        const response = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok || data.error) {
+            throw new Error(data.error || 'Error al crear cuenta');
+        }
+        
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+            if (typeof App !== 'undefined' && App.showAlert) {
+                App.showAlert('¡Cuenta creada! Revisa tu correo para confirmar.', 'success');
+            }
+            closeAuthModal();
+        } else if (data.session) {
+            // Auto-login if no confirmation needed
+            saveAuthData(data.user, data.session);
+            updateAuthUI(true, data.user.email);
+            closeAuthModal();
+            
+            if (typeof App !== 'undefined' && App.showAlert) {
+                App.showAlert('¡Cuenta creada exitosamente!', 'success');
+            }
+            
+            // Sync local data to cloud
+            await syncToCloud();
+        }
+        
+    } catch (error) {
+        showError('signup', error.message);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Crear cuenta';
+    }
+});
+
+// Sign Out
+async function signOut() {
+    try {
+        const token = authSession?.access_token;
+        
+        await fetch('/api/auth/signout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            }
+        });
+        
+    } catch (error) {
+        console.error('Sign out error:', error);
+    } finally {
+        // Always clear local auth data
+        clearAuthData();
+        updateAuthUI(false);
+        
+        const userMenu = document.getElementById('user-menu');
+        if (userMenu) userMenu.classList.add('hidden');
+        
+        if (typeof App !== 'undefined' && App.showAlert) {
+            App.showAlert('Sesión cerrada', 'success');
+        }
+    }
+}
+
+// Save auth data to localStorage
+function saveAuthData(user, session) {
+    currentUser = user;
+    authSession = session;
+    localStorage.setItem('auth_user', JSON.stringify(user));
+    localStorage.setItem('auth_session', JSON.stringify(session));
+    
+    // Initialize storage sync if available
+    if (typeof storage !== 'undefined' && storage.initSync) {
+        storage.initSync(null, user.id); // Pass null for supabase client, use REST API
+    }
+}
+
+// Clear auth data
+function clearAuthData() {
+    currentUser = null;
+    authSession = null;
+    localStorage.removeItem('auth_user');
+    localStorage.removeItem('auth_session');
+}
+
+// Load auth data on page load
+function loadAuthData() {
+    try {
+        const userStr = localStorage.getItem('auth_user');
+        const sessionStr = localStorage.getItem('auth_session');
+        
+        if (userStr && sessionStr) {
+            currentUser = JSON.parse(userStr);
+            authSession = JSON.parse(sessionStr);
+            return true;
+        }
+    } catch (e) {
+        console.error('Error loading auth data:', e);
+        clearAuthData();
+    }
+    return false;
+}
+
+// Update UI based on auth state
+function updateAuthUI(isLoggedIn, email = '') {
+    const authButton = document.getElementById('auth-button');
+    const authText = document.getElementById('auth-text');
+    const userMenu = document.getElementById('user-menu');
+    const userEmail = document.getElementById('user-email');
+    
+    if (isLoggedIn && email) {
+        // Update button to show user is logged in
+        authText.textContent = email.split('@')[0]; // Show username part
+        authButton.onclick = toggleUserMenu;
+        
+        // Update user menu email
+        if (userEmail) userEmail.textContent = email;
+        
+        // Position user menu relative to button
+        if (userMenu) {
+            userMenu.style.position = 'absolute';
+            userMenu.style.top = '100%';
+            userMenu.style.right = '0';
+        }
+    } else {
+        authText.textContent = 'Iniciar sesión';
+        authButton.onclick = openAuthModal;
+        if (userMenu) userMenu.classList.add('hidden');
+    }
+}
+
+// Sync local data to cloud
+async function syncToCloud() {
+    if (!currentUser || !authSession) {
+        if (typeof App !== 'undefined' && App.showAlert) {
+            App.showAlert('Inicia sesión para sincronizar', 'warning');
+        }
+        return;
+    }
+    
+    try {
+        // Gather all local data - using correct localStorage keys (prefix: uniapp_)
+        const localData = {
+            user_id: currentUser.id,
+            pensum: JSON.parse(localStorage.getItem('uniapp_materias') || '[]'),
+            clases: JSON.parse(localStorage.getItem('uniapp_clases') || '[]'),
+            calificaciones: JSON.parse(localStorage.getItem('uniapp_calificaciones') || '[]'),
+            configuracion: JSON.parse(localStorage.getItem('uniapp_configuracion') || '{}'),
+            franjas: JSON.parse(localStorage.getItem('uniapp_franjas') || '[]')
+        };
+        
+        console.log('Syncing data:', localData); // Debug log
+        
+        const response = await fetch('/api/sync', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authSession.access_token}`
+            },
+            body: JSON.stringify(localData)
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok || data.error) {
+            throw new Error(data.error || 'Error al sincronizar');
+        }
+        
+        if (typeof App !== 'undefined' && App.showAlert) {
+            App.showAlert('Datos sincronizados ✓', 'success');
+        }
+        
+    } catch (error) {
+        console.error('Sync error:', error);
+        if (typeof App !== 'undefined' && App.showAlert) {
+            App.showAlert('Error al sincronizar: ' + error.message, 'error');
+        }
+    }
+}
+
+// Pull data from cloud
+async function pullFromCloud() {
+    if (!currentUser || !authSession) return;
+    
+    try {
+        const response = await fetch(`/api/sync/pull?user_id=${currentUser.id}`, {
+            headers: {
+                'Authorization': `Bearer ${authSession.access_token}`
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || result.error) {
+            console.error('Pull error:', result.error);
+            return;
+        }
+        
+        const data = result.data || {};
+        
+        // Check if cloud has data
+        const hasCloudData = data.pensum?.length > 0 || data.clases?.length > 0;
+        const hasLocalData = localStorage.getItem('uniapp_materias');
+        
+        if (hasCloudData && hasLocalData) {
+            // Ask user which data to keep
+            const useCloud = confirm('Se encontraron datos en la nube. ¿Deseas reemplazar tus datos locales con los de la nube?');
+            if (!useCloud) return;
+        }
+        
+        if (hasCloudData) {
+            // Import cloud data - map backend names to frontend storage keys (prefix: uniapp_)
+            if (data.pensum) localStorage.setItem('uniapp_materias', JSON.stringify(data.pensum));
+            if (data.clases) localStorage.setItem('uniapp_clases', JSON.stringify(data.clases));
+            if (data.calificaciones) localStorage.setItem('uniapp_calificaciones', JSON.stringify(data.calificaciones));
+            if (data.configuracion) localStorage.setItem('uniapp_configuracion', JSON.stringify(data.configuracion));
+            if (data.franjas) localStorage.setItem('uniapp_franjas', JSON.stringify(data.franjas));
+            
+            // Reload page to reflect changes
+            window.location.reload();
+        }
+        
+    } catch (error) {
+        console.error('Pull error:', error);
+    }
+}
+
+// Initialize auth on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (loadAuthData()) {
+        updateAuthUI(true, currentUser.email);
+    }
+});
+</script>

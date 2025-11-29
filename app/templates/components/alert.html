@@ -1,0 +1,97 @@
+<!-- Alert Component Template -->
+<!-- Usage: Call showAlert(message, type) from JavaScript -->
+
+<template id="alert-template">
+    <div class="alert flex items-center p-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full">
+        <div class="flex-shrink-0 mr-3">
+            <!-- Success icon -->
+            <svg class="alert-icon-success hidden w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <!-- Error icon -->
+            <svg class="alert-icon-error hidden w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <!-- Warning icon -->
+            <svg class="alert-icon-warning hidden w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <!-- Info icon -->
+            <svg class="alert-icon-info hidden w-5 h-5 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <div class="flex-1">
+            <p class="alert-message text-sm font-medium"></p>
+        </div>
+        <button class="alert-close ml-4 text-gray-400 hover:text-gray-500">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+</template>
+
+<script>
+/**
+ * Show an alert notification
+ * @param {string} message - Alert message
+ * @param {string} type - Alert type: 'success', 'error', 'warning', 'info'
+ * @param {number} duration - Auto-dismiss duration in ms (0 = no auto-dismiss)
+ */
+function showAlert(message, type = 'info', duration = 5000) {
+    const container = document.getElementById('alerts-container');
+    const template = document.getElementById('alert-template');
+    const alert = template.content.cloneNode(true).querySelector('.alert');
+    
+    // Set background color based on type
+    const bgColors = {
+        success: 'bg-green-50 border border-green-200',
+        error: 'bg-red-50 border border-red-200',
+        warning: 'bg-yellow-50 border border-yellow-200',
+        info: 'bg-accent-50 border border-accent-200'
+    };
+    alert.className += ` ${bgColors[type] || bgColors.info}`;
+    
+    // Show correct icon
+    alert.querySelector(`.alert-icon-${type}`).classList.remove('hidden');
+    
+    // Set message
+    const textColors = {
+        success: 'text-green-800',
+        error: 'text-red-800',
+        warning: 'text-yellow-800',
+        info: 'text-accent-800'
+    };
+    const messageEl = alert.querySelector('.alert-message');
+    messageEl.textContent = message;
+    messageEl.className += ` ${textColors[type] || textColors.info}`;
+    
+    // Close button
+    alert.querySelector('.alert-close').addEventListener('click', () => {
+        dismissAlert(alert);
+    });
+    
+    // Add to container
+    container.appendChild(alert);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+        alert.classList.remove('translate-x-full');
+        alert.classList.add('translate-x-0');
+    });
+    
+    // Auto-dismiss
+    if (duration > 0) {
+        setTimeout(() => dismissAlert(alert), duration);
+    }
+    
+    return alert;
+}
+
+function dismissAlert(alert) {
+    alert.classList.remove('translate-x-0');
+    alert.classList.add('translate-x-full', 'opacity-0');
+    setTimeout(() => alert.remove(), 300);
+}
+</script>

@@ -1,0 +1,424 @@
+<!-- Course Modal Component -->
+<div id="course-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onclick="closeCourseModal()"></div>
+        
+        <!-- Modal panel -->
+        <div class="relative inline-block w-full max-w-lg p-6 overflow-hidden text-left align-middle transition-all transform bg-white rounded-xl shadow-xl max-h-[90vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 id="modal-course-name" class="text-lg font-semibold text-gray-900">Nombre del Curso</h3>
+                    <p id="modal-course-code" class="text-sm text-gray-500">CÓDIGO</p>
+                </div>
+                <button onclick="closeCourseModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Course Info -->
+            <div class="grid grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                <div class="text-center">
+                    <span class="block text-2xl font-bold text-accent-600" id="modal-credits">3</span>
+                    <span class="text-xs text-gray-500">Créditos</span>
+                </div>
+                <div class="text-center">
+                    <span class="block text-2xl font-bold text-accent-600" id="modal-semester">1</span>
+                    <span class="text-xs text-gray-500">Semestre</span>
+                </div>
+                <div class="text-center">
+                    <span class="block text-2xl font-bold" id="modal-current-grade">--</span>
+                    <span class="text-xs text-gray-500">Nota Final</span>
+                </div>
+            </div>
+            
+            <!-- Status -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Estado de la materia</label>
+                <select id="modal-status-select"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500">
+                    <option value="pending">Pendiente</option>
+                    <option value="enrolled">En curso</option>
+                    <option value="passed">Aprobada</option>
+                    <option value="failed">Reprobada</option>
+                    <option value="dropped">Retirada</option>
+                </select>
+            </div>
+            
+            <!-- Grade Components Section -->
+            <div class="mb-6 border rounded-lg p-4 bg-gray-50">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="text-sm font-semibold text-gray-700">Notas por componente</h4>
+                    <span id="modal-total-percentage" class="text-xs px-2 py-1 rounded bg-gray-200 text-gray-600">0% usado</span>
+                </div>
+                
+                <!-- Grade Components List -->
+                <div id="modal-grade-components" class="space-y-2 mb-3">
+                    <!-- Components will be added here dynamically -->
+                </div>
+                
+                <!-- Add New Component -->
+                <div class="flex gap-2 items-end pt-3 border-t border-gray-200">
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-500 mb-1">Nombre</label>
+                        <input type="text" id="new-component-name" placeholder="Ej: Parcial 1"
+                               class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-accent-500 focus:border-accent-500">
+                    </div>
+                    <div class="w-20">
+                        <label class="block text-xs text-gray-500 mb-1">%</label>
+                        <input type="number" id="new-component-percentage" min="1" max="100" placeholder="20"
+                               class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-accent-500 focus:border-accent-500">
+                    </div>
+                    <div class="w-20">
+                        <label class="block text-xs text-gray-500 mb-1">Nota</label>
+                        <input type="number" id="new-component-grade" min="0" max="5" step="0.1" placeholder="0.0"
+                               class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-accent-500 focus:border-accent-500">
+                    </div>
+                    <button onclick="addGradeComponent()" 
+                            class="px-3 py-1.5 text-sm bg-accent-500 text-white rounded hover:bg-accent-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Calculated Final Grade -->
+                <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-700">Nota calculada:</span>
+                    <span id="modal-calculated-grade" class="text-lg font-bold text-accent-600">--</span>
+                </div>
+            </div>
+            
+            <!-- Prerequisites Info -->
+            <div class="mb-6">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Prerrequisitos</h4>
+                <div id="modal-prerequisites" class="flex flex-wrap gap-2">
+                    <span class="text-sm text-gray-500">Ninguno</span>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="pt-4 border-t border-gray-200 flex justify-between">
+                <button onclick="deleteMateriaFromModal()"
+                        class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Eliminar
+                </button>
+                <div class="flex space-x-3">
+                    <button onclick="closeCourseModal()" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                    <button onclick="saveCourseModalChanges()"
+                            class="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600">
+                        Guardar cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store the currently selected course and its grade components
+let modalSelectedCourse = null;
+let modalGradeComponents = [];
+
+function openCourseModalWithData(materia) {
+    modalSelectedCourse = materia;
+    
+    // Populate modal fields
+    document.getElementById('modal-course-name').textContent = materia.nombre;
+    document.getElementById('modal-course-code').textContent = materia.codigo;
+    document.getElementById('modal-credits').textContent = materia.creditos || 0;
+    document.getElementById('modal-semester').textContent = materia.semestre || 1;
+    
+    // Status
+    document.getElementById('modal-status-select').value = materia.estado || 'pending';
+    
+    // Load grade components
+    const cal = storage.getCalificacion(materia.codigo);
+    modalGradeComponents = cal?.componentes || [];
+    renderGradeComponents();
+    
+    // Display final grade
+    const finalGrade = cal?.nota;
+    document.getElementById('modal-current-grade').textContent = finalGrade?.toFixed(1) ?? '--';
+    
+    // Prerequisites
+    const prereqsEl = document.getElementById('modal-prerequisites');
+    if (materia.prerrequisitos?.length) {
+        prereqsEl.innerHTML = materia.prerrequisitos
+            .map(p => `<span class="px-2 py-1 text-xs bg-gray-100 rounded">${p}</span>`)
+            .join('');
+    } else {
+        prereqsEl.innerHTML = '<span class="text-sm text-gray-500">Ninguno</span>';
+    }
+    
+    // Clear new component inputs
+    document.getElementById('new-component-name').value = '';
+    document.getElementById('new-component-percentage').value = '';
+    document.getElementById('new-component-grade').value = '';
+    
+    // Show modal
+    document.getElementById('course-modal').classList.remove('hidden');
+}
+
+function renderGradeComponents() {
+    const container = document.getElementById('modal-grade-components');
+    
+    if (modalGradeComponents.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-400 italic">No hay componentes de nota agregados</p>';
+    } else {
+        container.innerHTML = modalGradeComponents.map((comp, index) => `
+            <div class="flex items-center gap-2 bg-white p-2 rounded border">
+                <div class="flex-1">
+                    <span class="text-sm font-medium">${comp.nombre}</span>
+                </div>
+                <div class="w-16 text-center">
+                    <span class="text-sm text-gray-500">${comp.porcentaje}%</span>
+                </div>
+                <div class="w-20">
+                    <input type="number" min="0" max="5" step="0.1" value="${comp.nota ?? ''}"
+                           onchange="updateComponentGrade(${index}, this.value)"
+                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-accent-500"
+                           placeholder="Nota">
+                </div>
+                <button onclick="removeGradeComponent(${index})" 
+                        class="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        `).join('');
+    }
+    
+    updateTotalPercentage();
+    calculateFinalGrade();
+}
+
+function addGradeComponent() {
+    const nameInput = document.getElementById('new-component-name');
+    const percentageInput = document.getElementById('new-component-percentage');
+    const gradeInput = document.getElementById('new-component-grade');
+    
+    const nombre = nameInput.value.trim();
+    const porcentaje = parseInt(percentageInput.value);
+    const nota = gradeInput.value ? parseFloat(gradeInput.value) : null;
+    
+    if (!nombre) {
+        alert('Por favor ingresa un nombre para el componente');
+        return;
+    }
+    
+    if (isNaN(porcentaje) || porcentaje < 1 || porcentaje > 100) {
+        alert('El porcentaje debe estar entre 1 y 100');
+        return;
+    }
+    
+    // Check total percentage
+    const currentTotal = modalGradeComponents.reduce((sum, c) => sum + c.porcentaje, 0);
+    if (currentTotal + porcentaje > 100) {
+        alert(`No puedes agregar más del 100%. Actualmente tienes ${currentTotal}% usado.`);
+        return;
+    }
+    
+    if (nota !== null && (isNaN(nota) || nota < 0 || nota > 5)) {
+        alert('La nota debe estar entre 0.0 y 5.0');
+        return;
+    }
+    
+    modalGradeComponents.push({ nombre, porcentaje, nota });
+    renderGradeComponents();
+    
+    // Clear inputs
+    nameInput.value = '';
+    percentageInput.value = '';
+    gradeInput.value = '';
+    nameInput.focus();
+}
+
+function updateComponentGrade(index, value) {
+    const nota = value ? parseFloat(value) : null;
+    if (nota !== null && (isNaN(nota) || nota < 0 || nota > 5)) {
+        alert('La nota debe estar entre 0.0 y 5.0');
+        return;
+    }
+    modalGradeComponents[index].nota = nota;
+    calculateFinalGrade();
+}
+
+function removeGradeComponent(index) {
+    modalGradeComponents.splice(index, 1);
+    renderGradeComponents();
+}
+
+function updateTotalPercentage() {
+    const total = modalGradeComponents.reduce((sum, c) => sum + c.porcentaje, 0);
+    const el = document.getElementById('modal-total-percentage');
+    el.textContent = `${total}% usado`;
+    
+    if (total === 100) {
+        el.className = 'text-xs px-2 py-1 rounded bg-green-100 text-green-700';
+    } else if (total > 100) {
+        el.className = 'text-xs px-2 py-1 rounded bg-red-100 text-red-700';
+    } else {
+        el.className = 'text-xs px-2 py-1 rounded bg-gray-200 text-gray-600';
+    }
+}
+
+function calculateFinalGrade() {
+    const componentsWithGrades = modalGradeComponents.filter(c => c.nota !== null && c.nota !== undefined);
+    
+    if (componentsWithGrades.length === 0) {
+        document.getElementById('modal-calculated-grade').textContent = '--';
+        return;
+    }
+    
+    // Calculate grade by multiplying each grade by its percentage/100
+    // Example: Parcial 30% with 4.0 = 4.0 * 0.30 = 1.2 points
+    let calculatedGrade = 0;
+    
+    componentsWithGrades.forEach(c => {
+        calculatedGrade += c.nota * (c.porcentaje / 100);
+    });
+    
+    const el = document.getElementById('modal-calculated-grade');
+    el.textContent = calculatedGrade.toFixed(2);
+    
+    // Color based on passing grade (3.0)
+    if (calculatedGrade >= 3) {
+        el.className = 'text-lg font-bold text-green-600';
+    } else {
+        el.className = 'text-lg font-bold text-red-600';
+    }
+}
+
+function closeCourseModal() {
+    document.getElementById('course-modal').classList.add('hidden');
+    modalSelectedCourse = null;
+    modalGradeComponents = [];
+}
+
+function deleteMateriaFromModal() {
+    if (!modalSelectedCourse) return;
+    
+    if (!confirm(`¿Eliminar la materia "${modalSelectedCourse.nombre}"?`)) return;
+    
+    storage.deleteMateria(modalSelectedCourse.codigo);
+    closeCourseModal();
+    
+    // Refresh the page data
+    if (typeof loadSemester === 'function') {
+        loadSemester(currentSemester);
+    } else if (typeof loadPensumData === 'function') {
+        loadPensumData();
+    }
+    
+    if (typeof App !== 'undefined' && App.showAlert) {
+        App.showAlert('Materia eliminada', 'success');
+    }
+}
+
+function saveCourseModalChanges() {
+    if (!modalSelectedCourse) return;
+    
+    // Get values from form
+    const newStatus = document.getElementById('modal-status-select').value;
+    const previousStatus = modalSelectedCourse.estado;
+    
+    // Update materia status
+    modalSelectedCourse.estado = newStatus;
+    storage.saveMateria(modalSelectedCourse);
+    
+    // Calculate final grade from components (sum of grade * percentage/100)
+    let finalGrade = null;
+    const componentsWithGrades = modalGradeComponents.filter(c => c.nota !== null && c.nota !== undefined);
+    
+    if (componentsWithGrades.length > 0) {
+        finalGrade = componentsWithGrades.reduce((sum, c) => sum + (c.nota * (c.porcentaje / 100)), 0);
+    }
+    
+    // Save calificacion with components
+    storage.saveCalificacion({
+        codigo_materia: modalSelectedCourse.codigo,
+        nota: finalGrade,
+        componentes: modalGradeComponents,
+        fecha: new Date().toISOString()
+    });
+    
+    // Handle failed subject: create a copy in next semester
+    if (newStatus === 'failed' && previousStatus !== 'failed') {
+        handleFailedSubjectFromModal(modalSelectedCourse);
+    }
+    
+    // Close modal
+    closeCourseModal();
+    
+    // Refresh the page data if the function exists
+    if (typeof loadSemester === 'function') {
+        loadSemester(currentSemester);
+    } else if (typeof loadPensumData === 'function') {
+        loadPensumData();
+    }
+    
+    // Show success message
+    if (typeof App !== 'undefined' && App.showAlert) {
+        App.showAlert('Cambios guardados', 'success');
+    }
+}
+
+// Handle failed subject from modal - creates repeat in next semester
+function handleFailedSubjectFromModal(failedMateria) {
+    const materias = storage.getMaterias();
+    const nextSemester = (failedMateria.semestre || 1) + 1;
+    
+    // Generate new code for the repeated subject
+    let repeatCount = 1;
+    let newCodigo = `${failedMateria.codigo}-R${repeatCount}`;
+    while (materias.some(m => m.codigo === newCodigo)) {
+        repeatCount++;
+        newCodigo = `${failedMateria.codigo}-R${repeatCount}`;
+    }
+    
+    // Create new materia for next semester
+    const repeatedMateria = {
+        codigo: newCodigo,
+        nombre: `${failedMateria.nombre} (Repetición)`,
+        creditos: failedMateria.creditos,
+        semestre: nextSemester,
+        prerrequisitos: [],
+        correquisitos: failedMateria.correquisitos || [],
+        estado: 'pending',
+        originalCodigo: failedMateria.codigo
+    };
+    
+    storage.saveMateria(repeatedMateria);
+    
+    // Update dependent subjects
+    materias.forEach(m => {
+        if (m.prerrequisitos?.includes(failedMateria.codigo)) {
+            if (m.semestre <= nextSemester && m.estado === 'pending') {
+                m.semestre = nextSemester + 1;
+                storage.saveMateria(m);
+            }
+        }
+        if (m.correquisitos?.includes(failedMateria.codigo) && m.estado === 'pending') {
+            if (m.semestre < nextSemester) {
+                m.semestre = nextSemester;
+                storage.saveMateria(m);
+            }
+        }
+    });
+    
+    if (typeof App !== 'undefined' && App.showAlert) {
+        App.showAlert(`Materia reprogramada para semestre ${nextSemester}`, 'info');
+    }
+}
+</script>

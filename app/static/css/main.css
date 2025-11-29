@@ -1,0 +1,488 @@
+/**
+ * Uni-App Custom Styles
+ * Complements Tailwind CSS with custom utilities and components
+ */
+
+/* ==================== CSS Variables ==================== */
+:root {
+    --color-accent: #5091AF;
+    --color-accent-dark: #3d7a94;
+    --color-accent-light: #6ba8c4;
+}
+
+/* ==================== Base Styles ==================== */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ==================== Accent Color Utilities ==================== */
+.text-accent {
+    color: var(--color-accent);
+}
+
+.bg-accent {
+    background-color: var(--color-accent);
+}
+
+.border-accent {
+    border-color: var(--color-accent);
+}
+
+.text-accent-dark {
+    color: var(--color-accent-dark);
+}
+
+.bg-accent-dark {
+    background-color: var(--color-accent-dark);
+}
+
+.hover\:bg-accent-dark:hover {
+    background-color: var(--color-accent-dark);
+}
+
+.hover\:text-accent:hover {
+    color: var(--color-accent);
+}
+
+.ring-accent {
+    --tw-ring-color: var(--color-accent);
+}
+
+.focus\:ring-accent:focus {
+    --tw-ring-color: var(--color-accent);
+}
+
+/* ==================== Form Elements ==================== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="time"],
+select,
+textarea {
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    padding: 0.5rem 0.75rem;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="time"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(80, 145, 175, 0.3);
+    border-color: var(--color-accent);
+}
+
+/* ==================== Buttons ==================== */
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-accent-dark);
+}
+
+.btn-secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+.btn-outline {
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+}
+
+/* ==================== Cards ==================== */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+}
+
+.card-hover {
+    transition: box-shadow 0.2s;
+}
+
+.card-hover:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* ==================== Course Status Colors ==================== */
+.status-pending {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    color: #4b5563;
+}
+
+.status-enrolled {
+    background-color: rgba(80, 145, 175, 0.1);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.status-passed {
+    background-color: #f0fdf4;
+    border-color: #4ade80;
+    color: #15803d;
+}
+
+.status-failed {
+    background-color: #fef2f2;
+    border-color: #f87171;
+    color: #b91c1c;
+}
+
+.status-dropped {
+    background-color: #fefce8;
+    border-color: #facc15;
+    color: #a16207;
+}
+
+/* ==================== Schedule Grid ==================== */
+.schedule-grid {
+    overflow-x: auto;
+}
+
+.schedule-grid .time-slot {
+    min-height: 3rem;
+}
+
+.schedule-grid .class-block {
+    position: absolute;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    font-size: 0.75rem;
+    overflow: hidden;
+    min-height: 100%;
+}
+
+/* ==================== Semester Columns ==================== */
+.semester-column {
+    min-width: 200px;
+    max-width: 280px;
+}
+
+@media (max-width: 768px) {
+    .semester-column {
+        min-width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* ==================== Course Cards ==================== */
+.course-card {
+    transition: all 0.2s;
+}
+
+.course-card:hover {
+    transform: translateY(-1px);
+}
+
+/* ==================== Modal Styles ==================== */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 28rem;
+    width: 100%;
+    margin: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body {
+    padding: 1rem 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* ==================== Navbar ==================== */
+.nav-link {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    color: #4b5563;
+    transition: all 0.15s;
+}
+
+.nav-link:hover {
+    color: var(--color-accent);
+    background-color: #f9fafb;
+}
+
+.nav-link.active {
+    color: var(--color-accent);
+    background-color: rgba(80, 145, 175, 0.1);
+}
+
+/* ==================== Alerts ==================== */
+.app-alert {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ==================== Loading Spinner ==================== */
+.spinner {
+    animation: spin 1s linear infinite;
+    border-radius: 50%;
+    border: 2px solid #e5e7eb;
+    border-top-color: var(--color-accent);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==================== Franja Grid ==================== */
+.franja-cell {
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.franja-cell:hover {
+    filter: brightness(0.95);
+}
+
+.franja-blocked {
+    background-color: #fecaca;
+}
+
+.franja-preferred {
+    background-color: #bbf7d0;
+}
+
+/* ==================== Scrollbar Styles ==================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #f3f4f6;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+/* ==================== Responsive Utilities ==================== */
+@media (max-width: 640px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+@media (min-width: 641px) {
+    .show-mobile-only {
+        display: none !important;
+    }
+}
+
+/* ==================== Print Styles ==================== */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        color: black;
+        background-color: white;
+    }
+    
+    .schedule-grid {
+        box-shadow: none;
+        border: 1px solid #d1d5db;
+    }
+}
+
+/* ==================== Transitions ==================== */
+.fade-enter {
+    opacity: 0;
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transition: opacity 200ms ease-in;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+}
+
+/* ==================== Tooltip ==================== */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    z-index: 50;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    color: white;
+    background-color: #1f2937;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 4px;
+}
+
+/* ==================== Empty States ==================== */
+.empty-state {
+    text-align: center;
+    padding: 3rem 0;
+    color: #6b7280;
+}
+
+.empty-state svg {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto 1rem;
+    color: #d1d5db;
+}
+
+/* ==================== Badge ==================== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-accent {
+    background-color: rgba(80, 145, 175, 0.1);
+    color: var(--color-accent);
+}
+
+.badge-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* ==================== GPA Alert ==================== */
+.gpa-warning {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
