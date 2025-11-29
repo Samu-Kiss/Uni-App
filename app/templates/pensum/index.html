@@ -413,6 +413,15 @@
                     class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                 Tabla
             </button>
+            <button id="view-graph" onclick="setView('graph')" 
+                    class="px-3 py-1 text-sm font-medium rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                    </svg>
+                    Grafo
+                </span>
+            </button>
         </div>
         <div class="flex items-center space-x-2">
             <label class="text-sm text-gray-600 dark:text-gray-400">Simular pérdida:</label>
@@ -459,6 +468,137 @@
     <!-- Pensum Tree View (by semester) -->
     <div id="pensum-tree-view" class="space-y-6">
         <!-- Will be populated by JavaScript -->
+    </div>
+    
+    <!-- Pensum Graph View (prerequisites visualization) -->
+    <div id="pensum-graph-view" class="hidden">
+        <div id="graph-card" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors flex flex-col">
+            <!-- Graph Header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <h3 class="font-semibold text-gray-800 dark:text-white">Grafo de Prerrequisitos</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Visualización de dependencias entre materias</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="resetGraphZoom()" class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Resetear Vista
+                    </button>
+                    <button onclick="toggleGraphFullscreen()" class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                        </svg>
+                        Pantalla Completa
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Graph Legend -->
+            <div class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center gap-4 text-sm">
+                <span class="font-medium text-gray-700 dark:text-gray-300">Leyenda:</span>
+                <div class="flex items-center space-x-1">
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Aprobada</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Cursando</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="w-3 h-3 rounded-full bg-gray-400"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Pendiente</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Reprobada</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Bloqueada</span>
+                </div>
+                <div class="flex items-center space-x-1 ml-4">
+                    <span class="w-6 h-0.5 bg-gray-400"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Prerrequisito</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="w-6 h-0.5 bg-indigo-400 border-dashed" style="border-top: 2px dashed;"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Correquisito</span>
+                </div>
+            </div>
+            
+            <!-- Graph Canvas -->
+            <div id="graph-container" class="relative flex-grow" style="height: 600px; min-height: 400px;">
+                <canvas id="prerequisites-graph" class="w-full h-full"></canvas>
+                
+                <!-- Node Tooltip -->
+                <div id="graph-tooltip" class="hidden absolute z-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-3 max-w-xs pointer-events-none">
+                    <h4 id="tooltip-name" class="font-semibold text-gray-800 dark:text-white"></h4>
+                    <p id="tooltip-code" class="text-xs text-gray-500 dark:text-gray-400"></p>
+                    <div class="mt-2 space-y-1 text-sm">
+                        <p><span class="text-gray-500 dark:text-gray-400">Créditos:</span> <span id="tooltip-credits" class="font-medium text-gray-700 dark:text-gray-300"></span></p>
+                        <p><span class="text-gray-500 dark:text-gray-400">Semestre:</span> <span id="tooltip-semester" class="font-medium text-gray-700 dark:text-gray-300"></span></p>
+                        <p><span class="text-gray-500 dark:text-gray-400">Estado:</span> <span id="tooltip-status" class="font-medium"></span></p>
+                        <div id="tooltip-prereqs" class="hidden">
+                            <span class="text-gray-500 dark:text-gray-400">Prerrequisitos:</span>
+                            <span id="tooltip-prereqs-list" class="font-medium text-gray-700 dark:text-gray-300"></span>
+                        </div>
+                        <div id="tooltip-dependents" class="hidden">
+                            <span class="text-gray-500 dark:text-gray-400">Desbloquea:</span>
+                            <span id="tooltip-dependents-list" class="font-medium text-gray-700 dark:text-gray-300"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Selected Node Info Panel -->
+                <div id="selected-node-panel" class="hidden absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 w-72 z-10">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 id="selected-node-name" class="font-semibold text-gray-800 dark:text-white"></h4>
+                        <button onclick="closeSelectedNodePanel()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="selected-node-details" class="space-y-2 text-sm"></div>
+                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">Cadena de Prerrequisitos</h5>
+                        <div id="prereq-chain" class="space-y-1 text-xs"></div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">Materias que Desbloquea</h5>
+                        <div id="unlock-chain" class="space-y-1 text-xs"></div>
+                    </div>
+                </div>
+                
+                <!-- Zoom Controls -->
+                <div class="absolute bottom-4 left-4 flex flex-col space-y-1 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <button onclick="zoomGraph(1.2)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                    </button>
+                    <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                    <button onclick="zoomGraph(0.8)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Bottleneck Indicator -->
+                <div id="bottleneck-panel" class="absolute bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-3 max-w-xs">
+                    <h5 class="font-medium text-gray-700 dark:text-gray-300 text-sm mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-1 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        Cuellos de Botella
+                    </h5>
+                    <div id="bottleneck-list" class="space-y-1 text-xs text-gray-600 dark:text-gray-400"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1084,23 +1224,37 @@
         currentView = view;
         const tableView = document.getElementById('pensum-table-view');
         const treeView = document.getElementById('pensum-tree-view');
+        const graphView = document.getElementById('pensum-graph-view');
         const tableBtn = document.getElementById('view-table');
         const treeBtn = document.getElementById('view-tree');
+        const graphBtn = document.getElementById('view-graph');
         
+        // Reset all buttons
+        [tableBtn, treeBtn, graphBtn].forEach(btn => {
+            btn.classList.remove('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-gray-700', 'dark:text-gray-200');
+            btn.classList.add('text-gray-500', 'dark:text-gray-400');
+        });
+        
+        // Hide all views
+        tableView.classList.add('hidden');
+        treeView.classList.add('hidden');
+        graphView.classList.add('hidden');
+        
+        // Show selected view
         if (view === 'table') {
             tableView.classList.remove('hidden');
-            treeView.classList.add('hidden');
-            tableBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-700');
-            tableBtn.classList.remove('text-gray-500');
-            treeBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-700');
-            treeBtn.classList.add('text-gray-500');
+            tableBtn.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-gray-700', 'dark:text-gray-200');
+            tableBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
+        } else if (view === 'graph') {
+            graphView.classList.remove('hidden');
+            graphBtn.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-gray-700', 'dark:text-gray-200');
+            graphBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
+            // Initialize graph when switching to this view
+            setTimeout(() => initializeGraph(), 100);
         } else {
-            tableView.classList.add('hidden');
             treeView.classList.remove('hidden');
-            treeBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-700');
-            treeBtn.classList.remove('text-gray-500');
-            tableBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-700');
-            tableBtn.classList.add('text-gray-500');
+            treeBtn.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-gray-700', 'dark:text-gray-200');
+            treeBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
         }
     }
     
@@ -2434,6 +2588,689 @@
                 setTimeout(() => applyFilters(), 50);
             }
         };
+    }
+    
+    // ==================== GRAPH VISUALIZATION ====================
+    
+    let graphState = {
+        canvas: null,
+        ctx: null,
+        nodes: [],
+        edges: [],
+        zoom: 1,
+        offsetX: 0,
+        offsetY: 0,
+        isDragging: false,
+        dragStart: { x: 0, y: 0 },
+        selectedNode: null,
+        hoveredNode: null,
+        isFullscreen: false
+    };
+    
+    const statusColors = {
+        'passed': '#22c55e',    // green-500
+        'enrolled': '#3b82f6',  // blue-500
+        'pending': '#9ca3af',   // gray-400
+        'failed': '#ef4444',    // red-500
+        'dropped': '#f59e0b',   // amber-500
+        'blocked': '#f97316'    // orange-500
+    };
+    
+    function initializeGraph() {
+        const canvas = document.getElementById('prerequisites-graph');
+        if (!canvas) return;
+        
+        graphState.canvas = canvas;
+        graphState.ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        resizeCanvas();
+        
+        // Build graph data
+        buildGraphData();
+        
+        // Calculate node positions
+        calculateNodePositions();
+        
+        // Find bottlenecks
+        findBottlenecks();
+        
+        // Draw graph
+        drawGraph();
+        
+        // Add event listeners
+        canvas.addEventListener('wheel', handleGraphWheel);
+        canvas.addEventListener('mousedown', handleGraphMouseDown);
+        canvas.addEventListener('mousemove', handleGraphMouseMove);
+        canvas.addEventListener('mouseup', handleGraphMouseUp);
+        canvas.addEventListener('mouseleave', handleGraphMouseLeave);
+        canvas.addEventListener('click', handleGraphClick);
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            drawGraph();
+        });
+    }
+    
+    function resizeCanvas() {
+        const container = document.getElementById('graph-container');
+        const canvas = graphState.canvas;
+        if (!container || !canvas) return;
+        
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+    }
+    
+    function buildGraphData() {
+        const materias = storage.getMaterias() || [];
+        graphState.nodes = [];
+        graphState.edges = [];
+        
+        // Create nodes
+        materias.forEach(m => {
+            // Calculate node width based on name length
+            const nameLength = m.nombre.length;
+            const nodeWidth = Math.max(120, Math.min(200, nameLength * 7 + 20));
+            const nodeHeight = 50;
+            
+            graphState.nodes.push({
+                id: m.codigo,
+                name: m.nombre,
+                credits: m.creditos,
+                semester: m.semestre,
+                status: m.estado,
+                prerequisites: m.prerrequisitos || [],
+                corequisites: m.correquisitos || [],
+                x: 0,
+                y: 0,
+                width: nodeWidth,
+                height: nodeHeight
+            });
+        });
+        
+        // Create edges
+        materias.forEach(m => {
+            // Prerequisite edges
+            (m.prerrequisitos || []).forEach(prereq => {
+                const fromNode = graphState.nodes.find(n => n.id === prereq);
+                if (fromNode) {
+                    graphState.edges.push({
+                        from: prereq,
+                        to: m.codigo,
+                        type: 'prerequisite'
+                    });
+                }
+            });
+            
+            // Corequisite edges
+            (m.correquisitos || []).forEach(coreq => {
+                const fromNode = graphState.nodes.find(n => n.id === coreq);
+                if (fromNode) {
+                    graphState.edges.push({
+                        from: coreq,
+                        to: m.codigo,
+                        type: 'corequisite'
+                    });
+                }
+            });
+        });
+    }
+    
+    function calculateNodePositions() {
+        const canvas = graphState.canvas;
+        if (!canvas) return;
+        
+        const nodes = graphState.nodes;
+        if (nodes.length === 0) return;
+        
+        // Group by semester
+        const bySemester = {};
+        nodes.forEach(node => {
+            const sem = node.semester || 1;
+            if (!bySemester[sem]) bySemester[sem] = [];
+            bySemester[sem].push(node);
+        });
+        
+        const semesters = Object.keys(bySemester).map(Number).sort((a, b) => a - b);
+        const semesterCount = semesters.length;
+        
+        // Calculate max nodes per semester for height calculation
+        const maxNodesInSemester = Math.max(...semesters.map(sem => bySemester[sem].length));
+        
+        const padding = 100;
+        const nodeSpacingX = 220; // Horizontal spacing between semester columns
+        const nodeSpacingY = 80;  // Vertical spacing between nodes
+        
+        // Calculate required canvas dimensions
+        const requiredWidth = padding * 2 + nodeSpacingX * semesterCount;
+        const requiredHeight = padding * 2 + nodeSpacingY * (maxNodesInSemester + 1);
+        
+        // Use the larger of required or available space
+        const workingWidth = Math.max(canvas.width, requiredWidth);
+        const workingHeight = Math.max(canvas.height, requiredHeight);
+        
+        semesters.forEach((sem, semIndex) => {
+            const semNodes = bySemester[sem];
+            const startY = (workingHeight - nodeSpacingY * semNodes.length) / 2;
+            
+            semNodes.forEach((node, nodeIndex) => {
+                node.x = padding + nodeSpacingX * semIndex + nodeSpacingX / 2;
+                node.y = startY + nodeSpacingY * (nodeIndex + 0.5);
+            });
+        });
+        
+        // Calculate zoom to fit and center the graph
+        const graphWidth = nodeSpacingX * semesterCount;
+        const graphHeight = nodeSpacingY * maxNodesInSemester;
+        
+        const scaleX = (canvas.width - padding * 2) / graphWidth;
+        const scaleY = (canvas.height - padding * 2) / graphHeight;
+        const fitZoom = Math.min(scaleX, scaleY, 1); // Don't zoom in more than 1
+        
+        graphState.zoom = fitZoom;
+        graphState.offsetX = (canvas.width - graphWidth * fitZoom) / 2 - padding * fitZoom;
+        graphState.offsetY = (canvas.height - graphHeight * fitZoom) / 2 - padding * fitZoom;
+    }
+    
+    function drawGraph() {
+        const ctx = graphState.ctx;
+        const canvas = graphState.canvas;
+        if (!ctx || !canvas) return;
+        
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        
+        // Clear canvas
+        ctx.fillStyle = isDarkMode ? '#1f2937' : '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.save();
+        ctx.translate(graphState.offsetX, graphState.offsetY);
+        ctx.scale(graphState.zoom, graphState.zoom);
+        
+        // Draw semester lines
+        drawSemesterLines(ctx, isDarkMode);
+        
+        // Draw edges first (behind nodes)
+        graphState.edges.forEach(edge => {
+            drawEdge(ctx, edge, isDarkMode);
+        });
+        
+        // Draw nodes
+        graphState.nodes.forEach(node => {
+            drawNode(ctx, node, isDarkMode);
+        });
+        
+        ctx.restore();
+    }
+    
+    function drawSemesterLines(ctx, isDarkMode) {
+        const nodes = graphState.nodes;
+        if (nodes.length === 0) return;
+        
+        const bySemester = {};
+        nodes.forEach(node => {
+            const sem = node.semester || 1;
+            if (!bySemester[sem]) bySemester[sem] = [];
+            bySemester[sem].push(node);
+        });
+        
+        const semesters = Object.keys(bySemester).map(Number).sort((a, b) => a - b);
+        const canvas = graphState.canvas;
+        
+        ctx.font = '14px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        
+        semesters.forEach((sem, index) => {
+            const semNodes = bySemester[sem];
+            if (semNodes.length === 0) return;
+            
+            const x = semNodes[0].x;
+            
+            // Draw vertical line
+            ctx.strokeStyle = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x, 20);
+            ctx.lineTo(x, canvas.height - 20);
+            ctx.stroke();
+            
+            // Draw semester label
+            ctx.fillStyle = isDarkMode ? '#9ca3af' : '#6b7280';
+            ctx.fillText(`Sem ${sem}`, x, 15);
+        });
+    }
+    
+    function drawEdge(ctx, edge, isDarkMode) {
+        const fromNode = graphState.nodes.find(n => n.id === edge.from);
+        const toNode = graphState.nodes.find(n => n.id === edge.to);
+        
+        if (!fromNode || !toNode) return;
+        
+        const isHighlighted = graphState.selectedNode && 
+            (graphState.selectedNode.id === edge.from || graphState.selectedNode.id === edge.to);
+        
+        ctx.beginPath();
+        
+        if (edge.type === 'corequisite') {
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = isHighlighted ? '#818cf8' : (isDarkMode ? '#6366f1' : '#a5b4fc');
+        } else {
+            ctx.setLineDash([]);
+            ctx.strokeStyle = isHighlighted ? '#6b7280' : (isDarkMode ? '#4b5563' : '#d1d5db');
+        }
+        
+        ctx.lineWidth = isHighlighted ? 2 : 1;
+        
+        // Calculate edge points from rectangle borders
+        const fromRight = fromNode.x + fromNode.width / 2;
+        const toLeft = toNode.x - toNode.width / 2;
+        
+        // Draw curved line
+        const startX = fromRight;
+        const startY = fromNode.y;
+        const endX = toLeft;
+        const endY = toNode.y;
+        
+        // Control point for the curve - offset horizontally for more pronounced curve
+        const dx = endX - startX;
+        const dy = endY - startY;
+        const controlX1 = startX + dx * 0.5;
+        const controlY1 = startY;
+        const controlX2 = startX + dx * 0.5;
+        const controlY2 = endY;
+        
+        ctx.moveTo(startX, startY);
+        ctx.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
+        ctx.stroke();
+        
+        // Draw arrow - calculate angle at the end of the curve
+        const arrowAngle = Math.atan2(endY - controlY2, endX - controlX2);
+        const arrowLength = 10;
+        
+        ctx.beginPath();
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(
+            endX - arrowLength * Math.cos(arrowAngle - Math.PI / 6),
+            endY - arrowLength * Math.sin(arrowAngle - Math.PI / 6)
+        );
+        ctx.lineTo(
+            endX - arrowLength * Math.cos(arrowAngle + Math.PI / 6),
+            endY - arrowLength * Math.sin(arrowAngle + Math.PI / 6)
+        );
+        ctx.closePath();
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+        
+        ctx.setLineDash([]);
+    }
+    
+    function drawNode(ctx, node, isDarkMode) {
+        const isSelected = graphState.selectedNode && graphState.selectedNode.id === node.id;
+        const isHovered = graphState.hoveredNode && graphState.hoveredNode.id === node.id;
+        const isConnected = graphState.selectedNode && isNodeConnected(node.id, graphState.selectedNode.id);
+        
+        const x = node.x - node.width / 2;
+        const y = node.y - node.height / 2;
+        const cornerRadius = 8;
+        
+        // Fill color based on status
+        const baseColor = statusColors[node.status] || statusColors.pending;
+        
+        if (isSelected || isHovered) {
+            ctx.shadowColor = baseColor;
+            ctx.shadowBlur = 15;
+        } else if (graphState.selectedNode && !isConnected) {
+            ctx.globalAlpha = 0.3;
+        }
+        
+        // Draw rounded rectangle
+        ctx.beginPath();
+        ctx.moveTo(x + cornerRadius, y);
+        ctx.lineTo(x + node.width - cornerRadius, y);
+        ctx.quadraticCurveTo(x + node.width, y, x + node.width, y + cornerRadius);
+        ctx.lineTo(x + node.width, y + node.height - cornerRadius);
+        ctx.quadraticCurveTo(x + node.width, y + node.height, x + node.width - cornerRadius, y + node.height);
+        ctx.lineTo(x + cornerRadius, y + node.height);
+        ctx.quadraticCurveTo(x, y + node.height, x, y + node.height - cornerRadius);
+        ctx.lineTo(x, y + cornerRadius);
+        ctx.quadraticCurveTo(x, y, x + cornerRadius, y);
+        ctx.closePath();
+        
+        ctx.fillStyle = baseColor;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+        
+        // Border
+        ctx.strokeStyle = isSelected ? '#ffffff' : (isDarkMode ? '#374151' : '#e5e7eb');
+        ctx.lineWidth = isSelected ? 3 : 2;
+        ctx.stroke();
+        
+        // Course name (main text)
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Truncate long names
+        let displayName = node.name;
+        const maxWidth = node.width - 16;
+        while (ctx.measureText(displayName).width > maxWidth && displayName.length > 3) {
+            displayName = displayName.substring(0, displayName.length - 4) + '...';
+        }
+        ctx.fillText(displayName, node.x, node.y - 6);
+        
+        // Course code and credits (secondary text)
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillText(`${node.id} • ${node.credits}cr`, node.x, node.y + 12);
+    }
+    
+    function isNodeConnected(nodeId, selectedId) {
+        // Check if node is prerequisite or dependent of selected
+        const selected = graphState.nodes.find(n => n.id === selectedId);
+        if (!selected) return false;
+        
+        // Is nodeId a prerequisite of selected?
+        if (selected.prerequisites.includes(nodeId)) return true;
+        
+        // Is selected a prerequisite of nodeId?
+        const node = graphState.nodes.find(n => n.id === nodeId);
+        if (node && node.prerequisites.includes(selectedId)) return true;
+        
+        // Check transitive connections
+        const allPrereqs = getAllPrerequisites(selectedId);
+        const allDependents = getAllDependents(selectedId);
+        
+        return allPrereqs.has(nodeId) || allDependents.has(nodeId);
+    }
+    
+    function getAllPrerequisites(nodeId, visited = new Set()) {
+        if (visited.has(nodeId)) return visited;
+        
+        const node = graphState.nodes.find(n => n.id === nodeId);
+        if (!node) return visited;
+        
+        node.prerequisites.forEach(prereq => {
+            visited.add(prereq);
+            getAllPrerequisites(prereq, visited);
+        });
+        
+        return visited;
+    }
+    
+    function getAllDependents(nodeId, visited = new Set()) {
+        if (visited.has(nodeId)) return visited;
+        
+        graphState.nodes.forEach(node => {
+            if (node.prerequisites.includes(nodeId) && !visited.has(node.id)) {
+                visited.add(node.id);
+                getAllDependents(node.id, visited);
+            }
+        });
+        
+        return visited;
+    }
+    
+    function findBottlenecks() {
+        // Find nodes that unlock the most other nodes
+        const bottlenecks = graphState.nodes
+            .map(node => ({
+                node,
+                dependentCount: getAllDependents(node.id).size
+            }))
+            .filter(item => item.dependentCount > 0)
+            .sort((a, b) => b.dependentCount - a.dependentCount)
+            .slice(0, 5);
+        
+        const container = document.getElementById('bottleneck-list');
+        if (!container) return;
+        
+        if (bottlenecks.length === 0) {
+            container.innerHTML = '<p class="text-gray-400">No hay cuellos de botella</p>';
+            return;
+        }
+        
+        container.innerHTML = bottlenecks.map(item => `
+            <div class="flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
+                 onclick="selectGraphNode('${item.node.id}')">
+                <span class="font-medium text-gray-700 dark:text-gray-300">${item.node.id}</span>
+                <span class="text-amber-500">${item.dependentCount} materias</span>
+            </div>
+        `).join('');
+    }
+    
+    // Graph event handlers
+    function handleGraphWheel(e) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? 0.9 : 1.1;
+        graphState.zoom = Math.max(0.3, Math.min(3, graphState.zoom * delta));
+        drawGraph();
+    }
+    
+    function handleGraphMouseDown(e) {
+        graphState.isDragging = true;
+        graphState.dragStart = { x: e.clientX - graphState.offsetX, y: e.clientY - graphState.offsetY };
+    }
+    
+    function handleGraphMouseMove(e) {
+        const rect = graphState.canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left - graphState.offsetX) / graphState.zoom;
+        const y = (e.clientY - rect.top - graphState.offsetY) / graphState.zoom;
+        
+        if (graphState.isDragging) {
+            graphState.offsetX = e.clientX - graphState.dragStart.x;
+            graphState.offsetY = e.clientY - graphState.dragStart.y;
+            drawGraph();
+            return;
+        }
+        
+        // Check hover - use rectangle bounds
+        const hoveredNode = graphState.nodes.find(node => {
+            const halfWidth = node.width / 2;
+            const halfHeight = node.height / 2;
+            return x >= node.x - halfWidth && x <= node.x + halfWidth &&
+                   y >= node.y - halfHeight && y <= node.y + halfHeight;
+        });
+        
+        if (hoveredNode !== graphState.hoveredNode) {
+            graphState.hoveredNode = hoveredNode;
+            drawGraph();
+            
+            if (hoveredNode) {
+                showTooltip(hoveredNode, e.clientX, e.clientY);
+                graphState.canvas.style.cursor = 'pointer';
+            } else {
+                hideTooltip();
+                graphState.canvas.style.cursor = graphState.isDragging ? 'grabbing' : 'grab';
+            }
+        }
+    }
+    
+    function handleGraphMouseUp() {
+        graphState.isDragging = false;
+        graphState.canvas.style.cursor = 'grab';
+    }
+    
+    function handleGraphMouseLeave() {
+        graphState.isDragging = false;
+        graphState.hoveredNode = null;
+        hideTooltip();
+        drawGraph();
+    }
+    
+    function handleGraphClick(e) {
+        const rect = graphState.canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left - graphState.offsetX) / graphState.zoom;
+        const y = (e.clientY - rect.top - graphState.offsetY) / graphState.zoom;
+        
+        const clickedNode = graphState.nodes.find(node => {
+            const halfWidth = node.width / 2;
+            const halfHeight = node.height / 2;
+            return x >= node.x - halfWidth && x <= node.x + halfWidth &&
+                   y >= node.y - halfHeight && y <= node.y + halfHeight;
+        });
+        
+        if (clickedNode) {
+            selectGraphNode(clickedNode.id);
+        } else {
+            graphState.selectedNode = null;
+            document.getElementById('selected-node-panel').classList.add('hidden');
+            drawGraph();
+        }
+    }
+    
+    function selectGraphNode(nodeId) {
+        const node = graphState.nodes.find(n => n.id === nodeId);
+        if (!node) return;
+        
+        graphState.selectedNode = node;
+        drawGraph();
+        showSelectedNodePanel(node);
+    }
+    
+    function showTooltip(node, mouseX, mouseY) {
+        const tooltip = document.getElementById('graph-tooltip');
+        const container = document.getElementById('graph-container');
+        
+        document.getElementById('tooltip-name').textContent = node.name;
+        document.getElementById('tooltip-code').textContent = node.id;
+        document.getElementById('tooltip-credits').textContent = node.credits;
+        document.getElementById('tooltip-semester').textContent = node.semester;
+        
+        const statusLabels = {
+            'passed': 'Aprobada',
+            'enrolled': 'Cursando',
+            'pending': 'Pendiente',
+            'failed': 'Reprobada',
+            'blocked': 'Bloqueada'
+        };
+        const statusEl = document.getElementById('tooltip-status');
+        statusEl.textContent = statusLabels[node.status] || node.status;
+        statusEl.style.color = statusColors[node.status];
+        
+        // Prerequisites
+        const prereqsDiv = document.getElementById('tooltip-prereqs');
+        const prereqsList = document.getElementById('tooltip-prereqs-list');
+        if (node.prerequisites.length > 0) {
+            prereqsDiv.classList.remove('hidden');
+            prereqsList.textContent = node.prerequisites.join(', ');
+        } else {
+            prereqsDiv.classList.add('hidden');
+        }
+        
+        // Dependents
+        const dependents = getAllDependents(node.id);
+        const dependentsDiv = document.getElementById('tooltip-dependents');
+        const dependentsList = document.getElementById('tooltip-dependents-list');
+        if (dependents.size > 0) {
+            dependentsDiv.classList.remove('hidden');
+            dependentsList.textContent = Array.from(dependents).slice(0, 3).join(', ') + 
+                (dependents.size > 3 ? ` +${dependents.size - 3} más` : '');
+        } else {
+            dependentsDiv.classList.add('hidden');
+        }
+        
+        const rect = container.getBoundingClientRect();
+        tooltip.style.left = `${mouseX - rect.left + 15}px`;
+        tooltip.style.top = `${mouseY - rect.top + 15}px`;
+        tooltip.classList.remove('hidden');
+    }
+    
+    function hideTooltip() {
+        document.getElementById('graph-tooltip').classList.add('hidden');
+    }
+    
+    function showSelectedNodePanel(node) {
+        const panel = document.getElementById('selected-node-panel');
+        document.getElementById('selected-node-name').textContent = node.name;
+        
+        const statusLabels = {
+            'passed': 'Aprobada',
+            'enrolled': 'Cursando',
+            'pending': 'Pendiente',
+            'failed': 'Reprobada',
+            'blocked': 'Bloqueada'
+        };
+        
+        document.getElementById('selected-node-details').innerHTML = `
+            <p><span class="text-gray-500 dark:text-gray-400">Código:</span> <span class="font-medium">${node.id}</span></p>
+            <p><span class="text-gray-500 dark:text-gray-400">Créditos:</span> <span class="font-medium">${node.credits}</span></p>
+            <p><span class="text-gray-500 dark:text-gray-400">Semestre:</span> <span class="font-medium">${node.semester}</span></p>
+            <p><span class="text-gray-500 dark:text-gray-400">Estado:</span> <span class="font-medium" style="color: ${statusColors[node.status]}">${statusLabels[node.status]}</span></p>
+        `;
+        
+        // Build prerequisite chain
+        const prereqChain = document.getElementById('prereq-chain');
+        const allPrereqs = getAllPrerequisites(node.id);
+        if (allPrereqs.size > 0) {
+            prereqChain.innerHTML = Array.from(allPrereqs).map(prereq => {
+                const prereqNode = graphState.nodes.find(n => n.id === prereq);
+                const color = prereqNode ? statusColors[prereqNode.status] : '#9ca3af';
+                return `<span class="inline-block px-2 py-0.5 rounded text-white mr-1 mb-1" style="background: ${color}">${prereq}</span>`;
+            }).join('');
+        } else {
+            prereqChain.innerHTML = '<span class="text-gray-400">Sin prerrequisitos</span>';
+        }
+        
+        // Build unlock chain
+        const unlockChain = document.getElementById('unlock-chain');
+        const allDependents = getAllDependents(node.id);
+        if (allDependents.size > 0) {
+            unlockChain.innerHTML = Array.from(allDependents).map(dep => {
+                const depNode = graphState.nodes.find(n => n.id === dep);
+                const color = depNode ? statusColors[depNode.status] : '#9ca3af';
+                return `<span class="inline-block px-2 py-0.5 rounded text-white mr-1 mb-1" style="background: ${color}">${dep}</span>`;
+            }).join('');
+        } else {
+            unlockChain.innerHTML = '<span class="text-gray-400">No desbloquea materias</span>';
+        }
+        
+        panel.classList.remove('hidden');
+    }
+    
+    function closeSelectedNodePanel() {
+        document.getElementById('selected-node-panel').classList.add('hidden');
+        graphState.selectedNode = null;
+        drawGraph();
+    }
+    
+    function zoomGraph(factor) {
+        graphState.zoom = Math.max(0.3, Math.min(3, graphState.zoom * factor));
+        drawGraph();
+    }
+    
+    function resetGraphZoom() {
+        graphState.zoom = 1;
+        graphState.offsetX = 0;
+        graphState.offsetY = 0;
+        calculateNodePositions();
+        drawGraph();
+    }
+    
+    function toggleGraphFullscreen() {
+        const container = document.getElementById('graph-container');
+        const graphView = document.getElementById('pensum-graph-view');
+        
+        graphState.isFullscreen = !graphState.isFullscreen;
+        
+        const graphCard = document.getElementById('graph-card');
+        
+        if (graphState.isFullscreen) {
+            graphView.classList.add('fixed', 'inset-0', 'z-50');
+            graphCard.classList.add('h-full', 'rounded-none', 'border-0');
+            container.style.height = '';
+        } else {
+            graphView.classList.remove('fixed', 'inset-0', 'z-50');
+            graphCard.classList.remove('h-full', 'rounded-none', 'border-0');
+            container.style.height = '600px';
+        }
+        
+        setTimeout(() => {
+            resizeCanvas();
+            calculateNodePositions();
+            drawGraph();
+        }, 100);
     }
 </script>
 {% endblock %}
