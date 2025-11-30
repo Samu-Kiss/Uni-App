@@ -153,6 +153,20 @@
                     </button>
                 </div>
                 
+                <!-- Group sections toggle -->
+                <div class="mt-3 flex items-center gap-2">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="group-sections-toggle" class="sr-only peer" checked>
+                        <div class="w-9 h-5 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent-500"></div>
+                    </label>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Agrupar secciones con mismo horario</span>
+                    <button type="button" onclick="showGroupSectionsHelp()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" title="¿Qué es esto?">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+                
                 <!-- Warning banner for large combinations -->
                 <div id="generation-warning" class="hidden mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                     <p class="text-sm text-yellow-700 dark:text-yellow-400">
@@ -1168,6 +1182,9 @@
             return;
         }
         
+        // Check if grouping is enabled
+        const groupSections = document.getElementById('group-sections-toggle').checked;
+        
         // Group classes by materia
         const materiaGroups = {};
         activeClasses.forEach(c => {
@@ -1177,7 +1194,15 @@
             materiaGroups[c.codigo_materia].push(c);
         });
         
-        const materias = Object.keys(materiaGroups);
+        // Optionally group sections with identical schedules within each materia
+        const processedGroups = {};
+        for (const [codigo, classes] of Object.entries(materiaGroups)) {
+            processedGroups[codigo] = groupSections 
+                ? groupSectionsBySchedule(classes) 
+                : classes;
+        }
+        
+        const materias = Object.keys(processedGroups);
         
         // Generate all combinations
         function getCombinations(arrays, current = []) {
@@ -1190,7 +1215,7 @@
             return results;
         }
         
-        const allCombinations = getCombinations(materias.map(m => materiaGroups[m]));
+        const allCombinations = getCombinations(materias.map(m => processedGroups[m]));
         
         // Filter valid combinations (no conflicts)
         generatedSchedules = allCombinations.filter(combo => !hasConflict(combo));
@@ -1245,6 +1270,46 @@
         return start1 < end2 && start2 < end1;
     }
     
+    function showGroupSectionsHelp() {
+        App.showAlert(
+            'Cuando esta opción está activa, las secciones que tienen exactamente el mismo horario se agrupan, reduciendo las combinaciones duplicadas. Por ejemplo, si las secciones 001 y 002 de una materia tienen el mismo horario, solo se contará como una opción en vez de dos.',
+            'info'
+        );
+    }
+    
+    function getBloquesKey(bloques) {
+        // Create a unique key from the bloques array for comparison
+        return bloques
+            .map(b => `${b.dia}-${b.hora_inicio}-${b.hora_fin}`)
+            .sort()
+            .join('|');
+    }
+    
+    function groupSectionsBySchedule(classes) {
+        // Group classes that have identical bloques (same schedule)
+        const groups = {};
+        
+        classes.forEach(c => {
+            const key = getBloquesKey(c.bloques);
+            if (!groups[key]) {
+                groups[key] = {
+                    representative: c,  // Use first class as representative
+                    sections: []
+                };
+            }
+            groups[key].sections.push(c);
+        });
+        
+        // Return array of representatives with grouped section info
+        return Object.values(groups).map(group => ({
+            ...group.representative,
+            grouped_sections: group.sections,
+            seccion: group.sections.length > 1 
+                ? group.sections.map(s => s.seccion).join('/') 
+                : group.representative.seccion
+        }));
+    }
+
     function sortSchedules(criteria, buttonEl) {
         // Update button styles
         document.querySelectorAll('#optimization-presets button').forEach(btn => {
