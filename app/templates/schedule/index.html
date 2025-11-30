@@ -481,6 +481,49 @@
         return bloques.map(b => DAY_NAMES[b.dia] + ' ' + b.hora_inicio + '-' + b.hora_fin).join(', ');
     }
     
+    // Helper functions for color manipulation
+    function lightenColor(hex, percent) {
+        const num = parseInt(hex.replace('#', ''), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.min(255, (num >> 16) + amt);
+        const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+        const B = Math.min(255, (num & 0x0000FF) + amt);
+        return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+    }
+    
+    function darkenColor(hex, percent) {
+        const num = parseInt(hex.replace('#', ''), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.max(0, (num >> 16) - amt);
+        const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
+        const B = Math.max(0, (num & 0x0000FF) - amt);
+        return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+    }
+    
+    // Convert hex color to Tailwind-like classes using inline styles
+    function convertCustomColor(hexColor) {
+        if (!hexColor) return null;
+        
+        // Parse hex to RGB
+        const hex = hexColor.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        
+        // Create lighter version for background (mix with white)
+        const bgR = Math.round(r + (255 - r) * 0.85);
+        const bgG = Math.round(g + (255 - g) * 0.85);
+        const bgB = Math.round(b + (255 - b) * 0.85);
+        
+        // Create darker version for dark mode background
+        const darkBgR = Math.round(r * 0.3);
+        const darkBgG = Math.round(g * 0.3);
+        const darkBgB = Math.round(b * 0.3);
+        
+        // Return a special format that we'll handle in rendering
+        return `custom:${hexColor}`;
+    }
+    
     const COLORS = [
         'bg-blue-100 dark:bg-blue-900/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200',
         'bg-green-100 dark:bg-green-900/50 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200',
@@ -561,6 +604,7 @@
             option.textContent = `${m.codigo} - ${m.nombre}`;
             option.dataset.credits = m.creditos;
             option.dataset.name = m.nombre;
+            option.dataset.color = m.color || ''; // Store materia's custom color
             select.appendChild(option);
         });
     }
@@ -681,6 +725,10 @@
             return;
         }
         
+        // Use materia's custom color if available, otherwise use assigned color
+        const materiaCustomColor = option.dataset.color;
+        const displayColor = materiaCustomColor ? convertCustomColor(materiaCustomColor) : getMateriaColor(codigo);
+        
         const clase = {
             id: `${codigo}-${section}-${Date.now()}`,
             codigo_materia: codigo,
@@ -689,14 +737,23 @@
             profesor: professor,
             bloques: timeBlocks,
             creditos: parseInt(option.dataset.credits) || 3,
-            color: getMateriaColor(codigo)
+            color: displayColor,
+            customColor: materiaCustomColor || null // Store original hex color for reference
         };
         
         registeredClasses.push(clase);
         storage.saveClase(clase);
         
         renderClassesList();
+        
+        // Save selected materia before reset
+        const selectedMateria = materiaSelect.value;
+        
         e.target.reset();
+        
+        // Restore selected materia for quick adding of multiple sections
+        materiaSelect.value = selectedMateria;
+        
         App.showAlert('Clase agregada', 'success');
     }
     
@@ -723,11 +780,86 @@
         });
         
         container.innerHTML = Object.values(groupedByMateria).map(materia => {
-            // Parse color classes: format is "bg-X dark:bg-X border-X dark:border-X text-X dark:text-X"
+            // Check if it's a custom color (hex) or Tailwind classes
+            const isCustomColor = materia.color && materia.color.startsWith('custom:');
+            let headerStyle = '';
+            let borderStyle = '';
+            let bgClasses = '';
+            let borderClasses = '';
+            let textClasses = '';
+            
+            if (isCustomColor) {
+                const hexColor = materia.color.replace('custom:', '');
+                // Parse hex to RGB for lighter/darker variants
+                const hex = hexColor.replace('#', '');
+                const r = parseInt(hex.substr(0, 2), 16);
+                const g = parseInt(hex.substr(2, 2), 16);
+                const b = parseInt(hex.substr(4, 2), 16);
+                
+                // Light mode: light background
+                const bgLight = `rgba(${r}, ${g}, ${b}, 0.15)`;
+                // Dark mode will use CSS variable
+                const bgDark = `rgba(${r}, ${g}, ${b}, 0.3)`;
+                const borderColor = hexColor;
+                const textColor = hexColor;
+                
+                // Use inline styles for custom colors
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                headerStyle = `style="background-color: ${isDark ? bgDark : bgLight}; border-color: ${borderColor};"`;
+                borderStyle = `style="border-color: ${borderColor};"`;
+                textClasses = ''; // Will use inline style
+                const textStyle = `style="color: ${isDark ? lightenColor(hexColor, 40) : hexColor};"`;
+                
+                return `
+            <div class="rounded-lg border overflow-hidden" ${borderStyle}>
+                <div class="px-3 py-2 border-b" ${headerStyle}>
+                    <p class="text-sm font-semibold" style="color: ${isDark ? lightenColor(hexColor, 40) : darkenColor(hexColor, 20)};">${materia.codigo}</p>
+                    <p class="text-xs opacity-75" style="color: ${isDark ? lightenColor(hexColor, 40) : darkenColor(hexColor, 20)};">${materia.nombre}</p>
+                </div>
+                <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                    ${materia.clases.map(c => `
+                        <div class="flex items-center justify-between px-3 py-2 ${c.disabled ? 'bg-gray-100 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-800'} hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm font-medium ${c.disabled ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-800 dark:text-gray-200'}">Sección ${c.seccion}</p>
+                                    ${c.disabled ? '<span class="text-xs bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded">Deshabilitada</span>' : ''}
+                                </div>
+                                ${c.profesor ? `<p class="text-xs text-gray-500 dark:text-gray-400">${c.profesor}</p>` : ''}
+                                <p class="text-xs text-gray-400 dark:text-gray-500 truncate">${formatBloques(c.bloques)}</p>
+                            </div>
+                            <div class="flex items-center gap-1 ml-2">
+                                <!-- Edit -->
+                                <button onclick="openEditClassModal('${c.id}')" class="text-gray-400 hover:text-accent-500 p-1" title="Editar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <!-- Toggle disable -->
+                                <button onclick="toggleClassDisabled('${c.id}')" class="${c.disabled ? 'text-green-500 hover:text-green-600' : 'text-gray-400 hover:text-yellow-500'} p-1" title="${c.disabled ? 'Habilitar' : 'Deshabilitar'}">
+                                    ${c.disabled ? 
+                                        '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>' :
+                                        '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>'
+                                    }
+                                </button>
+                                <!-- Delete -->
+                                <button onclick="removeClass('${c.id}')" class="text-gray-400 hover:text-red-500 p-1" title="Eliminar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+            }
+            
+            // Parse Tailwind color classes
             const colorParts = materia.color.split(' ');
-            const bgClasses = colorParts.filter(c => c.startsWith('bg-') || c.startsWith('dark:bg-')).join(' ');
-            const borderClasses = colorParts.filter(c => c.startsWith('border-') || c.startsWith('dark:border-')).join(' ');
-            const textClasses = colorParts.filter(c => c.startsWith('text-') || c.startsWith('dark:text-')).join(' ');
+            bgClasses = colorParts.filter(c => c.startsWith('bg-') || c.startsWith('dark:bg-')).join(' ');
+            borderClasses = colorParts.filter(c => c.startsWith('border-') || c.startsWith('dark:border-')).join(' ');
+            textClasses = colorParts.filter(c => c.startsWith('text-') || c.startsWith('dark:text-')).join(' ');
             
             return `
             <div class="rounded-lg border ${borderClasses} overflow-hidden">
