@@ -52,6 +52,15 @@ def create_app(config_name: str = None) -> Flask:
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(auth_bp)
     
+    # Context processor for global template variables
+    @app.context_processor
+    def inject_globals():
+        # VERCEL_GIT_COMMIT_SHA is provided by Vercel during deployment
+        commit_sha = os.environ.get('VERCEL_GIT_COMMIT_SHA', '')
+        return {
+            'commit_sha': commit_sha[:7] if commit_sha else 'dev'
+        }
+    
     # Register main route
     @app.route('/')
     def index():
