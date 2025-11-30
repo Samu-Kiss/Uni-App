@@ -1471,8 +1471,8 @@ METHOD:PUBLISH
 DTSTART:${formatDate(eventStart)}
 DTEND:${formatDate(eventEnd)}
 RRULE:FREQ=WEEKLY;UNTIL=${end.toISOString().replace(/[-:]/g, '').split('.')[0]}Z
-SUMMARY:${clase.codigo_materia} - ${clase.seccion}
-DESCRIPTION:${clase.nombre_materia}${clase.profesor ? '\\nProfesor: ' + clase.profesor : ''}
+SUMMARY:${clase.nombre_materia || clase.codigo_materia}
+DESCRIPTION:${clase.codigo_materia} - Sección ${clase.seccion}${clase.profesor ? '\\nProfesor: ' + clase.profesor : ''}
 END:VEVENT
 `;
             });
