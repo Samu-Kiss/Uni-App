@@ -482,14 +482,14 @@
     }
     
     const COLORS = [
-        'bg-blue-100 border-blue-300 text-blue-800',
-        'bg-green-100 border-green-300 text-green-800',
-        'bg-yellow-100 border-yellow-300 text-yellow-800',
-        'bg-purple-100 border-purple-300 text-purple-800',
-        'bg-pink-100 border-pink-300 text-pink-800',
-        'bg-indigo-100 border-indigo-300 text-indigo-800',
-        'bg-orange-100 border-orange-300 text-orange-800',
-        'bg-teal-100 border-teal-300 text-teal-800',
+        'bg-blue-100 dark:bg-blue-900/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200',
+        'bg-green-100 dark:bg-green-900/50 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200',
+        'bg-yellow-100 dark:bg-yellow-900/50 border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200',
+        'bg-purple-100 dark:bg-purple-900/50 border-purple-300 dark:border-purple-700 text-purple-800 dark:text-purple-200',
+        'bg-pink-100 dark:bg-pink-900/50 border-pink-300 dark:border-pink-700 text-pink-800 dark:text-pink-200',
+        'bg-indigo-100 dark:bg-indigo-900/50 border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-200',
+        'bg-orange-100 dark:bg-orange-900/50 border-orange-300 dark:border-orange-700 text-orange-800 dark:text-orange-200',
+        'bg-teal-100 dark:bg-teal-900/50 border-teal-300 dark:border-teal-700 text-teal-800 dark:text-teal-200',
     ];
     
     document.addEventListener('DOMContentLoaded', function() {
@@ -722,22 +722,29 @@
             groupedByMateria[c.codigo_materia].clases.push(c);
         });
         
-        container.innerHTML = Object.values(groupedByMateria).map(materia => `
-            <div class="rounded-lg border ${materia.color.split(' ')[1]} overflow-hidden">
-                <div class="${materia.color.split(' ')[0]} px-3 py-2 border-b ${materia.color.split(' ')[1]}">
-                    <p class="text-sm font-semibold ${materia.color.split(' ')[2]}">${materia.codigo}</p>
-                    <p class="text-xs opacity-75">${materia.nombre}</p>
+        container.innerHTML = Object.values(groupedByMateria).map(materia => {
+            // Parse color classes: format is "bg-X dark:bg-X border-X dark:border-X text-X dark:text-X"
+            const colorParts = materia.color.split(' ');
+            const bgClasses = colorParts.filter(c => c.startsWith('bg-') || c.startsWith('dark:bg-')).join(' ');
+            const borderClasses = colorParts.filter(c => c.startsWith('border-') || c.startsWith('dark:border-')).join(' ');
+            const textClasses = colorParts.filter(c => c.startsWith('text-') || c.startsWith('dark:text-')).join(' ');
+            
+            return `
+            <div class="rounded-lg border ${borderClasses} overflow-hidden">
+                <div class="${bgClasses} px-3 py-2 border-b ${borderClasses}">
+                    <p class="text-sm font-semibold ${textClasses}">${materia.codigo}</p>
+                    <p class="text-xs ${textClasses} opacity-75">${materia.nombre}</p>
                 </div>
-                <div class="divide-y divide-gray-100">
+                <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     ${materia.clases.map(c => `
-                        <div class="flex items-center justify-between px-3 py-2 ${c.disabled ? 'bg-gray-100 opacity-60' : 'bg-white'} hover:bg-gray-50">
+                        <div class="flex items-center justify-between px-3 py-2 ${c.disabled ? 'bg-gray-100 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-800'} hover:bg-gray-50 dark:hover:bg-gray-700">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2">
-                                    <p class="text-sm font-medium ${c.disabled ? 'text-gray-500 line-through' : 'text-gray-800'}">Sección ${c.seccion}</p>
-                                    ${c.disabled ? '<span class="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">Deshabilitada</span>' : ''}
+                                    <p class="text-sm font-medium ${c.disabled ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-800 dark:text-gray-200'}">Sección ${c.seccion}</p>
+                                    ${c.disabled ? '<span class="text-xs bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded">Deshabilitada</span>' : ''}
                                 </div>
-                                ${c.profesor ? `<p class="text-xs text-gray-500">${c.profesor}</p>` : ''}
-                                <p class="text-xs text-gray-400 truncate">${formatBloques(c.bloques)}</p>
+                                ${c.profesor ? `<p class="text-xs text-gray-500 dark:text-gray-400">${c.profesor}</p>` : ''}
+                                <p class="text-xs text-gray-400 dark:text-gray-500 truncate">${formatBloques(c.bloques)}</p>
                             </div>
                             <div class="flex items-center gap-1 ml-2">
                                 <!-- Edit -->
@@ -764,7 +771,7 @@
                     `).join('')}
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     }
     
     function removeClass(id) {
@@ -815,12 +822,26 @@
         editingClassId = null;
     }
     
-    function addEditTimeBlock(dia = 'L', inicio = '07:00', fin = '09:00') {
+    function addEditTimeBlock(dia = null, inicio = null, fin = null) {
         const container = document.getElementById('edit-time-blocks-container');
+        const existingBlocks = container.querySelectorAll('.edit-time-block');
+        
+        // If no params provided, copy from last block
+        if (dia === null && existingBlocks.length > 0) {
+            const lastBlock = existingBlocks[existingBlocks.length - 1];
+            inicio = lastBlock.querySelector('.edit-block-start').value || '07:00';
+            fin = lastBlock.querySelector('.edit-block-end').value || '09:00';
+            dia = 'L'; // Default to Monday for new blocks
+        } else {
+            dia = dia || 'L';
+            inicio = inicio || '07:00';
+            fin = fin || '09:00';
+        }
+        
         const block = document.createElement('div');
         block.className = 'edit-time-block flex items-center space-x-2';
         block.innerHTML = `
-            <select class="edit-block-day text-sm border-gray-300 rounded focus:ring-accent-500">
+            <select class="edit-block-day text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors">
                 <option value="L" ${dia === 'L' ? 'selected' : ''}>Lun</option>
                 <option value="M" ${dia === 'M' ? 'selected' : ''}>Mar</option>
                 <option value="W" ${dia === 'W' ? 'selected' : ''}>Mié</option>
@@ -828,9 +849,9 @@
                 <option value="V" ${dia === 'V' ? 'selected' : ''}>Vie</option>
                 <option value="S" ${dia === 'S' ? 'selected' : ''}>Sáb</option>
             </select>
-            <input type="time" class="edit-block-start text-sm border-gray-300 rounded focus:ring-accent-500" value="${inicio}">
-            <span class="text-gray-400">-</span>
-            <input type="time" class="edit-block-end text-sm border-gray-300 rounded focus:ring-accent-500" value="${fin}">
+            <input type="time" class="edit-block-start text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors" value="${inicio}">
+            <span class="text-gray-400 dark:text-gray-500">-</span>
+            <input type="time" class="edit-block-end text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors" value="${fin}">
             <button type="button" onclick="removeEditTimeBlock(this)" class="text-red-400 hover:text-red-600">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -882,10 +903,21 @@
     
     function addTimeBlock() {
         const container = document.getElementById('time-blocks-container');
+        const existingBlocks = container.querySelectorAll('.time-block');
+        
+        // Get hours from last block if exists
+        let startTime = '07:00';
+        let endTime = '09:00';
+        if (existingBlocks.length > 0) {
+            const lastBlock = existingBlocks[existingBlocks.length - 1];
+            startTime = lastBlock.querySelector('.block-start').value || '07:00';
+            endTime = lastBlock.querySelector('.block-end').value || '09:00';
+        }
+        
         const block = document.createElement('div');
         block.className = 'time-block flex items-center space-x-2';
         block.innerHTML = `
-            <select class="block-day text-xs border-gray-300 rounded focus:ring-accent-500">
+            <select class="block-day text-xs border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors">
                 <option value="L">Lun</option>
                 <option value="M">Mar</option>
                 <option value="W">Mié</option>
@@ -893,9 +925,9 @@
                 <option value="V">Vie</option>
                 <option value="S">Sáb</option>
             </select>
-            <input type="time" class="block-start text-xs border-gray-300 rounded focus:ring-accent-500" value="07:00">
-            <span class="text-gray-400">-</span>
-            <input type="time" class="block-end text-xs border-gray-300 rounded focus:ring-accent-500" value="09:00">
+            <input type="time" class="block-start text-xs border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors" value="${startTime}">
+            <span class="text-gray-400 dark:text-gray-500">-</span>
+            <input type="time" class="block-end text-xs border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-accent-500 transition-colors" value="${endTime}">
             <button type="button" onclick="removeTimeBlock(this)" class="text-red-400 hover:text-red-600">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -957,23 +989,23 @@
         const preferredContainer = document.getElementById('preferred-slots');
         
         if (preferences.blocked.length === 0) {
-            blockedContainer.innerHTML = '<p class="text-xs text-gray-400">Ninguna</p>';
+            blockedContainer.innerHTML = '<p class="text-xs text-gray-400 dark:text-gray-500">Ninguna</p>';
         } else {
             blockedContainer.innerHTML = preferences.blocked.map((f, i) => `
-                <div class="flex items-center justify-between text-xs bg-red-50 px-2 py-1 rounded">
+                <div class="flex items-center justify-between text-xs bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-1 rounded">
                     <span>${DAY_NAMES[f.dia]} ${f.hora_inicio}-${f.hora_fin}</span>
-                    <button onclick="removeFranja('blocked', ${i})" class="text-red-400 hover:text-red-600">×</button>
+                    <button onclick="removeFranja('blocked', ${i})" class="text-red-400 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">×</button>
                 </div>
             `).join('');
         }
         
         if (preferences.preferred.length === 0) {
-            preferredContainer.innerHTML = '<p class="text-xs text-gray-400">Ninguna</p>';
+            preferredContainer.innerHTML = '<p class="text-xs text-gray-400 dark:text-gray-500">Ninguna</p>';
         } else {
             preferredContainer.innerHTML = preferences.preferred.map((f, i) => `
-                <div class="flex items-center justify-between text-xs bg-green-50 px-2 py-1 rounded">
+                <div class="flex items-center justify-between text-xs bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded">
                     <span>${DAY_NAMES[f.dia]} ${f.hora_inicio}-${f.hora_fin}</span>
-                    <button onclick="removeFranja('preferred', ${i})" class="text-green-400 hover:text-green-600">×</button>
+                    <button onclick="removeFranja('preferred', ${i})" class="text-green-400 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300">×</button>
                 </div>
             `).join('');
         }
